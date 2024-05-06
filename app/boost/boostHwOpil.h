@@ -1,10 +1,12 @@
 /*
- * boostHw.h
+ * boostHwOpil.h
  *
+ *  Created on: 06.10.2023
+ *      Author: mguerreiro
  */
 
-#ifndef BOOST_HW_H_
-#define BOOST_HW_H_
+#ifndef BOOST_HW_OPIL_H_
+#define BOOST_HW_OPIL_H_
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -15,100 +17,91 @@
 //=============================================================================
 
 //=============================================================================
-/*------------------------------- Definitions -------------------------------*/
-//=============================================================================
-
-typedef void (*boostHwAdcIrqHandle_t)(void *ref);
-
-typedef struct{
-
-    void *intc;
-    boostHwAdcIrqHandle_t irqhandle;
-
-}boostHwInitConfig_t;
-
-//=============================================================================
-
-//=============================================================================
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-int32_t boostHwInitialize(boostHwInitConfig_t *config);
+int32_t boostHwOpilInitialize(void);
 //-----------------------------------------------------------------------------
-int32_t boostHwStatus(void);
+int32_t boostHwOpilStatus(void);
 //-----------------------------------------------------------------------------
-void boostHwStatusClear(void);
+void boostHwOpilStatusClear(void);
 //-----------------------------------------------------------------------------
-void boostHwSetPwmReset(uint32_t reset);
+void boostHwOpilSetPwmReset(uint32_t reset);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetPwmReset(void);
+uint32_t boostHwOpilGetPwmReset(void);
 //-----------------------------------------------------------------------------
-void boostHwSetPwmOutputEnable(uint32_t enable);
+void boostHwOpilSetPwmOutputEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetPwmOutputEnable(void);
+uint32_t boostHwOpilGetPwmOutputEnable(void);
 //-----------------------------------------------------------------------------
-void boostHwSetPwmOvfTriggerEnable(uint32_t enable);
+void boostHwOpilSetPwmOvfTriggerEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetPwmOvfTriggerEnable(void);
+uint32_t boostHwOpilGetPwmOvfTriggerEnable(void);
 //-----------------------------------------------------------------------------
-void boostHwSetPwmInv(uint32_t enable);
+void boostHwOpilSetPwmInv(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetPwmInv(void);
+uint32_t boostHwOpilGetPwmInv(void);
 //-----------------------------------------------------------------------------
-void boostHwSetPwmFrequency(uint32_t freq);
+void boostHwOpilSetPwmFrequency(uint32_t freq);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetPwmFrequency(void);
+uint32_t boostHwOpilGetPwmFrequency(void);
 //-----------------------------------------------------------------------------
-void boostHwSetPwmDuty(float duty);
+void boostHwOpilSetPwmDuty(float duty);
 //-----------------------------------------------------------------------------
-float boostHwGetPwmDuty(void);
+float boostHwOpilGetPwmDuty(void);
 //-----------------------------------------------------------------------------
-void boostHwSetPwmDeadTime(float deadtime);
+void boostHwOpilSetPwmDeadTime(float deadtime);
 //-----------------------------------------------------------------------------
-float boostHwGetPwmDeadTime(void);
+float boostHwOpilGetPwmDeadTime(void);
 //-----------------------------------------------------------------------------
-void boostHwSetAdcEnable(uint32_t enable);
+void boostHwOpilSetAdcEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetAdcEnable(void);
+uint32_t boostHwOpilGetAdcEnable(void);
 //-----------------------------------------------------------------------------
-void boostHwSetAdcManualTrigger(uint32_t trigger);
+void boostHwOpilSetAdcManualTrigger(uint32_t trigger);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetAdcManualTrigger(void);
+uint32_t boostHwOpilGetAdcManualTrigger(void);
 //-----------------------------------------------------------------------------
-void boostHwSetAdcInterruptEnable(uint32_t enable);
+void boostHwOpilSetAdcInterruptEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetAdcInterruptEnable(void);
+uint32_t boostHwOpilGetAdcInterruptEnable(void);
 //-----------------------------------------------------------------------------
-void boostHwSetAdcSpiFreq(uint32_t freq);
+void boostHwOpilSetAdcSpiFreq(uint32_t freq);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetAdcSpiFreq(void);
+uint32_t boostHwOpilGetAdcSpiFreq(void);
 //-----------------------------------------------------------------------------
-int32_t boostHwGetMeasurements(void *meas);
+int32_t boostHwOpilGetMeasurements(void *meas);
 //-----------------------------------------------------------------------------
-int32_t boostHwApplyOutputs(void *outputs, int32_t size);
+int32_t boostHwOpilApplyOutputs(void *outputs, int32_t size);
 //-----------------------------------------------------------------------------
-void boostHwDisable(void);
+void boostHwOpilDisable(void);
 //-----------------------------------------------------------------------------
-void boostHwEnable(void);
+void boostHwOpilEnable(void);
 //-----------------------------------------------------------------------------
-void boostHwControllerDisable(void);
+void boostHwOpilControllerDisable(void);
 //-----------------------------------------------------------------------------
-void boostHwControllerEnable(void);
+void boostHwOpilControllerEnable(void);
 //-----------------------------------------------------------------------------
-void boostHwSetInputRelay(uint32_t state);
+void boostHwOpilSetLoadSwitch(uint32_t state);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetInputRelay(void);
+uint32_t boostHwOpilGetLoadSwitch(void);
 //-----------------------------------------------------------------------------
-void boostHwSetOutputRelay(uint32_t state);
+void boostHwOpilSetOutputSwitch(uint32_t state);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetOutputRelay(void);
+uint32_t boostHwOpilGetOutputSwitch(void);
 //-----------------------------------------------------------------------------
-void boostHwSetMeasGains(boostConfigMeasGains_t *gains);
+void boostHwOpilSetMeasGains(boostConfigMeasGains_t *gains);
 //-----------------------------------------------------------------------------
-uint32_t boostHwGetMeasGains(boostConfigMeasGains_t *gains);
+uint32_t boostHwOpilGetMeasGains(boostConfigMeasGains_t *gains);
 //-----------------------------------------------------------------------------
-void boostHwShutDown(void);
+void boostHwOpilSetFilterCoef(float alpha);
+//-----------------------------------------------------------------------------
+float boostHwOpilGetFilterCoef(void);
+//-----------------------------------------------------------------------------
+float boostHwOpilExpMovAvg(float sample, float average);
+//-----------------------------------------------------------------------------
+void boostHwOpilShutDown(void);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-#endif /* BOOST_HW_H_ */
+#endif /* BOOST_HW_OPIL_H_ */

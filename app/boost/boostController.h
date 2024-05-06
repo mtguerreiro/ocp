@@ -18,6 +18,8 @@
 typedef enum{
 	BOOST_CONTROLLER_DISABLED,
     BOOST_CONTROLLER_STARTUP,
+	BOOST_CONTROLLER_ENERGYC,	  //added for new controller
+	BOOST_CONTROLLER_ENERGYCINT,  //added for new controller
 	BOOST_CONTROLLER_END
 }boostControllers_t;
 

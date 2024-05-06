@@ -47,6 +47,9 @@ static int32_t boostHwIfGetPwmOutputEnable(void *in, uint32_t insize, void **out
 static int32_t boostHwIfSetPwmOvfTriggerEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 static int32_t boostHwIfGetPwmOvfTriggerEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 
+static int32_t boostHwIfSetPwmInv(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+static int32_t boostHwIfGetPwmInv(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+
 static int32_t boostHwIfSetPwmFrequency(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 static int32_t boostHwIfGetPwmFrequency(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 
@@ -97,7 +100,10 @@ int32_t boostHwIfInitialize(void){
 
     rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_SET_PWM_OVF_TRIGGER_ENABLE, boostHwIfSetPwmOvfTriggerEnable);
     rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_GET_PWM_OVF_TRIGGER_ENABLE, boostHwIfGetPwmOvfTriggerEnable);
-
+//-------------------------------------------------------------------------------------------------------------------------------added by rodolfo
+    rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_SET_PWM_INV, boostHwIfSetPwmInv);
+    rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_GET_PWM_INV, boostHwIfGetPwmInv);
+//-------------------------------------------------------------------------------------------------------------------------------
     rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_SET_PWM_FREQ, boostHwIfSetPwmFrequency);
     rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_GET_PWM_FREQ, boostHwIfGetPwmFrequency);
 
@@ -241,6 +247,39 @@ static int32_t boostHwIfGetPwmOvfTriggerEnable(void *in, uint32_t insize, void *
 
     return 4;
 }
+//-----------------------------------------------------------------------------
+
+static int32_t boostHwIfSetPwmInv(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t enable;
+
+    enable = *( (uint32_t *)in ) & 0x01;
+
+#ifdef BOOST_HW_IF_CONFIG_OPIL
+    boostHwOpilSetPwmInv(enable);
+#else
+    boostHwSetPwmInv(enable);
+#endif
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+static int32_t boostHwIfGetPwmInv(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t *o = (uint32_t *)*out;
+    uint32_t enable;
+
+#ifdef BOOST_HW_IF_CONFIG_OPIL
+    enable = boostHwOpilGetPwmInv();
+#else
+    enable = boostHwGetPwmInv();
+#endif
+
+    *o = enable;
+
+    return 4;
+}
+
 //-----------------------------------------------------------------------------
 static int32_t boostHwIfSetPwmFrequency(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 

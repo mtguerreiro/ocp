@@ -24,10 +24,17 @@ typedef struct{
     float i_l;
     float i_l_avg;
     float i_o;
+
+
+
 }boostConfigMeasurements_t;
 
 typedef struct{
     float u;
+    float v_o_reference;
+    float e;
+    float e_reference;
+    float i_o_filt;
 }boostConfigControl_t;
 
 typedef struct{
@@ -54,33 +61,42 @@ typedef struct{
     float i_o_gain;
     float i_o_ofs;
 
+    float unit;
+
 }boostConfigMeasGains_t;
 
-#define BOOST_CONFIG_V_DC_IN_GAIN      (3.3f * (16.0f * 1.5f / 1.6416f) / 4095.0f)
-#define BOOST_CONFIG_V_DC_IN_OFFS      (0.0f)
 
-#define BOOST_CONFIG_V_DC_OUT_GAIN     (3.3f * (5.83f / 0.6f) / 4095.0f)
-#define BOOST_CONFIG_V_DC_OUT_OFFS     (0.0f)
+#define BOOST_CONFIG_V_DC_IN_GAIN      (float)((0.00804f))
+#define BOOST_CONFIG_V_DC_IN_OFFS      (float)((0.02395f))
 
-#define BOOST_CONFIG_V_OUT_GAIN        (3.3f * (5.83f / 0.5927f) / 4095.0f)
-#define BOOST_CONFIG_V_OUT_OFFS        (0.0f)
 
-#define BOOST_CONFIG_IL_GAIN           (3.3f * (5.9f / 3.9f) / 4095.0f / 50e-3)
-#define BOOST_CONFIG_IL_OFFS           (-(2.49f / 50e-3 + 1.4165f))
+#define BOOST_CONFIG_V_DC_OUT_GAIN      (float)((0.01215f))
+#define BOOST_CONFIG_V_DC_OUT_OFFS     (float)((0.03153f))
 
-#define BOOST_CONFIG_IL_AVG_GAIN       (3.3f * (5.9f / 3.9f) / 4095.0f / 50e-3)
-#define BOOST_CONFIG_IL_AVG_OFFS       (-(2.49f / 50e-3 + 0.8603f))
+#define BOOST_CONFIG_V_OUT_GAIN         (float)((0.01207f))
+#define BOOST_CONFIG_V_OUT_OFFS        (float)((0.02956f))
 
-#define BOOST_CONFIG_IO_AVG_GAIN       (0.0f)
-#define BOOST_CONFIG_IO_AVG_OFFS       (0.0f)
+#define BOOST_CONFIG_IL_GAIN            (float)((-0.02506f))
+#define BOOST_CONFIG_IL_OFFS           (float)((51.52f))
+
+#define BOOST_CONFIG_IL_AVG_GAIN        (float)((-0.02506f))
+#define BOOST_CONFIG_IL_AVG_OFFS       (float)((51.51f))
+
+#define BOOST_CONFIG_IO_AVG_GAIN        (float)((0.01164f))
+#define BOOST_CONFIG_IO_AVG_OFFS       (float)((-24.2f))
+
+
 
 #define BOOST_CONFIG_L                 ((float)(47e-6))
-#define BOOST_CONFIG_C                 ((float)(150e-6))
+#define BOOST_CONFIG_C                 ((float)(156.6e-6))
 
-#define BOOST_CONFIG_I_LIM             (10.0f)
-#define BOOST_CONFIG_V_LIM             (30.0f)
+#define BOOST_CONFIG_I_LIM             (10.0f) //originally 10
+#define BOOST_CONFIG_V_LIM             (30.0f) //originally 30
 
 #define BOOST_CONFIG_SHUTDOWN_U_DEC     0.005
+
+
+
 //=============================================================================
 
 #endif /* BOOST_CONFIG_H_ */

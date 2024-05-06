@@ -39,6 +39,8 @@ class Controllers:
         self.ctl = {
             0            : {'id':0, 'if':None},
             'startup'    : {'id':1, 'if':Startup()},
+            'energyc'    : {'id':2, 'if':Energyc()}, #added for new controller
+            'energycint' : {'id':3, 'if':Energycint()} #added for new controller
             }
 
 
@@ -63,6 +65,72 @@ class Startup:
         params = {
             'uinc': pars[0],
             'ufinal': pars[1]
+            }
+
+        return params
+
+class Energyc:    #added for new controller
+    def __init__(self):
+        pass
+    
+
+    def set(self, params):
+
+        L = params['L']
+        C = params['C']
+        K1 = params['K1']
+        K2 = params['K2']
+        #v_o_ref = params['v_o_ref']
+      
+        data = list(struct.pack('<ffff', L, C, K1, K2))
+        
+        return data
+    
+
+    def get(self, data):
+
+        pars = struct.unpack('<ffff', data)
+
+        params = {
+            'L': pars[0],
+            'C': pars[1],
+            'K1': pars[2],
+            'K2': pars[3]
+         #   'v_o_ref': pars[4]
+            
+            }
+
+        return params
+
+class Energycint:    #added for new controller
+    def __init__(self):
+        pass
+    
+
+    def set(self, params):
+
+        L = params['L']
+        C = params['C']
+        KI = params['KI']
+        K1 = params['K1']
+        K2 = params['K2']
+        alpha = params['alpha']
+        data = list(struct.pack('<ffffff', L, C, KI, K1, K2, alpha))
+        
+        return data
+    
+
+    def get(self, data):
+
+        pars = struct.unpack('<ffffff', data)
+
+        params = {
+            'L': pars[0],
+            'C': pars[1],
+            'KI': pars[2],
+            'K1': pars[3],
+            'K2': pars[4],
+            'alpha':pars[5]
             }
 
         return params

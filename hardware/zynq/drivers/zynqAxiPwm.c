@@ -98,6 +98,34 @@ uint32_t zynqAxiPwmOvfTriggerEnableRead(uint32_t pwmBase){
     return enable;
 }
 //-----------------------------------------------------------------------------
+//new functions for pwm inverter
+//-----------------------------------------------------------------------------
+
+void zynqAxiPwmInvWrite(uint32_t pwmBase, uint32_t enable){
+
+    uint32_t control;
+
+    enable = (enable & 0x01) << ZYNQ_AXI_PWM_INV_OFS;
+
+    control = zynqAxiPwmControlRead(pwmBase) & (~ZYNQ_AXI_PWM_INV_MASK);
+
+    control = control | enable;
+
+    zynqAxiPwmControlWrite(pwmBase, control);
+}
+//-----------------------------------------------------------------------------
+uint32_t zynqAxiPwmInvRead(uint32_t pwmBase){
+
+    uint32_t enable;
+
+    enable = zynqAxiPwmControlRead(pwmBase) & (ZYNQ_AXI_PWM_INV_MASK);
+
+    enable = enable >> ZYNQ_AXI_PWM_INV_OFS;
+
+    return enable;
+}
+
+//-----------------------------------------------------------------------------
 void zynqAxiPwmControlWrite(uint32_t pwmBase, uint32_t data){
     
     Xil_Out32(pwmBase + ZYNQ_AXI_PWM_CONTROL_REG_OFS, data);

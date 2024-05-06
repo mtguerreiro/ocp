@@ -42,7 +42,7 @@
 //#include "cukHw.h"
 //#include "cukConfig.h"
 
-//#include "cukOpil.h"
+#include "boostOpil.h"
 #include "boostController.h"
 
 #include "boostHwIf.h"
@@ -99,6 +99,7 @@ void ocpZynqCpu1AdcIrq(void *callbackRef);
 
 #define OCP_ZYNQ_C1_CONFIG_INPUT_BUF_SIZE           50
 #define OCP_ZYNQ_C1_CONFIG_OUTPUT_BUG_SIZE          20
+#define OCP_ZYNQ_C1_CONFIG_REFERENCE_BUF_SIZE       20
 //=============================================================================
 
 //=============================================================================
@@ -111,6 +112,7 @@ static float bInputs[OCP_ZYNQ_C1_CONFIG_INPUT_BUF_SIZE];
 static float bOutputs[OCP_ZYNQ_C1_CONFIG_OUTPUT_BUG_SIZE];
 
 static float texec = 0.0f;
+
 //=============================================================================
 
 //=============================================================================
@@ -223,6 +225,9 @@ static int32_t ocpZynqCpu1InitializeTracesMeasBoost(void){
 
     boostConfigMeasurements_t *meas;
     boostConfigControl_t *outputs;
+    //boostConfigReferences_t *references; //added
+
+
 
     /* Adds measurements to trace */
     meas = (boostConfigMeasurements_t *)bInputs;
@@ -236,10 +241,18 @@ static int32_t ocpZynqCpu1InitializeTracesMeasBoost(void){
 
     /* Adds control signals to trace */
     outputs = (boostConfigControl_t *)bOutputs;
-    //ocpTraceAddSignal(OCP_TRACE_1, &outputs->u, "Duty-cycle");
+    ocpTraceAddSignal(OCP_TRACE_1, &outputs->u, "Duty-cycle");
 
     /* Other signals to add */
+    ocpTraceAddSignal(OCP_TRACE_1, &outputs->v_o_reference, "Output voltage Reference");
+    ocpTraceAddSignal(OCP_TRACE_1, &outputs->e, "Energy");
+    ocpTraceAddSignal(OCP_TRACE_1, &outputs->e_reference, "Energy Reference");
+    ocpTraceAddSignal(OCP_TRACE_1, &outputs->i_o_filt, "Output current filtered");
+    /* Other signals to add */
+    //references = (boostConfigReferences_t *)bOutputs;
+    //ocpTraceAddSignal(OCP_TRACE_1, &references->v_o, "Reference");
     ocpTraceAddSignal(OCP_TRACE_1, &texec, "Exec. time");
+
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeControlSystem(void){
@@ -294,27 +307,29 @@ static int32_t ocpZynqCpu1InitializeControlSystemBoost(void){
     boostControllerInitialize(&boostconfig);
     boostHwIfInitialize();
 
+    boostHwSetPwmInv(1); //pwm_inv set by default
+
     /* Initializes control sys lib */
     config.binputs = (void *)bInputs;
     config.boutputs = (void *)bOutputs;
 
+
     config.fhwInterface = boostHwIf;
     config.fhwStatus = boostHwStatus;
-
-    //config.fgetInputs = boostOpilGetMeasurements;
+//for HW
     config.fgetInputs = boostHwGetMeasurements;
-
-    //config.fapplyOutputs = boostOpilUpdateControl;
     config.fapplyOutputs = boostHwApplyOutputs;
+    config.fenable = boostHwEnable;
+    config.fdisable = boostHwDisable;
+//for simulation
+    //config.fgetInputs = boostOpilGetMeasurements;
+    //config.fapplyOutputs = boostOpilUpdateControl;
+    //config.fenable = 0;
+    //config.fdisable = boostOpilDisable;
 
     config.frun = boostControllerRun;
     config.fcontrollerInterface = boostControllerInterface;
     config.fcontrollerStatus = boostControllerStatus;
-
-    config.fenable = boostHwEnable;
-    //config.fenable = 0;
-    config.fdisable = boostHwDisable;
-    //config.fdisable = cukOpilDisable;
 
     config.fonEntry = 0;
     config.fonExit = 0;
@@ -351,14 +366,14 @@ static int32_t ocpZynqCpu1InitializeInterfaceBoost(void){
     /* Initializes OPiL interface */
     ocpOpilConfig_t config;
 
-    config.updateMeas = 0;
-    config.updateSimData = 0;
+    config.updateMeas = boostOpilUpdateMeasurements;
+    config.updateSimData = boostOpilUpdateSimData;
 
     config.initControl = 0;
     config.runControl = ocpZynqCpu1AdcIrq;
 
-    config.getControl = 0;
-    config.getControllerData = 0;
+    config.getControl = boostOpilGetControl;
+    config.getControllerData = boostOpilGetControllerData;
 
     ocpOpilInitialize(&config);
 
