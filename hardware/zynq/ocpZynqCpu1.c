@@ -49,6 +49,12 @@
 #include "boostHw.h"
 #include "boostConfig.h"
 
+#include "buckController.h"
+
+#include "buckHwIf.h"
+#include "buckHw.h"
+#include "buckConfig.h"
+
 #include "zynqConfig.h"
 #include "zynqAxiAdc.h"
 
@@ -70,13 +76,19 @@ static int32_t ocpZynqCpu1InitializeTracesMeas(void);
 //-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeTracesMeasBoost(void);
 //-----------------------------------------------------------------------------
+static int32_t ocpZynqCpu1InitializeTracesMeasBuck(void);
+//-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeControlSystem(void);
 //-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeControlSystemBoost(void);
 //-----------------------------------------------------------------------------
+static int32_t ocpZynqCpu1InitializeControlSystemBuck(void);
+//-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeInterface(void);
 //-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeInterfaceBoost(void);
+//-----------------------------------------------------------------------------
+static int32_t ocpZynqCpu1InitializeInterfaceBuck(void);
 //-----------------------------------------------------------------------------
 void ocpZynqCpu1AdcIrq(void *callbackRef);
 //-----------------------------------------------------------------------------
@@ -124,8 +136,10 @@ void ocpZynqCpu1Initialize(void *intcInst){
 	ocpZynqCpu1InitializeHw(intcInst);
 //    ocpZynqCpu1InitializeControlSystem();
 //    ocpZynqCpu1InitializeInterface();
-    ocpZynqCpu1InitializeControlSystemBoost();
-    ocpZynqCpu1InitializeInterfaceBoost();
+//    ocpZynqCpu1InitializeControlSystemBoost();
+//    ocpZynqCpu1InitializeInterfaceBoost();
+    ocpZynqCpu1InitializeControlSystemBuck();
+    ocpZynqCpu1InitializeInterfaceBuck();
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -139,13 +153,15 @@ static int32_t ocpZynqCpu1InitializeHw(void *intcInst){
 
     /* Initialize Cuk's hardware */
     //cukHwInitConfig_t config;
-    boostHwInitConfig_t config;
+    //boostHwInitConfig_t config;
+    buckHwInitConfig_t config;
 
     config.intc = intcInst;
     config.irqhandle = ocpZynqCpu1AdcIrq;
 
     //cukHwInitialize(&config);
-    boostHwInitialize(&config);
+    //boostHwInitialize(&config);
+    buckHwInitialize(&config);
 
     /* Initialize timer for benchmarking */
     InitBenchmarking();
@@ -176,7 +192,9 @@ static int32_t ocpZynqCpu1InitializeTraces(void){
 
 	ocpTraceInitialize(OCP_TRACE_1, &config, "Main Trace");
 
-	ocpZynqCpu1InitializeTracesMeasBoost();
+	//ocpZynqCpu1InitializeTracesMeasBoost();
+
+	ocpZynqCpu1InitializeTracesMeasBuck();
 
 	return 0;
 }
@@ -237,6 +255,29 @@ static int32_t ocpZynqCpu1InitializeTracesMeasBoost(void){
     /* Adds control signals to trace */
     outputs = (boostConfigControl_t *)bOutputs;
     //ocpTraceAddSignal(OCP_TRACE_1, &outputs->u, "Duty-cycle");
+
+    /* Other signals to add */
+    ocpTraceAddSignal(OCP_TRACE_1, &texec, "Exec. time");
+}
+//-----------------------------------------------------------------------------
+static int32_t ocpZynqCpu1InitializeTracesMeasBuck(void){
+
+    buckConfigMeasurements_t *meas;
+    buckConfigControl_t *outputs;
+
+    /* Adds measurements to trace */
+    meas = (buckConfigMeasurements_t *)bInputs;
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_in, "Input voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc_in, "Input DC link");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc_out, "Output DC link");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_out, "Output voltage");
+
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_l, "Inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_o, "Output current current");
+
+    /* Adds control signals to trace */
+    outputs = (buckConfigControl_t *)bOutputs;
+    ocpTraceAddSignal(OCP_TRACE_1, &outputs->u, "Duty-cycle");
 
     /* Other signals to add */
     ocpTraceAddSignal(OCP_TRACE_1, &texec, "Exec. time");
@@ -324,6 +365,47 @@ static int32_t ocpZynqCpu1InitializeControlSystemBoost(void){
     return 0;
 }
 //-----------------------------------------------------------------------------
+static int32_t ocpZynqCpu1InitializeControlSystemBuck(void){
+
+    ocpCSConfig_t config;
+    buckControllerConfig_t buckconfig;
+
+    /* Initializes controller and hardware interface libs */
+    buckconfig.disable = buckHwControllerDisable;
+    buckconfig.enable = buckHwControllerEnable;
+    buckControllerInitialize(&buckconfig);
+    buckHwIfInitialize();
+
+    /* Initializes control sys lib */
+    config.binputs = (void *)bInputs;
+    config.boutputs = (void *)bOutputs;
+
+    config.fhwInterface = buckHwIf;
+    config.fhwStatus = buckHwStatus;
+
+    //config.fgetInputs = buckOpilGetMeasurements;
+    config.fgetInputs = buckHwGetMeasurements;
+
+    //config.fapplyOutputs = buckOpilUpdateControl;
+    config.fapplyOutputs = buckHwApplyOutputs;
+
+    config.frun = buckControllerRun;
+    config.fcontrollerInterface = buckControllerInterface;
+    config.fcontrollerStatus = buckControllerStatus;
+
+    config.fenable = buckHwEnable;
+    //config.fenable = 0;
+    config.fdisable = buckHwDisable;
+    //config.fdisable = buckOpilDisable;
+
+    config.fonEntry = 0;
+    config.fonExit = 0;
+
+    ocpCSInitialize(OCP_CS_1, &config, "Buck control");
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
 //static int32_t ocpZynqCpu1InitializeInterface(void){
 //
 //    /* Initializes OPiL interface */
@@ -347,6 +429,28 @@ static int32_t ocpZynqCpu1InitializeControlSystemBoost(void){
 //}
 //-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeInterfaceBoost(void){
+
+    /* Initializes OPiL interface */
+    ocpOpilConfig_t config;
+
+    config.updateMeas = 0;
+    config.updateSimData = 0;
+
+    config.initControl = 0;
+    config.runControl = ocpZynqCpu1AdcIrq;
+
+    config.getControl = 0;
+    config.getControllerData = 0;
+
+    ocpOpilInitialize(&config);
+
+    /* Initializes OCP interface */
+    ocpIfInitialize();
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+static int32_t ocpZynqCpu1InitializeInterfaceBuck(void){
 
     /* Initializes OPiL interface */
     ocpOpilConfig_t config;
