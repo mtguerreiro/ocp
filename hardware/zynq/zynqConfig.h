@@ -43,7 +43,7 @@
 
 /* Interrupts from PL to CPU1 */
 #define ZYNQ_CONFIG_IRQ_PL_TO_CPU1				61U
-
+#define ZYNQ_CONFIG_IRQ_PL_TO_CPU1_2            62U
 //-----------------------------------------------------------------------------
 /*
  * Next, memory definitions are given.

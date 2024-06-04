@@ -17,7 +17,9 @@ port = 8080
 host = '131.246.75.145'
 settings = {'host':host, 'port':port}
 
-buck = lrssoc.buck.buck.Buck(0, 'ethernet', settings, 0)
+buck = lrssoc.buck.buck.Buck(1, 'ethernet', settings, tr_id=1)
+
+boost = lrssoc.boost.boost.Boost(0, 'ethernet', settings, tr_id=0)
 
 #plot = lrssoc.buck.buck_plot.Plot()
 
