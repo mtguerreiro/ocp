@@ -182,6 +182,70 @@ class Boost:
     def startup_ctl_get_params(self):
 
         return self.get_controller_params('startup')
+
+#added for new controller
+    # ------------------------------------------------------------------------  
+    # -------------------------- Energyc controller --------------------------
+    # ------------------------------------------------------------------------
+    def energyc_ctl_enable(self, reset=False):
+
+        return self.enable_controller('energyc', reset=reset)
+    
+
+    def energyc_ctl_set_params(self, uinc=None, ufinal=None):
+
+        params = {}
+        if L is not None:
+            params['L'] = float(L)
+        if C is not None:
+            params['C'] = float(C)
+        if K1 is not None:
+            params['K1'] = float(K1)
+        if K2 is not None:
+            params['K2'] = float(K2)
+
+        return self.set_controller_params('energyc', params)
+
+
+    def energyc_ctl_get_params(self):
+
+        return self.get_controller_params('energyc')
+
+    
+ #added for new controller
+    # ------------------------------------------------------------------------  
+    # -------------------------- Energycint controller --------------------------
+    # ------------------------------------------------------------------------
+    def energycint_ctl_enable(self, reset=False):
+
+        return self.enable_controller('energycint', reset=reset)
+    
+
+    def energycint_ctl_set_params(self, uinc=None, ufinal=None):
+
+        params = {}
+        if L is not None:
+            params['L'] = float(L)
+        if C is not None:
+            params['C'] = float(C)
+        if KI is not None:
+            params['KI'] = float(KI)
+        if K1 is not None:
+            params['K1'] = float(K1)    
+        if K2 is not None:
+            params['K2'] = float(K2)
+        if alpha is not None:
+            params['alpha'] = float(alpha)
+
+        return self.set_controller_params('energycint', params)
+
+
+    def energycint_ctl_get_params(self):
+
+        return self.get_controller_params('energycint')
+    
+
+
     
     # ------------------------------------------------------------------------
     
@@ -282,7 +346,9 @@ class Boost:
 
     def plot(self, data, t=None, ax=None):
         self._plot.measurements(data, t)
-        
+
+    #def plot_raw(self, data, t=None, ax=None):
+     #   self._plot.measurements(data, t)   
 
     def plot_live(self, dt):
 
@@ -304,5 +370,66 @@ class Boost:
             self._plot.measurements(data, t, fig=fig)
             plt.pause(dt)
             self.reset_trace()
-            
+
+
+  
+
+        
+    def plot_compare( a, file1, file2, vector1, vector2, vectorref1, vectorref2, valueref1, valueref2, op1, op2, t1, t2):
+        # Load data from both files
+        data1 = np.loadtxt(file1, delimiter=',', skiprows=1)
+        data2 = np.loadtxt(file2, delimiter=',', skiprows=1)
+        vref1 = data1[:, vectorref1]  # Column corresponding to reference vector1
+        vref2 = data2[:, vectorref2]  # Column corresponding to reference vector2
+        
+        
+        # Find indices where the value is equal to valueref for file1 in the column vectorref1
+        i_1 = np.where(vref1 == valueref1)[0]
+        if len(i_1) > 0:
+            first1 = i_1[0]
+            print("In file1, the first value equal to ", valueref1, " is at i: ", first1)
+            new1 = data1[first1:, :]
+        else:
+            print("In file1, no value equal to ", valueref1, " was found on the specified column: ", vectorref1)
+        # Find indices where the value is equal to valueref for file2 in the column vectorref2
+        i_2 = np.where(vref2 == valueref2)[0]
+        if len(i_2) > 0:
+            first2 = i_2[0]
+            print("In file2, the first value equal to ", valueref2, " is at i: ", first2)
+            new2 = data2[first2:, :]
+        else:
+            print("In file2, no value equal to ", valueref2, " was found on the specified column: ", vectorref2)
+
+
+        #Plot
+        if (op1 == 0 and op2 == 0):
+            t_1 = 10e-6 * np.arange(new1[:, t1].shape[0]) #an array from 0 to the number of rows of new in microseconds
+            plt.plot(t_1[0:10000], new1[0:10000, vector1], label='Signal 1')
+            t_2 = 10e-6 * np.arange(new2[:, t2].shape[0]) #an array from 0 to the number of rows of new in microseconds
+            plt.plot(t_2[0:10000], new2[0:10000, vector2], label='Signal 2')
+        elif (op1 == 0 and op2 == 1): #signal1 converted from samples to time
+            plt.plot(new2[0:10000, t2], new2[0:10000, vector2], label='Signal 2')
+            t_1 = 10e-6 * np.arange(new1[:, 0].shape[0]) + new2[0, t2]
+            plt.plot(t_1[0:5000], new1[0:5000, vector1], label='Signal 1')
+        elif (op1 == 1 and op2 == 0):
+            plt.plot(new1[0:10000, t1], new1[0:10000, vector1], label='Signal 1')
+            t_2 = 10e-6 * np.arange(new2[:, 0].shape[0]) + new1[0, t1]
+            plt.plot(t_2[0:5000], new2[0:5000, vector2], label='Signal 2')
+        else:
+            print("At least one op must be 0")
+        plt.xlabel('Time (s)')
+        plt.ylabel('signal unit')
+        plt.title('Comparison of signal1 and signal2')
+        plt.legend()
+        plt.show()
+
+        # Example usage, we compare when from v_o_ref is 10 (valueref = 10), t1 and t2 are 0 always except the case when is included in a vector which is not the 0 vector
+        #d1 = 'sr_v_050424_1.csv'  v_o (vector1 = 2), v_o_ref (vectorref1 = 7), from plecs (op1 = 1), time vector (t1 = 0)        
+        #d2 = 'sr_r_050424_1.csv'  v_o (vector2 = 1), v_o_ref (vectorref2 = 6), from trace (op2 = 0), no time vector (t2 = 0)
+        #plot_compare( d1, d2, 2, 1, 7, 6, 10, 1, 0, 0, 0):
+
+
+
+        
+        
     # ========================================================================

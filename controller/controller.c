@@ -74,10 +74,10 @@ void controllerInitialize(void){
 	rpRegisterHandle(&controllers.interface.rp, CONTROLLER_IF_SET_PARAMS, controllerInterfaceSetControllerParams);
 
 	/* Register the available controllers */
-	controllers.initialize[CONTROLLER_PRPI] = prpictlInitialize;
-	controllers.setParams[CONTROLLER_PRPI] = prpictlSetParams;
-	controllers.getParams[CONTROLLER_PRPI] = prpictlGetParams;
-	controllers.run[CONTROLLER_PRPI] = prpictlRun;
+//	controllers.initialize[CONTROLLER_PRPI] = prpictlInitialize;
+//	controllers.setParams[CONTROLLER_PRPI] = prpictlSetParams;
+//	controllers.getParams[CONTROLLER_PRPI] = prpictlGetParams;
+//	controllers.run[CONTROLLER_PRPI] = prpictlRun;
 
 	/* Initializes all registered controllers */
 	for(k = 0; k < CONTROLLER_END; k++){

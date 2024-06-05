@@ -18,6 +18,8 @@
 /* Controllers */
 #include "boostControlDisabled.h"
 #include "boostControlStartup.h"
+#include "boostControlEnergyc.h"
+#include "boostControlEnergycint.h"
 
 //=============================================================================
 
@@ -152,6 +154,20 @@ static void boostControllerInitializeControllers(void){
     controllers.getParams[BOOST_CONTROLLER_STARTUP] = boostControlStartupGetParams;
     controllers.run[BOOST_CONTROLLER_STARTUP] = boostControlStartupRun;
     controllers.reset[BOOST_CONTROLLER_STARTUP] = boostControlStartupReset;
+
+
+    controllers.initialize[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycInitialize;
+    controllers.setParams[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycSetParams;
+    controllers.getParams[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycGetParams;
+    controllers.run[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycRun;
+    controllers.reset[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycReset;
+
+
+    controllers.initialize[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintInitialize;
+    controllers.setParams[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintSetParams;
+    controllers.getParams[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintGetParams;
+    controllers.run[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintRun;
+    controllers.reset[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintReset;
 
     /* Initializes all registered controllers */
     for(k = 0; k < BOOST_CONTROLLER_END; k++){

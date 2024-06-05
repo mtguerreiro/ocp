@@ -83,7 +83,7 @@
 #define ZYNQ_CONFIG_MEM_PL_TO_CPU1_SIZE			0x4000U
 
 /* RAM memory for scope data */
-#define ZYNQ_CONFIG_MEM_TRACE_ADR				0x00B00000U
+#define ZYNQ_CONFIG_MEM_TRACE_ADR				0x00C00000U
 #define ZYNQ_CONFIG_MEM_TRACE_SIZE_MAX			0x02800000U // 0x00A00000U
 //-----------------------------------------------------------------------------
 //=============================================================================

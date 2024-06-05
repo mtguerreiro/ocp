@@ -24,7 +24,7 @@ class Plot:
     """
     def __init__(self):
 
-        plt.style.use('seaborn-bright')
+        #plt.style.use('seaborn-bright')
         matplotlib.rcParams['mathtext.fontset'] = 'cm'
         matplotlib.rcParams['font.family'] = 'Times New Roman'
         matplotlib.rcParams.update({'font.size': 12})
@@ -37,6 +37,7 @@ class Plot:
         
         self._figsize_energy = (5,7)
         self._figsize_states = (9,7)
+        
         
         
     def measurements(self, data, t=None, fig=None):
@@ -53,7 +54,9 @@ class Plot:
             axes = fig.get_axes()
             
         axes[0].cla()
-        axes[0].step(t, data[:, 3], label='$i_l$', where='post', lw=self._lw)
+        axes[0].step(t, data[:, 4], label='$i_l$', where='post', lw=self._lw)
+        axes[0].step(t, data[:, 5], label='$i_{out}$', where='post', lw=self._lw)
+        axes[0].step(t, data[:, 10], label='$i_{out} filt$', where='post', lw=self._lw)
         axes[0].legend(loc='upper left', bbox_to_anchor=(1.01,1), borderaxespad=0, handlelength=0.75, handleheight=0.5, handletextpad=0.3, fontsize=self._l_fs)
         axes[0].grid()
         axes[0].set_ylabel('Current (A)', fontsize=self._l_fs)
@@ -64,9 +67,11 @@ class Plot:
         axes[1].step(t, data[:, 0], label='$V_{dc,in}$', where='post', lw=self._lw)
         axes[1].step(t, data[:, 1], label='$V_{dc,out}$', where='post', lw=self._lw)
         axes[1].step(t, data[:, 2], label='$V_{out}$', where='post', lw=self._lw)
+        axes[1].step(t, data[:, 7], label='$V_{out} reference$', where='post', lw=self._lw)
         axes[1].legend(loc='upper left', bbox_to_anchor=(1.01,1), borderaxespad=0, handlelength=0.75, handleheight=0.5, handletextpad=0.3, fontsize=self._l_fs)
         axes[1].grid()
         axes[1].set_ylabel('Voltage (V)', fontsize=self._l_fs)
         axes[1].set_title('Voltages', fontsize=self._title_fs)
 
         plt.tight_layout()
+        return fig

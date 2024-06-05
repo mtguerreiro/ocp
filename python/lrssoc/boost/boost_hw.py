@@ -53,6 +53,10 @@ class Commands:
         self.clear_status = 26
         self.get_status = 27
 
+        self.set_pwm_inv = 28  #added
+        self.get_pwm_inv = 29   #added
+
+
 """
 class MeasGains:
 
@@ -144,6 +148,15 @@ class Hw:
     def get_pwm_ovf_trigger_enable(self):
 
         return self._get_pwm_ovf_trigger_enable()
+
+    def set_pwm_inv(self, enable):
+
+        return self._set_pwm_inv(enable)
+
+
+    def get_pwm_inv(self):
+
+        return self._get_pwm_inv()
     
 
     def set_pwm_frequency(self, freq):
@@ -465,7 +478,57 @@ class Hw:
         enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
         
         return (0, enable)
-    
+
+
+    def _set_pwm_inv(self, enable):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """    
+        cmd = self._cmd.set_pwm_inv
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(enable, msb=False) )
+        
+        status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error setting PWM inv. Error code {:}\r\n'.format(status))
+            return (-1, status)
+        
+        return (0,)
+
+
+    def _get_pwm_inv(self):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """    
+        cmd = self._cmd.get_pwm_inv
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        
+        status, enable = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error getting PWM inv. Error code {:}\r\n'.format(status))
+            return (-1, status)
+
+        enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
+        
+        return (0, enable)   
 
     def _set_pwm_freq(self, freq):
         """

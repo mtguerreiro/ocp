@@ -26,6 +26,8 @@
 #define ZYNQ_AXI_PWM_OVF_TRIGGER_ENABLE_OFS     2
 #define ZYNQ_AXI_PWM_OVF_TRIGGER_ENABLE_MASK    (1 << ZYNQ_AXI_PWM_OVF_TRIGGER_ENABLE_OFS)
 
+#define ZYNQ_AXI_PWM_INV_OFS     3
+#define ZYNQ_AXI_PWM_INV_MASK    (1 << ZYNQ_AXI_PWM_INV_OFS)
 
 //=============================================================================
 
@@ -44,6 +46,10 @@ uint32_t zynqAxiPwmOutputEnableRead(uint32_t pwmBase);
 void zynqAxiPwmOvfTriggerEnableWrite(uint32_t pwmBase, uint32_t enable);
 //-----------------------------------------------------------------------------
 uint32_t zynqAxiPwmOvfTriggerEnableRead(uint32_t pwmBase);
+//-----------------------------------------------------------------------------
+void zynqAxiPwmInvWrite(uint32_t pwmBase, uint32_t enable);
+//-----------------------------------------------------------------------------
+uint32_t zynqAxiPwmInvRead(uint32_t pwmBase);
 //-----------------------------------------------------------------------------
 void zynqAxiPwmControlWrite(uint32_t pwmBase, uint32_t data);
 //-----------------------------------------------------------------------------
