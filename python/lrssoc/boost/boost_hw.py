@@ -53,8 +53,8 @@ class Commands:
         self.clear_status = 26
         self.get_status = 27
 
-        self.set_pwm_inv = 28  #added
-        self.get_pwm_inv = 29   #added
+        self.set_pwm_inv = 28
+        self.get_pwm_inv = 29
 
 
 """
@@ -148,6 +148,7 @@ class Hw:
     def get_pwm_ovf_trigger_enable(self):
 
         return self._get_pwm_ovf_trigger_enable()
+
 
     def set_pwm_inv(self, enable):
 
@@ -528,7 +529,8 @@ class Hw:
 
         enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
         
-        return (0, enable)   
+        return (0, enable)
+
 
     def _set_pwm_freq(self, freq):
         """

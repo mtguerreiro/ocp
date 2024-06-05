@@ -51,6 +51,10 @@ void buckHwSetPwmOvfTriggerEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
 uint32_t buckHwGetPwmOvfTriggerEnable(void);
 //-----------------------------------------------------------------------------
+void buckHwSetPwmInv(uint32_t enable);
+//-----------------------------------------------------------------------------
+uint32_t buckHwGetPwmInv(void);
+//-----------------------------------------------------------------------------
 void buckHwSetPwmFrequency(uint32_t freq);
 //-----------------------------------------------------------------------------
 uint32_t buckHwGetPwmFrequency(void);

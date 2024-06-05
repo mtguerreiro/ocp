@@ -133,6 +133,17 @@ uint32_t buckHwGetPwmOvfTriggerEnable(void){
     return zynqAxiPwmOvfTriggerEnableRead(BUCK_HW_CONFIG_PWM_BASE);
 }
 //-----------------------------------------------------------------------------
+void buckHwSetPwmInv(uint32_t enable){
+
+    zynqAxiPwmInvWrite(BUCK_HW_CONFIG_PWM_BASE, enable);
+}
+//-----------------------------------------------------------------------------
+uint32_t buckHwGetPwmInv(void){
+
+    return zynqAxiPwmInvRead(BUCK_HW_CONFIG_PWM_BASE);
+}
+//-----------------------------------------------------------------------------
+
 void buckHwSetPwmFrequency(uint32_t freq){
 
     uint32_t period;
@@ -422,6 +433,8 @@ static void buckHwInitializeAdc(void *intc, buckHwAdcIrqHandle_t irqhandle){
 static void buckHwInitializePwm(void){
 
     buckHwSetPwmReset(1);
+
+    buckHwSetPwmInv(1);
 
     buckHwSetPwmFrequency(BUCK_HW_CONFIG_PWM_FREQ_HZ);
     buckHwSetPwmDuty(0.0f);

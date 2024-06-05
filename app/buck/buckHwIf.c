@@ -47,6 +47,9 @@ static int32_t buckHwIfGetPwmOutputEnable(void *in, uint32_t insize, void **out,
 static int32_t buckHwIfSetPwmOvfTriggerEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 static int32_t buckHwIfGetPwmOvfTriggerEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 
+static int32_t buckHwIfSetPwmInv(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+static int32_t buckHwIfGetPwmInv(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+
 static int32_t buckHwIfSetPwmFrequency(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 static int32_t buckHwIfGetPwmFrequency(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 
@@ -97,6 +100,9 @@ int32_t buckHwIfInitialize(void){
 
     rpRegisterHandle(&hwControl.interface.rp, BUCK_HW_IF_SET_PWM_OVF_TRIGGER_ENABLE, buckHwIfSetPwmOvfTriggerEnable);
     rpRegisterHandle(&hwControl.interface.rp, BUCK_HW_IF_GET_PWM_OVF_TRIGGER_ENABLE, buckHwIfGetPwmOvfTriggerEnable);
+
+    rpRegisterHandle(&hwControl.interface.rp, BUCK_HW_IF_SET_PWM_INV, buckHwIfSetPwmInv);
+    rpRegisterHandle(&hwControl.interface.rp, BUCK_HW_IF_GET_PWM_INV, buckHwIfGetPwmInv);
 
     rpRegisterHandle(&hwControl.interface.rp, BUCK_HW_IF_SET_PWM_FREQ, buckHwIfSetPwmFrequency);
     rpRegisterHandle(&hwControl.interface.rp, BUCK_HW_IF_GET_PWM_FREQ, buckHwIfGetPwmFrequency);
@@ -235,6 +241,37 @@ static int32_t buckHwIfGetPwmOvfTriggerEnable(void *in, uint32_t insize, void **
     enable = buckHwOpilGetPwmOvfTriggerEnable();
 #else
     enable = buckHwGetPwmOvfTriggerEnable();
+#endif
+
+    *o = enable;
+
+    return 4;
+}
+//-----------------------------------------------------------------------------
+static int32_t buckHwIfSetPwmInv(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t enable;
+
+    enable = *( (uint32_t *)in ) & 0x01;
+
+#ifdef BUCK_HW_IF_CONFIG_OPIL
+    buckHwOpilSetPwmInv(enable);
+#else
+    buckHwSetPwmInv(enable);
+#endif
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+static int32_t buckHwIfGetPwmInv(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t *o = (uint32_t *)*out;
+    uint32_t enable;
+
+#ifdef BUCK_HW_IF_CONFIG_OPIL
+    enable = buckHwOpilGetPwmInv();
+#else
+    enable = buckHwGetPwmInv();
 #endif
 
     *o = enable;

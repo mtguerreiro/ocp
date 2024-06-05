@@ -381,8 +381,6 @@ static int32_t ocpZynqCpu1InitializeControlSystemBoost(void){
     boostControllerInitialize(&boostconfig);
     boostHwIfInitialize();
 
-    boostHwSetPwmInv(1); //pwm_inv set by default
-
     /* Initializes control sys lib */
     config.binputs = (void *)bInputs1;
     config.boutputs = (void *)bOutputs1;

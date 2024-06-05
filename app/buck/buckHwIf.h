@@ -450,6 +450,34 @@ typedef enum{
      */
     BUCK_HW_IF_GET_STATUS,
 
+    /**
+     * Command
+     *  ---------------------------------------
+     *  | SET PWM INV (uint32) | INV (uint32) |
+     *  ---------------------------------------
+     *
+     * Response
+     * No response
+     *
+     * Notes
+     * - INV should be either 0 or 1. PWM A and B outputs are XOR'ed with
+     *   the INV bit.
+     */
+    BUCK_HW_IF_SET_PWM_INV,
+
+    /**
+     * Command
+     *  ------------------------
+     *  | GET PWM INV (uint32) |
+     *  ------------------------
+     *
+     * Response
+     *  --------------------
+     *  | INV (uint32) |
+     *  --------------------
+     */
+    BUCK_HW_IF_GET_PWM_INV,
+
     BUCK_HW_IF_END
 }buckHwIfCommands_t;
 

@@ -449,38 +449,34 @@ typedef enum{
      *
      */
     BOOST_HW_IF_GET_STATUS,
-	   /**
-	     * Command
-	     *  ---------------------------------------------------------
-	     *  | SET PWM INV (uint32) | ENABLE (uint32) |
-	     *  ---------------------------------------------------------
-	     *
-	     * Response
-	     * No response
-	     *
-	     * Notes
-	     * - ENABLE should be either 0 or 1. A value of 1 enables generation of an
-	     *   overflow signal, generated when the PWM counter reaches the maximum
-	     *   value. A value of 0 disables generation of the overflow signal. This
-	     *   signal is used to trigger the ADC. Thus, if disabled, no ADC
-	     *   conversions will be triggered, even if the ADC is enabled.
-	     */
-	    BOOST_HW_IF_SET_PWM_INV,
 
-	    /**
-	     * Command
-	     *  ---------------------------------------
-	     *  | GET PWM INV (uint32) |
-	     *  ---------------------------------------
-	     *
-	     * Response
-	     *  -------------------------------
-	     *  | OVF INV (uint32) |
-	     *  -------------------------------
-	     */
-	    BOOST_HW_IF_GET_PWM_INV,
+    /**
+     * Command
+     *  ---------------------------------------
+     *  | SET PWM INV (uint32) | INV (uint32) |
+     *  ---------------------------------------
+     *
+     * Response
+     * No response
+     *
+     * Notes
+     * - INV should be either 0 or 1. PWM A and B outputs are XOR'ed with
+     *   the INV bit.
+     */
+    BOOST_HW_IF_SET_PWM_INV,
 
-
+    /**
+     * Command
+     *  ------------------------
+     *  | GET PWM INV (uint32) |
+     *  ------------------------
+     *
+     * Response
+     *  --------------------
+     *  | INV (uint32) |
+     *  --------------------
+     */
+    BOOST_HW_IF_GET_PWM_INV,
 
     BOOST_HW_IF_END
 }boostHwIfCommands_t;
