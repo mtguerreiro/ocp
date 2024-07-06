@@ -226,7 +226,7 @@ class EnergyInt:
 
         # Poles
         if method == 'approx':
-            zeta = -np.log(os) / np.sqrt(np.pi**2 + (np.log(os))**2)
+            zeta = -np.log(os/100) / np.sqrt(np.pi**2 + (np.log(os/100))**2)
             wn = 4/ts/zeta
 
             p1 = -zeta * wn + wn * np.sqrt(zeta**2 - 1, dtype=complex)
