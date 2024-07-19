@@ -25,13 +25,25 @@ typedef struct{
 
     float alpha;
 
+    boostConfigMeasGains_t gains;
+
 }boostHwControl_t;
 //=============================================================================
 
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
-static boostHwControl_t hwControl = {.status = 0, .alpha = 0.2f};
+static boostHwControl_t hwControl = {
+        .status = 0,
+        .alpha = 0.2f,
+        .gains = {.v_in_gain = BOOST_CONFIG_V_IN_GAIN, .v_in_ofs = BOOST_CONFIG_V_IN_OFFS,
+                  .v_dc_in_gain = BOOST_CONFIG_V_DC_IN_GAIN, .v_dc_in_ofs = BOOST_CONFIG_V_DC_IN_OFFS,
+                  .v_out_gain = BOOST_CONFIG_V_OUT_GAIN, .v_out_ofs = BOOST_CONFIG_V_OUT_OFFS,
+                  .v_dc_out_gain = BOOST_CONFIG_V_DC_OUT_GAIN, .v_dc_out_ofs = BOOST_CONFIG_V_DC_OUT_OFFS,
+                  .i_l_gain = BOOST_CONFIG_IL_GAIN, .i_l_ofs = BOOST_CONFIG_IL_OFFS,
+                  .i_o_gain = BOOST_CONFIG_IO_GAIN, .i_o_ofs = BOOST_CONFIG_IO_OFFS
+                  },
+};
 static float i_i_filt = 0.0f, i_1_filt = 0.0f, i_o_filt = 0.0f, i_2_filt = 0.0f;
 //=============================================================================
 
@@ -156,27 +168,36 @@ uint32_t boostHwOpilGetAdcSpiFreq(void){
 //-----------------------------------------------------------------------------
 int32_t boostHwOpilGetMeasurements(void *meas){
 
-    int32_t meassize;
+    boostConfigMeasurements_t *dst = (boostConfigMeasurements_t *)meas;
+    float *src = (float *)meas;
 
     boostConfigMeasurements_t *boostmeas;
 
     boostmeas = (boostConfigMeasurements_t *)meas;
 
-    meassize = boostOpilGetMeasurements(meas);
+    boostOpilGetMeasurements(meas);
+
+    /* Measurements */
+    dst->i_o =  hwControl.gains.i_o_gain * ((float)(*src++)) + hwControl.gains.i_o_ofs;
+    dst->i_l =  hwControl.gains.i_l_gain * ((float)(*src++)) + hwControl.gains.i_l_ofs;
+    dst->v_dc_in = hwControl.gains.v_dc_in_gain * ((float)(*src++)) + hwControl.gains.v_dc_in_ofs;
+    dst->v_in = hwControl.gains.v_in_gain * ((float)(*src++)) + hwControl.gains.v_in_ofs;
+    dst->v_dc_out = hwControl.gains.v_dc_out_gain * ((float)(*src++)) + hwControl.gains.v_dc_out_ofs;
+    dst->v_out  = hwControl.gains.v_out_gain * ((float)(*src++)) + hwControl.gains.v_out_ofs;
 
     /* Protection */
     if( (boostmeas->i_l > BOOST_CONFIG_I_LIM) || (boostmeas->i_o > BOOST_CONFIG_I_LIM) ) hwControl.status = 1;
-       if( (boostmeas->i_l < -BOOST_CONFIG_I_LIM) || (boostmeas->i_o < -BOOST_CONFIG_I_LIM) ) hwControl.status = 1;
+    if( (boostmeas->i_l < -BOOST_CONFIG_I_LIM) || (boostmeas->i_o < -BOOST_CONFIG_I_LIM) ) hwControl.status = 1;
 
-       if( (boostmeas->v_dc_in > BOOST_CONFIG_V_LIM) || (boostmeas->v_dc_out > BOOST_CONFIG_V_LIM) || (boostmeas->v_out > BOOST_CONFIG_V_LIM) ) hwControl.status = 1;
+    if( (boostmeas->v_dc_in > BOOST_CONFIG_V_LIM) || (boostmeas->v_dc_out > BOOST_CONFIG_V_LIM) || (boostmeas->v_out > BOOST_CONFIG_V_LIM) ) hwControl.status = 1;
 
-       if( hwControl.status != 0 ){
-           //boostHwSetPwmOutputEnable(0);
-//           boostHwShutDown();
-           return -1;
-       }
-       else
-           return sizeof(boostConfigMeasurements_t);
+    if( hwControl.status != 0 ){
+        //boostHwSetPwmOutputEnable(0);
+        //boostHwShutDown();
+       return -1;
+    }
+    else
+       return sizeof(boostConfigMeasurements_t);
 }
 //-----------------------------------------------------------------------------
 int32_t boostHwOpilApplyOutputs(void *outputs, int32_t size){

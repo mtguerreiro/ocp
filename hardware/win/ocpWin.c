@@ -24,11 +24,18 @@
 #include "../controller/controller.h"
 
 
-#include "cukOpil.h"
-#include "cukController.h"
+//#include "cukOpil.h"
+//#include "cukController.h"
+//
+//#include "cukHwIf.h"
+//#include "cukConfig.h"
 
-#include "cukHwIf.h"
-#include "cukConfig.h"
+#include "boostOpil.h"
+#include "boostHwOpil.h"
+#include "boostController.h"
+
+#include "boostHwIf.h"
+#include "boostConfig.h"
 
 //=============================================================================
 
@@ -110,38 +117,26 @@ static int32_t ocpWinInitializeTraces(void){
 //-----------------------------------------------------------------------------
 static int32_t ocpWinInitializeTracesMeas(void){
 
-    cukConfigMeasurements_t *meas;
-    cukConfigControl_t *outputs;
+    boostConfigMeasurements_t *meas;
+    boostConfigControl_t *outputs;
 
     /* Adds measurements to trace */
     meas = (cukConfigMeasurements_t *)bInputs;
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_i, "Input current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_1, "Primary inductor current");
     ocpTraceAddSignal(OCP_TRACE_1, &meas->v_in, "Input voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc, "DC link voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_1, "Primary coupling cap voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc_in, "Input DC link");
 
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_o, "Output current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_2, "Secondary inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc_out, "Output DC link");
     ocpTraceAddSignal(OCP_TRACE_1, &meas->v_out, "Output voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc_out, "Output DC link voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_2, "Secondary coupling cap voltage");
+
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_l, "Inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_o, "Output current");
 
     /* Adds control signals to trace */
     outputs = (cukConfigControl_t *)bOutputs;
     ocpTraceAddSignal(OCP_TRACE_1, &outputs->u, "Duty-cycle");
-    //ocpTraceAddSignal(OCP_TRACE_1, &outputs->sw_o, "Output switch");
 
     /* Other signals to add */
     ocpTraceAddSignal(OCP_TRACE_1, &texec, "Exec. time");
-
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_i_filt, "Ii filt");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_1_filt, "I1 filt");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_o_filt, "Io filt");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_2_filt, "I2 filt");
-
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->p_in, "Input power");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->p_out, "Output power");
 
     return 0;
 }
@@ -149,35 +144,35 @@ static int32_t ocpWinInitializeTracesMeas(void){
 static int32_t ocpWinInitializeControlSystem(void){
 
     ocpCSConfig_t config;
-    cukControllerConfig_t cukconfig;
+    boostControllerConfig_t boostconfig;
 
     /* Initializes controller and hardware interface libs */
-    cukconfig.disable = cukHwOpilControllerDisable;
-    cukconfig.enable = cukHwOpilControllerEnable;
-    cukControllerInitialize(&cukconfig);
-    cukHwIfInitialize();
+    boostconfig.disable = boostHwOpilControllerDisable;
+    boostconfig.enable = boostHwOpilControllerEnable;
+    boostControllerInitialize(&boostconfig);
+    boostHwIfInitialize();
 
     /* Initializes control sys lib */
     config.binputs = (void *)bInputs;
     config.boutputs = (void *)bOutputs;
 
-    config.fhwInterface = cukHwIf;
-    config.fhwStatus = cukHwOpilStatus;
+    config.fhwInterface = boostHwIf;
+    config.fhwStatus = boostHwOpilStatus;
 
-    config.fgetInputs = cukHwOpilGetMeasurements;//cukOpilGetMeasurements;
-    //config.fgetInputs = cukHwGetMeasurements;
+    config.fgetInputs = boostHwOpilGetMeasurements;
+    //config.fgetInputs = boostHwGetMeasurements;
 
-    config.fapplyOutputs = cukOpilUpdateControl;
-    //config.fapplyOutputs = cukHwApplyOutputs;
+    config.fapplyOutputs = boostOpilUpdateControl;
+    //config.fapplyOutputs = boostHwApplyOutputs;
 
-    config.frun = cukControllerRun;
-    config.fcontrollerInterface = cukControllerInterface;
-    config.fcontrollerStatus = cukControllerStatus;
+    config.frun = boostControllerRun;
+    config.fcontrollerInterface = boostControllerInterface;
+    config.fcontrollerStatus = boostControllerStatus;
 
-    //config.fenable = cukHwEnable;
+    //config.fenable = boostHwEnable;
     config.fenable = 0;
-    //config.fdisable = cukHwDisable;
-    config.fdisable = cukOpilDisable;
+    //config.fdisable = boostHwDisable;
+    config.fdisable = boostOpilDisable;
 
     config.fonEntry = 0;
     config.fonExit = 0;
@@ -192,14 +187,14 @@ static int32_t ocpWinInitializeInterface(void){
     /* Initializes OPiL interface */
     ocpOpilConfig_t config;
 
-    config.updateMeas = cukOpilUpdateMeasurements;
-    config.updateSimData = cukOpilUpdateSimData;
+    config.updateMeas = boostOpilUpdateMeasurements;
+    config.updateSimData = boostOpilUpdateSimData;
 
     config.initControl = 0;
     config.runControl = ocpWinAdcIrq;
 
-    config.getControl = cukOpilGetControl;
-    config.getControllerData = cukOpilGetControllerData;
+    config.getControl = boostOpilGetControl;
+    config.getControllerData = boostOpilGetControllerData;
 
     ocpOpilInitialize(&config);
 

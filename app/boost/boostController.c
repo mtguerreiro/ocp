@@ -18,8 +18,8 @@
 /* Controllers */
 #include "boostControlDisabled.h"
 #include "boostControlStartup.h"
-#include "boostControlEnergyc.h"
-#include "boostControlEnergycint.h"
+#include "boostControlEnergyInt.h"
+#include "boostControlEnergyMpc.h"
 
 //=============================================================================
 
@@ -155,19 +155,17 @@ static void boostControllerInitializeControllers(void){
     controllers.run[BOOST_CONTROLLER_STARTUP] = boostControlStartupRun;
     controllers.reset[BOOST_CONTROLLER_STARTUP] = boostControlStartupReset;
 
+    controllers.initialize[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntInitialize;
+    controllers.setParams[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntSetParams;
+    controllers.getParams[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntGetParams;
+    controllers.run[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntRun;
+    controllers.reset[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntReset;
 
-    controllers.initialize[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycInitialize;
-    controllers.setParams[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycSetParams;
-    controllers.getParams[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycGetParams;
-    controllers.run[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycRun;
-    controllers.reset[BOOST_CONTROLLER_ENERGYC] = boostControlEnergycReset;
-
-
-    controllers.initialize[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintInitialize;
-    controllers.setParams[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintSetParams;
-    controllers.getParams[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintGetParams;
-    controllers.run[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintRun;
-    controllers.reset[BOOST_CONTROLLER_ENERGYCINT] = boostControlEnergycintReset;
+    controllers.initialize[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcInitialize;
+    controllers.setParams[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcSetParams;
+    controllers.getParams[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcGetParams;
+    controllers.run[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcRun;
+    controllers.reset[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcReset;
 
     /* Initializes all registered controllers */
     for(k = 0; k < BOOST_CONTROLLER_END; k++){

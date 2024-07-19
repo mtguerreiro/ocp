@@ -503,7 +503,7 @@ static int32_t boostHwIfSetInputRelay(void *in, uint32_t insize, void **out, uin
     state = *( (uint32_t *)in );
 
 #ifdef BOOST_HW_IF_CONFIG_OPIL
-    boostHwOpilSetInputRelay(state);
+    //boostHwOpilSetInputRelay(state);
 #else
     boostHwSetInputRelay(state);
 #endif
@@ -514,10 +514,10 @@ static int32_t boostHwIfSetInputRelay(void *in, uint32_t insize, void **out, uin
 static int32_t boostHwIfGetInputRelay(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     uint32_t *o = (uint32_t *)*out;
-    uint32_t state;
+    uint32_t state = 0;
 
 #ifdef BOOST_HW_IF_CONFIG_OPIL
-    state = boostHwOpilGetInputRelay();
+    //state = boostHwOpilGetInputRelay();
 #else
     state = boostHwGetInputRelay();
 #endif
@@ -534,7 +534,7 @@ static int32_t boostHwIfSetOutputRelay(void *in, uint32_t insize, void **out, ui
     state = *( (uint32_t *)in );
 
 #ifdef BOOST_HW_IF_CONFIG_OPIL
-    boostHwOpilSetOutputRelay(state);
+    //boostHwOpilSetOutputRelay(state);
 #else
     boostHwSetOutputRelay(state);
 #endif
@@ -545,10 +545,10 @@ static int32_t boostHwIfSetOutputRelay(void *in, uint32_t insize, void **out, ui
 static int32_t boostHwIfGetOutputRelay(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     uint32_t *o = (uint32_t *)*out;
-    uint32_t state;
+    uint32_t state = 0;
 
 #ifdef BOOST_HW_IF_CONFIG_OPIL
-    state = boostHwOpilGetOutputRelay();
+    //state = boostHwOpilGetOutputRelay();
 #else
     state = boostHwGetOutputRelay();
 #endif

@@ -39,8 +39,8 @@ class Controllers:
         self.ctl = {
             0            : {'id':0, 'if':None},
             'startup'    : {'id':1, 'if':Startup()},
-            'energyc'    : {'id':2, 'if':Energyc()}, #added for new controller
-            'energycint' : {'id':3, 'if':Energycint()} #added for new controller
+            'energy_int' : {'id':2, 'if':EnergyInt()},
+            'energy_mpc' : {'id':3, 'if':EnergyMpc()},
             }
 
 
@@ -69,20 +69,20 @@ class Startup:
 
         return params
 
-class Energyc:    #added for new controller
+
+class EnergyInt:
     def __init__(self):
         pass
     
 
     def set(self, params):
 
-        L = params['L']
-        C = params['C']
-        K1 = params['K1']
-        K2 = params['K2']
-        #v_o_ref = params['v_o_ref']
-      
-        data = list(struct.pack('<ffff', L, C, K1, K2))
+        k1 = params['k1']
+        k2 = params['k2']
+        k3 = params['k3']
+        dt = params['dt']
+        
+        data = list(struct.pack('<ffff', k1, k2, k3, dt))
         
         return data
     
@@ -92,48 +92,76 @@ class Energyc:    #added for new controller
         pars = struct.unpack('<ffff', data)
 
         params = {
-            'L': pars[0],
-            'C': pars[1],
-            'K1': pars[2],
-            'K2': pars[3]
-         #   'v_o_ref': pars[4]
-            
+            'k1': pars[0],
+            'k2': pars[1],
+            'k3': pars[2],
+            'dt': pars[3],
             }
 
         return params
 
-class Energycint:    #added for new controller
+    
+    def gains(self, ts, os=5, method='approx', alpha=5.0, dt=1.0):
+
+        # Poles
+        if method == 'approx':
+            zeta = -np.log(os/100) / np.sqrt(np.pi**2 + (np.log(os/100))**2)
+            wn = 4/ts/zeta
+
+            p1 = -zeta * wn + wn * np.sqrt(zeta**2 - 1, dtype=complex)
+            p2 = np.conj(p1)
+            p3 = alpha * p1.real
+
+            poles = [p1, p2, p3]
+
+        elif method == 'bessel':
+            p1 = (-3.9668 + 3.7845j) / ts
+            p2 = np.conj(p1)
+            p3 = -5.0093 / ts
+
+        elif method == 'itae':
+            p1 = (-4.35 + 8.918j) / ts
+            p2 = np.conj(p1)
+            p3 = -5.913 / ts
+
+        else:
+            print('Unknown method')
+            return 0
+            
+        poles = [p1, p2, p3]
+        #print('Pole placement.\nMethod: {:}'.format(method))
+        #print('Poles: {:}'.format(poles))
+        
+        # Augmented model        
+        A = np.array([[ 0.0, 1.0, 0.0],
+                      [ 0.0, 0.0, 0.0],
+                      [-1.0, 0.0, 0.0]])
+
+        B = np.array([[0.0], [1.0], [0.0]])
+
+        # Gains
+        K = scipy.signal.place_poles(A, B, poles).gain_matrix.reshape(-1)
+
+        gains = {'k1':K[0], 'k2':K[1], 'k3':K[2], 'dt':dt}
+
+        #print('Gains: {:}'.format(gains))
+
+        return gains
+
+
+class EnergyMpc:
     def __init__(self):
         pass
     
 
     def set(self, params):
 
-        L = params['L']
-        C = params['C']
-        KI = params['KI']
-        K1 = params['K1']
-        K2 = params['K2']
-        alpha = params['alpha']
-        data = list(struct.pack('<ffffff', L, C, KI, K1, K2, alpha))
-        
-        return data
+        return []
     
 
     def get(self, data):
 
-        pars = struct.unpack('<ffffff', data)
-
-        params = {
-            'L': pars[0],
-            'C': pars[1],
-            'KI': pars[2],
-            'K1': pars[3],
-            'K2': pars[4],
-            'alpha':pars[5]
-            }
-
-        return params
+        return []
 
 
 class Controller:

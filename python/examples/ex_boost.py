@@ -18,7 +18,8 @@ import scipy.signal
 # --- Input ---
 port = 8080
 
-host = '131.246.75.192'
+#host = '131.246.75.192'
+host = '127.0.0.1'
 settings = {'host':host, 'port':port}
 
 boost = lrssoc.boost.boost.Boost(0, 'ethernet', settings, 0)
