@@ -39,7 +39,7 @@ class Controllers:
         self.ctl = {
             0            : {'id':0, 'if':None},
             'startup'    : {'id':1, 'if':Startup()},
-            'sfb_int'    : {'id':2, 'if':SFBINT()},
+            'sfb_int'    : {'id':2, 'if':SfbInt()},
             }
 
 
@@ -69,17 +69,17 @@ class Startup:
         return params
 
 
-class SFBINT:
+class SfbInt:
     def __init__(self, model_params={}):
 
         self._params = {}
 
-        self._params['V_in'] = 12
+        self._params['V_in'] = 30
 
         self._params['L'] = 47e-6
         self._params['Co'] = 150e-6
 
-        self._params['R_load'] = 3.34
+        self._params['R_load'] = 3.3
 
         for p, v in model_params.items():
             if p in self._params:
@@ -112,7 +112,7 @@ class SFBINT:
         return params
     
 
-    def params(self, ts, os, method='approx', dt=1/100e3, model_params={}):
+    def params(self, ts, os=5, method='approx', dt=1.0, model_params={}):
 
         for p, v in model_params.items():
             if p in self.params:
@@ -171,10 +171,10 @@ class SFBINT:
         poles = [p1, p2, p3]
 
         sys = control.ss(A, B, C, 0)
-        print('Pole placement.\nMethod: {:}'.format(method))
-        print('Poles: {:}'.format(poles))
-        print('Zeros: {:}'.format(sys.zeros()))
-        print('Open-loop poles: {:}'.format(sys.poles()))
+        #print('Pole placement.\nMethod: {:}'.format(method))
+        #print('Poles: {:}'.format(poles))
+        #print('Zeros: {:}'.format(sys.zeros()))
+        #print('Open-loop poles: {:}'.format(sys.poles()))
         
         # State feedback
         K = scipy.signal.place_poles(Aa, Ba, poles).gain_matrix[0]

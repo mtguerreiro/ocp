@@ -1,6 +1,14 @@
+/*
+ * @file dfilt.h
+ *
+ * @brief Digital filters.
+ *
+ * This library provides some implementations of digital filters.
+ *
+ */
 
-#ifndef BOOST_CONTROL_ENERGY_MPC_H_
-#define BOOST_CONTROL_ENERGY_MPC_H_
+#ifndef DFILT_H_
+#define DFILT_H_
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -18,20 +26,8 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void boostControlEnergyMpcInitialize(void);
-//-----------------------------------------------------------------------------
-int32_t boostControlEnergyMpcSetParams(void *params, uint32_t n);
-//-----------------------------------------------------------------------------
-int32_t boostControlEnergyMpcGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
-//-----------------------------------------------------------------------------
-int32_t boostControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
-//-----------------------------------------------------------------------------
-void boostControlEnergyMpcReset(void);
-//-----------------------------------------------------------------------------
-void boostControlEnergyMpcExit(void);
-//-----------------------------------------------------------------------------
-void boostControlEnergyMpcOpt(void);
+float dfiltExpMovAvg(float x, float y_1, float alpha);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-#endif /* BOOST_CONTROL_ENERGY_MPC_H_ */
+#endif /* DFILT_H_ */

@@ -478,6 +478,63 @@ typedef enum{
      */
     BOOST_HW_IF_GET_PWM_INV,
 
+    /**
+     * Command
+     *  --------------------------------------------------------------
+     *  | SET SCALED ADC INTERRUPT ENABLE (uint32) | ENABLE (uint32) |
+     *  --------------------------------------------------------------
+     *
+     * Response
+     * No response
+     *
+     * Notes
+     * - ENABLE should be either 0 or 1. A value of 1 enables generation of an
+     *   interrupt signal, and a value of 0 disables it.
+     */
+    BOOST_HW_IF_SET_ADC_SCALED_INT_ENABLE,
+
+    /**
+     * Command
+     *  --------------------------------------------
+     *  | GET ADC SCALED INTERRUPT ENABLE (uint32) |
+     *  --------------------------------------------
+     *
+     * Response
+     *  -------------------
+     *  | ENABLE (uint32) |
+     *  -------------------
+     */
+    BOOST_HW_IF_GET_ADC_SCALED_INT_ENABLE,
+
+    /**
+     * Command
+     *  --------------------------------------------------------------
+     *  | SET SCALED ADC INTERRUPT FACTOR (uint32) | FACTOR (uint32) |
+     *  --------------------------------------------------------------
+     *
+     * Response
+     * No response
+     *
+     * Notes
+     *  - The ADC scaled interrupt will be generated once every (FACTOR + 1)
+     *    ADC interrupts.
+     *
+     */
+    BOOST_HW_IF_SET_ADC_SCALED_INT_FACTOR,
+
+    /**
+     * Command
+     *  --------------------------------------------
+     *  | GET ADC SCALED INTERRUPT FACTOR (uint32) |
+     *  --------------------------------------------
+     *
+     * Response
+     *  -------------------
+     *  | FACTOR (uint32) |
+     *  -------------------
+     */
+    BOOST_HW_IF_GET_ADC_SCALED_INT_FACTOR,
+
     BOOST_HW_IF_END
 }boostHwIfCommands_t;
 

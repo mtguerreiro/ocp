@@ -44,6 +44,7 @@
 
 #include "boostOpil.h"
 #include "boostController.h"
+#include "boostControlEnergyMpc.h"
 
 #include "boostHwIf.h"
 #include "boostHw.h"
@@ -94,6 +95,8 @@ void ocpZynqCpu1AdcIrq(void *callbackRef);
 //-----------------------------------------------------------------------------
 void ocpZynqCpu1AdcIrq2(void *callbackRef);
 //-----------------------------------------------------------------------------
+void ocpZynqCpu1AdcIrqAux(void *callbackRef);
+//-----------------------------------------------------------------------------
 //=============================================================================
 
 //=============================================================================
@@ -132,6 +135,8 @@ static float bInputs2[OCP_ZYNQ_C1_CONFIG_INPUT_BUF_SIZE];
 static float bOutputs2[OCP_ZYNQ_C1_CONFIG_OUTPUT_BUG_SIZE];
 
 static float texec_boost = 0.0f, texec_buck = 0.0f;
+
+static float taux = 0.0f;
 //=============================================================================
 
 //=============================================================================
@@ -169,6 +174,7 @@ static int32_t ocpZynqCpu1InitializeHw(void *intcInst){
 
     boostHwConfig.intc = intcInst;
     boostHwConfig.irqhandle = ocpZynqCpu1AdcIrq;
+    boostHwConfig.auxirqhandle = ocpZynqCpu1AdcIrqAux;
 
     //cukHwInitialize(&config);
     boostHwInitialize(&boostHwConfig);
@@ -281,7 +287,7 @@ static int32_t ocpZynqCpu1InitializeTracesMeasBoost(void){
     ocpTraceAddSignal(OCP_TRACE_1, &meas->v_out, "Output voltage");
 
     ocpTraceAddSignal(OCP_TRACE_1, &meas->i_l, "Inductor current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_o, "Output current current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_o, "Output current");
 
     /* Adds control signals to trace */
     outputs = (boostConfigControl_t *)bOutputs1;
@@ -289,17 +295,7 @@ static int32_t ocpZynqCpu1InitializeTracesMeasBoost(void){
 
     /* Other signals to add */
     ocpTraceAddSignal(OCP_TRACE_1, &texec_boost, "Exec. time");
-
-    /* Other signals to add */
-    ocpTraceAddSignal(OCP_TRACE_1, &outputs->v_o_reference, "Output voltage Reference");
-    ocpTraceAddSignal(OCP_TRACE_1, &outputs->e, "Energy");
-    ocpTraceAddSignal(OCP_TRACE_1, &outputs->e_reference, "Energy Reference");
-    ocpTraceAddSignal(OCP_TRACE_1, &outputs->i_o_filt, "Output current filtered");
-
-    /* Other signals to add */
-    //references = (boostConfigReferences_t *)bOutputs;
-    //ocpTraceAddSignal(OCP_TRACE_1, &references->v_o, "Reference");
-    ocpTraceAddSignal(OCP_TRACE_1, &texec_boost, "Exec. time");
+    ocpTraceAddSignal(OCP_TRACE_1, &taux, "Exec. time aux");
     
     return 0;
 }
@@ -548,6 +544,17 @@ void ocpZynqCpu1AdcIrq2(void *callbackRef){
 
     ticks = ticks - GetTicks();
     texec_buck = TicksToS(ticks) / 1e-6;
+}
+//-----------------------------------------------------------------------------
+void ocpZynqCpu1AdcIrqAux(void *callbackRef){
+
+    static uint32_t ticks = 0;
+
+    ticks = GetTicks();
+
+    boostControlEnergyMpcOpt();
+
+    taux = TicksToS(ticks - GetTicks()) / 1e-6;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

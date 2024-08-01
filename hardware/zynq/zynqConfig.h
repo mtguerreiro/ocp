@@ -43,7 +43,13 @@
 
 /* Interrupts from PL to CPU1 */
 #define ZYNQ_CONFIG_IRQ_PL_TO_CPU1				61U
+#define ZYNQ_CONFIG_IRQ_PL_TO_CPU1_PRIO         (0U)
+
 #define ZYNQ_CONFIG_IRQ_PL_TO_CPU1_2            62U
+#define ZYNQ_CONFIG_IRQ_PL_TO_CPU1_2_PRIO       (16U)
+
+#define ZYNQ_CONFIG_IRQ_PL_TO_CPU1_3            63U
+#define ZYNQ_CONFIG_IRQ_PL_TO_CPU1_3_PRIO       (8U)
 //-----------------------------------------------------------------------------
 /*
  * Next, memory definitions are given.

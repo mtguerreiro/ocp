@@ -23,13 +23,18 @@
 //=============================================================================
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
-#define BOOST_HW_CONFIG_ADC_SPI_FREQ_HZ      ((uint32_t)10000000)
+#define BOOST_HW_CONFIG_ADC_SPI_FREQ_HZ      ((uint32_t)16666666)
 #define BOOST_HW_CONFIG_PWM_FREQ_HZ          ((uint32_t) 100000 )
 #define BOOST_HW_CONFIG_PWM_DEAD_TIME_NS     ((float) 200e-9 )
 #define BOOST_HW_CONFIG_PWM_BASE              XPAR_AXI_PWM_0_S00_AXI_BASEADDR //XPAR_LRSSOC_BD_AXI_PWM_1_0_BASEADDR
 #define BOOST_HW_CONFIG_ADC_BASE              XPAR_ADC_PSCTL_0_S00_AXI_BASEADDR
 
 #define BOOST_HW_CONFIG_IRQ_PL_CPU1           ZYNQ_CONFIG_IRQ_PL_TO_CPU1
+#define BOOST_HW_CONFIG_IRQ_PL_CPU1_PRIO      ZYNQ_CONFIG_IRQ_PL_TO_CPU1_PRIO
+
+#define BOOST_HW_CONFIG_IRQ_PL_CPU1_2         ZYNQ_CONFIG_IRQ_PL_TO_CPU1_2
+#define BOOST_HW_CONFIG_IRQ_PL_CPU1_2_PRIO    ZYNQ_CONFIG_IRQ_PL_TO_CPU1_2_PRIO
+
 #define BOOST_HW_CONFIG_ADC_BUFFER            ZYNQ_CONFIG_MEM_PL_TO_CPU1_ADR
 
 #define BOOST_HW_CONFIG_GPIO_ID               XPAR_AXI_GPIO_0_DEVICE_ID
@@ -66,7 +71,7 @@ typedef struct{
 //=============================================================================
 /*-------------------------------- Prototypes -------------------------------*/
 //=============================================================================
-static void boostHwInitializeAdc(void *intc, boostHwAdcIrqHandle_t irqhandle);
+static void boostHwInitializeAdc(void *intc, boostHwAdcIrqHandle_t irqhandle, boostHwAdcIrqHandle_t auxirqhandle);
 static void boostHwInitializePwm(void);
 static void boostHwInitializeGpio(void);
 static void boostHwInitializeMeasGains(void);
@@ -85,7 +90,7 @@ static float i_i_filt = 0.0f, i_1_filt = 0.0f, i_o_filt = 0.0f, i_2_filt = 0.0f;
 //-----------------------------------------------------------------------------
 int32_t boostHwInitialize(boostHwInitConfig_t *config){
 
-    boostHwInitializeAdc(config->intc, config->irqhandle);
+    boostHwInitializeAdc(config->intc, config->irqhandle, config->auxirqhandle);
     boostHwInitializePwm();
     boostHwInitializeGpio();
     boostHwInitializeMeasGains();
@@ -255,6 +260,26 @@ uint32_t boostHwGetAdcSpiFreq(void){
     return freq;
 }
 //-----------------------------------------------------------------------------
+void boostHwSetAdcScaledInterruptEnable(uint32_t enable){
+
+    zynqAxiAdcScaledInterruptEnableWrite(BOOST_HW_CONFIG_ADC_BASE, enable);
+}
+//-----------------------------------------------------------------------------
+uint32_t boostHwGetAdcScaledInterruptEnable(void){
+
+    return zynqAxiAdcScaledInterruptEnableRead(BOOST_HW_CONFIG_ADC_BASE);
+}
+//-----------------------------------------------------------------------------
+void boostHwSetAdcScaledInterruptFactor(uint32_t factor){
+
+    zynqAxiAdcScaledInterruptFactorWrite(BOOST_HW_CONFIG_ADC_BASE, factor);
+}
+//-----------------------------------------------------------------------------
+uint32_t boostHwGetAdcScaledInterruptFactor(void){
+
+    return zynqAxiAdcScaledInterruptFactorRead(BOOST_HW_CONFIG_ADC_BASE);
+}
+//-----------------------------------------------------------------------------
 int32_t boostHwGetMeasurements(void *meas){
 
     boostConfigMeasurements_t *dst;
@@ -294,8 +319,6 @@ int32_t boostHwApplyOutputs(void *outputs, int32_t size){
 
     boostHwSetPwmDuty(control->u);
 
-    //control->u = 0.5f;
-
     return 0;
 }
 //-----------------------------------------------------------------------------
@@ -321,7 +344,6 @@ void boostHwControllerDisable(void){
 void boostHwControllerEnable(void){
 
     boostHwSetPwmOutputEnable(1);
-    //boostHwSetPwmInv(1); starts as pwm inverted output
 }
 //-----------------------------------------------------------------------------
 void boostHwSetInputRelay(uint32_t state){
@@ -407,7 +429,7 @@ void boostHwShutDown(void){
 /*----------------------------- Static functions ----------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-static void boostHwInitializeAdc(void *intc, boostHwAdcIrqHandle_t irqhandle){
+static void boostHwInitializeAdc(void *intc, boostHwAdcIrqHandle_t irqhandle, boostHwAdcIrqHandle_t auxirqhandle){
 
     uint32_t clkdiv;
 
@@ -421,7 +443,9 @@ static void boostHwInitializeAdc(void *intc, boostHwAdcIrqHandle_t irqhandle){
 
     zynqAxiAdcBufferAddressWrite(BOOST_HW_CONFIG_ADC_BASE, BOOST_HW_CONFIG_ADC_BUFFER);
 
-    zynqAxiAdcInterruptConfig(intc, BOOST_HW_CONFIG_IRQ_PL_CPU1, irqhandle);
+    zynqAxiAdcInterruptConfig(intc, BOOST_HW_CONFIG_IRQ_PL_CPU1, ZYNQ_CONFIG_IRQ_PL_TO_CPU1_PRIO, irqhandle);
+
+    zynqAxiAdcInterruptConfig(intc, BOOST_HW_CONFIG_IRQ_PL_CPU1_2, ZYNQ_CONFIG_IRQ_PL_TO_CPU1_2_PRIO, auxirqhandle);
 
     zynqAxiAdcEnableWrite(BOOST_HW_CONFIG_ADC_BASE, 1);
 }
@@ -454,8 +478,8 @@ static void boostHwInitializeGpio(void){
 //-----------------------------------------------------------------------------
 static void boostHwInitializeMeasGains(void){
 
-    hwControl.gains.i_o_gain = BOOST_CONFIG_IO_AVG_GAIN;
-    hwControl.gains.i_o_ofs =  BOOST_CONFIG_IO_AVG_OFFS;
+    hwControl.gains.i_o_gain = BOOST_CONFIG_IO_GAIN;
+    hwControl.gains.i_o_ofs =  BOOST_CONFIG_IO_OFFS;
 
     hwControl.gains.i_l_gain = BOOST_CONFIG_IL_GAIN;
     hwControl.gains.i_l_ofs =  BOOST_CONFIG_IL_OFFS;

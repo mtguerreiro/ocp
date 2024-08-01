@@ -82,8 +82,8 @@ typedef struct{
 #define BUCK_CONFIG_IL_AVG_GAIN       (1.0f)
 #define BUCK_CONFIG_IL_AVG_OFFS       (0.0f)
 
-#define BUCK_CONFIG_I_LIM             (10.0f)
-#define BUCK_CONFIG_V_LIM             (30.0f)
+#define BUCK_CONFIG_I_LIM             (12.0f)
+#define BUCK_CONFIG_V_LIM             (55.0f)
 
 #define BUCK_CONFIG_SHUTDOWN_U_DEC     0.005
 //=============================================================================

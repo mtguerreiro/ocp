@@ -235,8 +235,8 @@ class Buck:
         if status != 0:
             return (-1, status)
 
-        t = 1 / freq * np.arange( len(trace_data[0]) )
-        trace_data = np.array(trace_data).T
+        t = 1 / freq * np.arange( len(trace_data[0]), dtype=np.float32 )
+        trace_data = np.array(trace_data, dtype=np.float32).T
         
         return (0, (traces, trace_data, t))
 

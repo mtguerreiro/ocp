@@ -33,9 +33,9 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void zynqAxiAdcInterruptConfig(void *intcInst, uint32_t intId, zynqAxiAdcIrqHandle_t handle){
+void zynqAxiAdcInterruptConfig(void *intcInst, uint32_t intId, uint8_t prio, zynqAxiAdcIrqHandle_t handle){
 
-    XScuGic_SetPriorityTriggerType(intcInst, intId, 0x00, 0x3);
+    XScuGic_SetPriorityTriggerType(intcInst, intId, prio, 0x3);
     XScuGic_Connect(intcInst, intId, (Xil_ExceptionHandler)handle, intcInst);
 
     XScuGic_Enable(intcInst, intId);
@@ -113,8 +113,56 @@ uint32_t zynqAxiAdcInterruptEnableRead(uint32_t adcBase){
     return enable;
 }
 //-----------------------------------------------------------------------------
+void zynqAxiAdcScaledInterruptEnableWrite(uint32_t adcBase, uint32_t enable){
+
+    uint32_t control;
+
+    enable = (enable & 0x01) << ZYNQ_AXI_ADC_SCALED_INT_ENABLE_OFS;
+
+    control = zynqAxiAdcControlRead(adcBase) & (~ZYNQ_AXI_ADC_SCALED_INT_ENABLE_MASK);
+
+    control = control | enable;
+
+    zynqAxiAdcControlWrite(adcBase, control);
+}
+//-----------------------------------------------------------------------------
+uint32_t zynqAxiAdcScaledInterruptEnableRead(uint32_t adcBase){
+
+    uint32_t enable;
+
+    enable = zynqAxiAdcControlRead(adcBase) & (ZYNQ_AXI_ADC_SCALED_INT_ENABLE_MASK);
+
+    enable = enable >> ZYNQ_AXI_ADC_SCALED_INT_ENABLE_OFS;
+
+    return enable;
+}
+//-----------------------------------------------------------------------------
+void zynqAxiAdcScaledInterruptFactorWrite(uint32_t adcBase, uint32_t factor){
+
+    uint32_t control;
+
+    factor = (factor << ZYNQ_AXI_ADC_SCALED_INT_FACTOR_OFS) & ZYNQ_AXI_ADC_SCALED_INT_FACTOR_MASK;
+
+    control = zynqAxiAdcControlRead(adcBase) & (~ZYNQ_AXI_ADC_SCALED_INT_FACTOR_MASK);
+
+    control = control | factor;
+
+    zynqAxiAdcControlWrite(adcBase, control);
+}
+//-----------------------------------------------------------------------------
+uint32_t zynqAxiAdcScaledInterruptFactorRead(uint32_t adcBase){
+
+    uint32_t factor;
+
+    factor = zynqAxiAdcControlRead(adcBase) & (ZYNQ_AXI_ADC_SCALED_INT_FACTOR_MASK);
+
+    factor = factor >> ZYNQ_AXI_ADC_SCALED_INT_FACTOR_OFS;
+
+    return factor;
+}
+//-----------------------------------------------------------------------------
 void zynqAxiAdcControlWrite(uint32_t adcBase, uint32_t data){
-    
+
     Xil_Out32(adcBase + ZYNQ_AXI_ADC_CONTROL_REG_OFS, data);
 }
 //-----------------------------------------------------------------------------

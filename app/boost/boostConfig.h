@@ -62,32 +62,32 @@ typedef struct{
 
 }boostConfigMeasGains_t;
 
-#define BOOST_CONFIG_V_IN_GAIN          (float)((0.008047f)) // still needs calibration
-#define BOOST_CONFIG_V_IN_OFFS          (float)((0.002216f)) // still needs calibration
+#define BOOST_CONFIG_V_IN_GAIN          0.008020949483123596f
+#define BOOST_CONFIG_V_IN_OFFS          0.011598827786870344f
 
-#define BOOST_CONFIG_V_DC_IN_GAIN       (float)((0.008047f))
-#define BOOST_CONFIG_V_DC_IN_OFFS       (float)((0.002216f))
+#define BOOST_CONFIG_V_DC_IN_GAIN       0.008028708880696712f
+#define BOOST_CONFIG_V_DC_IN_OFFS       0.00787639255415567f
 
-#define BOOST_CONFIG_V_DC_OUT_GAIN      (float)((0.01216f))
-#define BOOST_CONFIG_V_DC_OUT_OFFS      (float)((0.004624f))
+#define BOOST_CONFIG_V_DC_OUT_GAIN      0.012142125632366019f
+#define BOOST_CONFIG_V_DC_OUT_OFFS      0.003158288102495688f
 
-#define BOOST_CONFIG_V_OUT_GAIN         (float)((0.01209f))
-#define BOOST_CONFIG_V_OUT_OFFS         (float)((0.0003478f))
+#define BOOST_CONFIG_V_OUT_GAIN         0.012070524741706293f
+#define BOOST_CONFIG_V_OUT_OFFS         -0.0027503948329898127f
 
-#define BOOST_CONFIG_IL_GAIN            (float)((-0.02472f))
-#define BOOST_CONFIG_IL_OFFS            (float)((50.44f))
+#define BOOST_CONFIG_IL_GAIN            -0.024929819910083854f
+#define BOOST_CONFIG_IL_OFFS            50.853921803119505f
 
-#define BOOST_CONFIG_IL_AVG_GAIN        (float)((1.0f))
-#define BOOST_CONFIG_IL_AVG_OFFS        (float)((0.0f))
+#define BOOST_CONFIG_IL_AVG_GAIN        1.0f
+#define BOOST_CONFIG_IL_AVG_OFFS        0.0f
 
-#define BOOST_CONFIG_IO_GAIN            (float)((0.01177f))
-#define BOOST_CONFIG_IO_OFFS            (float)((-24.19f))
+#define BOOST_CONFIG_IO_GAIN            0.011056216067557635f
+#define BOOST_CONFIG_IO_OFFS            -22.730251335732746f
 
 #define BOOST_CONFIG_L                 ((float)(47e-6))
 #define BOOST_CONFIG_C                 ((float)(156.6e-6))
 
-#define BOOST_CONFIG_I_LIM             (20.0f)
-#define BOOST_CONFIG_V_LIM             (60.0f)
+#define BOOST_CONFIG_I_LIM             (25.0f)
+#define BOOST_CONFIG_V_LIM             (50.0f)
 
 #define BOOST_CONFIG_SHUTDOWN_U_DEC     0.005
 //=============================================================================

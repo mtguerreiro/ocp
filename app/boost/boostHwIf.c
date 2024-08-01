@@ -82,6 +82,12 @@ static int32_t boostHwIfGetMeasGains(void *in, uint32_t insize, void **out, uint
 
 static int32_t boostHwIfClearStatus(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 static int32_t boostHwIfGetStatus(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+
+static int32_t boostHwIfSetAdcScaledInterruptEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+static int32_t boostHwIfGetAdcScaledInterruptEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+
+static int32_t boostHwIfSetAdcScaledInterruptFactor(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+static int32_t boostHwIfGetAdcScaledInterruptFactor(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //=============================================================================
 
 //=============================================================================
@@ -136,6 +142,12 @@ int32_t boostHwIfInitialize(void){
 
     rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_CLEAR_STATUS, boostHwIfClearStatus);
     rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_GET_STATUS, boostHwIfGetStatus);
+
+    rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_SET_ADC_SCALED_INT_ENABLE, boostHwIfSetAdcScaledInterruptEnable);
+    rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_GET_ADC_SCALED_INT_ENABLE, boostHwIfGetAdcScaledInterruptEnable);
+
+    rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_SET_ADC_SCALED_INT_FACTOR, boostHwIfSetAdcScaledInterruptFactor);
+    rpRegisterHandle(&hwControl.interface.rp, BOOST_HW_IF_GET_ADC_SCALED_INT_FACTOR, boostHwIfGetAdcScaledInterruptFactor);
 
     return 0;
 }
@@ -492,6 +504,68 @@ static int32_t boostHwIfGetAdcSpiFreq(void *in, uint32_t insize, void **out, uin
 #endif
 
     *o = freq;
+
+    return 4;
+}
+//-----------------------------------------------------------------------------
+static int32_t boostHwIfSetAdcScaledInterruptEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t enable;
+
+    enable = *( (uint32_t *)in ) & 0x01;
+
+#ifdef BOOST_HW_IF_CONFIG_OPIL
+    //boostHwOpilSetAdcScaledInterruptEnable(enable);
+#else
+    boostHwSetAdcScaledInterruptEnable(enable);
+#endif
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+static int32_t boostHwIfGetAdcScaledInterruptEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t *o = (uint32_t *)*out;
+    uint32_t enable;
+
+#ifdef BOOST_HW_IF_CONFIG_OPIL
+    //enable = boostHwOpilGetAdcScaledInterruptEnable();
+#else
+    enable = boostHwGetAdcScaledInterruptEnable();
+#endif
+
+    *o = enable;
+
+    return 4;
+}
+//-----------------------------------------------------------------------------
+static int32_t boostHwIfSetAdcScaledInterruptFactor(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t factor;
+
+    factor = *( (uint32_t *)in );
+
+#ifdef BOOST_HW_IF_CONFIG_OPIL
+    //boostHwOpilSetAdcScaledInterruptFactor(factor);
+#else
+    boostHwSetAdcScaledInterruptFactor(factor);
+#endif
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+static int32_t boostHwIfGetAdcScaledInterruptFactor(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t *o = (uint32_t *)*out;
+    uint32_t factor;
+
+#ifdef BOOST_HW_IF_CONFIG_OPIL
+    //factor = boostHwOpilGetAdcScaledInterruptFactor();
+#else
+    factor = boostHwGetAdcScaledInterruptFactor();
+#endif
+
+    *o = factor;
 
     return 4;
 }

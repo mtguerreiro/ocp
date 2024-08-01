@@ -39,7 +39,7 @@ class Controllers:
         self.ctl = {
             0            : {'id':0, 'if':None},
             'startup'    : {'id':1, 'if':Startup()},
-            'energy_int' : {'id':2, 'if':EnergyInt()},
+            'energy_sfb' : {'id':2, 'if':EnergySfb()},
             'energy_mpc' : {'id':3, 'if':EnergyMpc()},
             }
 
@@ -70,38 +70,46 @@ class Startup:
         return params
 
 
-class EnergyInt:
+class EnergySfb:
     def __init__(self):
         pass
     
 
     def set(self, params):
 
-        k1 = params['k1']
-        k2 = params['k2']
-        k3 = params['k3']
-        dt = params['dt']
+        k1 =        params['k1']
+        k2 =        params['k2']
+        k3 =        params['k3']
+        dt =        params['dt']
+        C  =        params['C']
+        L  =        params['L']
+        alpha =     params['alpha']
+        filt_en =   params['filt_en']
         
-        data = list(struct.pack('<ffff', k1, k2, k3, dt))
+        data = list(struct.pack('<ffffffff', k1, k2, k3, dt, C, L, alpha, filt_en))
         
         return data
     
 
     def get(self, data):
 
-        pars = struct.unpack('<ffff', data)
+        pars = struct.unpack('<ffffffff', data)
 
         params = {
-            'k1': pars[0],
-            'k2': pars[1],
-            'k3': pars[2],
-            'dt': pars[3],
+            'k1':       pars[0],
+            'k2':       pars[1],
+            'k3':       pars[2],
+            'dt':       pars[3],
+            'C':        pars[4],
+            'L':        pars[5],
+            'alpha':    pars[6],
+            'filt_en':  pars[7]
             }
 
         return params
 
     
-    def gains(self, ts, os=5, method='approx', alpha=5.0, dt=1.0):
+    def params(self, ts, os=5, method='approx', alpha=5.0, dt=1.0):
 
         # Poles
         if method == 'approx':
@@ -156,12 +164,30 @@ class EnergyMpc:
 
     def set(self, params):
 
-        return []
+        L = params['L']
+        C = params['C']
+        alpha = params['alpha']
+        filt_en = params['filt_en']
+        il_lim = params['il_lim']
+        
+        data = list(struct.pack('<fffff', L, C, alpha, filt_en, il_lim))
+        
+        return data
     
 
     def get(self, data):
 
-        return []
+        pars = struct.unpack('<fffff', data)
+
+        params = {
+            'L': pars[0],
+            'C': pars[1],
+            'alpha': pars[2],
+            'filt_en': pars[3],
+            'il_lim': pars[4]
+            }
+
+        return params
 
 
 class Controller:

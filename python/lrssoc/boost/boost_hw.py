@@ -56,6 +56,12 @@ class Commands:
         self.set_pwm_inv = 28
         self.get_pwm_inv = 29
 
+        self.set_adc_scaled_int_enable = 30
+        self.get_adc_scaled_int_enable = 31
+
+        self.set_adc_scaled_int_factor = 32
+        self.get_adc_scaled_int_factor = 33
+
 
 """
 class MeasGains:
@@ -269,6 +275,30 @@ class Hw:
         
         return (status, int(freq))
 
+
+    def set_adc_scaled_int_enable(self, enable):
+        """Enables scaled ADC interrupt.
+        """
+        return self._set_adc_scaled_int_enable(int(enable))
+
+
+    def get_adc_scaled_int_enable(self):
+        """Gets ADC scaled interrupt status.
+        """
+        return self._get_adc_scaled_int_enable()
+
+
+    def set_adc_scaled_int_factor(self, factor):
+        """Sets scaling factor of scaled ADC interrupt.
+        """
+        return self._set_adc_scaled_int_factor(int(factor))
+
+
+    def get_adc_scaled_int_factor(self):
+        """Gets scaling factor of scaled ADC interrupt.
+        """
+        return self._get_adc_scaled_int_factor()
+    
 
     def set_input_relay(self, state):
         """Sets the input relay.
@@ -887,7 +917,109 @@ class Hw:
         freq = lrssoc.conversions.u8_to_u32(freq, msb=False)
         
         return (0, freq)
+    
 
+    def _set_adc_scaled_int_enable(self, enable):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """
+        cmd = self._cmd.set_adc_scaled_int_enable
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(enable, msb=False) )
+        
+        status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error setting scaled ADC int enable. Error code {:}\r\n'.format(status))
+            return (-1, status)
+        
+        return (0,)
+    
+
+    def _get_adc_scaled_int_enable(self):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """
+        cmd = self._cmd.get_adc_scaled_int_enable
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        
+        status, enable = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error getting scaled ADC int enable. Error code {:}\r\n'.format(status))
+            return (-1, status)
+        
+        enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
+        
+        return (0, enable)
+    
+
+    def _set_adc_scaled_int_factor(self, factor):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """
+        cmd = self._cmd.set_adc_scaled_int_factor
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(factor, msb=False) )
+        
+        status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error setting scaled ADC interrupt factor. Error code {:}\r\n'.format(status))
+            return (-1, status)
+        
+        return (0,)
+
+
+    def _get_adc_scaled_int_factor(self):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """
+        cmd = self._cmd.get_adc_scaled_int_factor
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        
+        status, factor = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error getting scaled ADC interrupt factor. Error code {:}\r\n'.format(status))
+            return (-1, status)
+
+        factor = lrssoc.conversions.u8_to_u32(factor, msb=False)
+        
+        return (0, factor)
+    
 
     def _set_input_relay(self, state):
         """

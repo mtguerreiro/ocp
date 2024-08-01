@@ -30,6 +30,7 @@
 #define CUK_HW_CONFIG_ADC_BASE              XPAR_ADC_PSCTL_0_S00_AXI_BASEADDR
 
 #define CUK_HW_CONFIG_IRQ_PL_CPU1           ZYNQ_CONFIG_IRQ_PL_TO_CPU1
+#define CUK_HW_CONFIG_IRQ_PL_CPU1_PRIO      ZYNQ_CONFIG_IRQ_PL_TO_CPU1_PRIO
 #define CUK_HW_CONFIG_ADC_BUFFER            ZYNQ_CONFIG_MEM_PL_TO_CPU1_ADR
 
 #define CUK_HW_CONFIG_GPIO_ID               XPAR_AXI_GPIO_0_DEVICE_ID
@@ -477,7 +478,7 @@ static void cukHwInitializeAdc(void *intc, cukHwAdcIrqHandle_t irqhandle){
 
     zynqAxiAdcBufferAddressWrite(CUK_HW_CONFIG_ADC_BASE, CUK_HW_CONFIG_ADC_BUFFER);
 
-    zynqAxiAdcInterruptConfig(intc, CUK_HW_CONFIG_IRQ_PL_CPU1, irqhandle);
+    zynqAxiAdcInterruptConfig(intc, CUK_HW_CONFIG_IRQ_PL_CPU1, ZYNQ_CONFIG_IRQ_PL_TO_CPU1_PRIO, irqhandle);
 
     zynqAxiAdcEnableWrite(CUK_HW_CONFIG_ADC_BASE, 1);
 }

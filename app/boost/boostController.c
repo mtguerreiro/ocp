@@ -28,6 +28,7 @@
 //=============================================================================
 typedef void(*controllerInit)(void);
 typedef void(*controllerReset)(void);
+typedef void(*controllerDisable)(void);
 typedef int32_t(*controllerSP)(void *in, uint32_t insize);
 typedef int32_t(*controllerGP)(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
 typedef int32_t(*controllerR)(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
@@ -44,6 +45,7 @@ typedef struct{
 	controllerGP getParams[BOOST_CONTROLLER_END];
 	controllerR run[BOOST_CONTROLLER_END];
 	controllerReset reset[BOOST_CONTROLLER_END];
+	controllerDisable exit[BOOST_CONTROLLER_END];
 
 	uint32_t active;
 
@@ -148,24 +150,28 @@ static void boostControllerInitializeControllers(void){
     controllers.getParams[BOOST_CONTROLLER_DISABLED] = boostControlDisabledGetParams;
     controllers.run[BOOST_CONTROLLER_DISABLED] = boostControlDisabledRun;
     controllers.reset[BOOST_CONTROLLER_DISABLED] = boostControlDisabledReset;
+    controllers.exit[BOOST_CONTROLLER_DISABLED] = 0;
 
     controllers.initialize[BOOST_CONTROLLER_STARTUP] = boostControlStartupInitialize;
     controllers.setParams[BOOST_CONTROLLER_STARTUP] = boostControlStartupSetParams;
     controllers.getParams[BOOST_CONTROLLER_STARTUP] = boostControlStartupGetParams;
     controllers.run[BOOST_CONTROLLER_STARTUP] = boostControlStartupRun;
     controllers.reset[BOOST_CONTROLLER_STARTUP] = boostControlStartupReset;
+    controllers.exit[BOOST_CONTROLLER_STARTUP] = 0;
 
     controllers.initialize[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntInitialize;
     controllers.setParams[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntSetParams;
     controllers.getParams[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntGetParams;
     controllers.run[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntRun;
     controllers.reset[BOOST_CONTROLLER_ENERGY_INT] = boostControlEnergyIntReset;
+    controllers.exit[BOOST_CONTROLLER_ENERGY_INT] = 0;
 
     controllers.initialize[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcInitialize;
     controllers.setParams[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcSetParams;
     controllers.getParams[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcGetParams;
     controllers.run[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcRun;
     controllers.reset[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcReset;
+    controllers.exit[BOOST_CONTROLLER_ENERGY_MPC] = boostControlEnergyMpcExit;
 
     /* Initializes all registered controllers */
     for(k = 0; k < BOOST_CONTROLLER_END; k++){
@@ -195,6 +201,14 @@ static int32_t boostControllerInterfaceSetController(void *in, uint32_t insize, 
 	ctl = *( (uint32_t *) in );
 
 	if( ctl >= BOOST_CONTROLLER_END ) return BOOST_CONTROLLER_ERR_INVALID_CTL;
+
+	/*
+	 * Before enabling a different controller, run exit function of previous
+	 * controller.
+	 */
+	if( controllers.exit[controllers.active] != 0 ){
+	    controllers.exit[controllers.active]();
+	}
 
 	controllers.active = ctl;
 

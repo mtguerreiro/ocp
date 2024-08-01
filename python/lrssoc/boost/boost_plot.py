@@ -33,21 +33,17 @@ class Plot:
         self._l_fs = 11.5
         self._title_fs = 12
         self._lw = 1.5
-        self._figsize = (10,6)
-        
-        self._figsize_energy = (5,7)
-        self._figsize_states = (9,7)
+        self._figsize = (10,6)        
         
         
-        
-    def measurements(self, data, t=None, fig=None):
+    def measurements(self, data, t=None, fig=None, dt=1/100e3):
         """
         """
         if t is None:
-            t = np.arange(data.shape[0])
+            t = dt * np.arange(data.shape[0])
 
         if fig is None:
-            fig, axes = plt.subplots(nrows=2, ncols=1)
+            fig, axes = plt.subplots(nrows=4, ncols=1)
             axes = axes.reshape(-1)
             fig.set_size_inches(self._figsize[0], self._figsize[1])
         else:
@@ -56,7 +52,6 @@ class Plot:
         axes[0].cla()
         axes[0].step(t, data[:, 4], label='$i_l$', where='post', lw=self._lw)
         axes[0].step(t, data[:, 5], label='$i_{out}$', where='post', lw=self._lw)
-        axes[0].step(t, data[:, 10], label='$i_{out} filt$', where='post', lw=self._lw)
         axes[0].legend(loc='upper left', bbox_to_anchor=(1.01,1), borderaxespad=0, handlelength=0.75, handleheight=0.5, handletextpad=0.3, fontsize=self._l_fs)
         axes[0].grid()
         axes[0].set_ylabel('Current (A)', fontsize=self._l_fs)
@@ -64,14 +59,30 @@ class Plot:
 
         axes[1].cla()
         axes[1].sharex(axes[0])
-        axes[1].step(t, data[:, 0], label='$V_{dc,in}$', where='post', lw=self._lw)
-        axes[1].step(t, data[:, 1], label='$V_{dc,out}$', where='post', lw=self._lw)
+        axes[1].step(t, data[:, 1], label='$V_{dc,in}$', where='post', lw=self._lw)
         axes[1].step(t, data[:, 2], label='$V_{out}$', where='post', lw=self._lw)
-        axes[1].step(t, data[:, 7], label='$V_{out} reference$', where='post', lw=self._lw)
         axes[1].legend(loc='upper left', bbox_to_anchor=(1.01,1), borderaxespad=0, handlelength=0.75, handleheight=0.5, handletextpad=0.3, fontsize=self._l_fs)
         axes[1].grid()
         axes[1].set_ylabel('Voltage (V)', fontsize=self._l_fs)
         axes[1].set_title('Voltages', fontsize=self._title_fs)
 
+        axes[2].cla()
+        axes[2].sharex(axes[0])
+        axes[2].step(t, data[:, 6], label='Duty-cycle', where='post', lw=self._lw)
+        axes[2].step(t, data[:, 12], label='Duty-cycle (control)', where='post', lw=self._lw)
+        axes[2].legend(loc='upper left', bbox_to_anchor=(1.01,1), borderaxespad=0, handlelength=0.75, handleheight=0.5, handletextpad=0.3, fontsize=self._l_fs)
+        axes[2].grid()
+        axes[2].set_ylabel('Duty-cycle', fontsize=self._l_fs)
+        axes[2].set_title('Control', fontsize=self._title_fs)
+
+        axes[3].cla()
+        axes[3].sharex(axes[0])
+        axes[3].step(t, data[:, 7], label='$t_{lin}$', where='post', lw=self._lw)
+        axes[3].step(t, data[:, 8], label='$t_{mpc}$', where='post', lw=self._lw)
+        axes[3].legend(loc='upper left', bbox_to_anchor=(1.01,1), borderaxespad=0, handlelength=0.75, handleheight=0.5, handletextpad=0.3, fontsize=self._l_fs)
+        axes[3].grid()
+        axes[3].set_ylabel('Time (us)', fontsize=self._l_fs)
+        axes[3].set_title('Exec. time', fontsize=self._title_fs)
+        
         plt.tight_layout()
         return fig

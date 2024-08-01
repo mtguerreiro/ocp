@@ -25,21 +25,22 @@
 //=============================================================================
 #define BUCK_HW_CONFIG_ADC_SPI_FREQ_HZ      ((uint32_t)16666666)
 #define BUCK_HW_CONFIG_PWM_FREQ_HZ          ((uint32_t) 100000 )
-#define BUCK_HW_CONFIG_PWM_DEAD_TIME_NS     ((float) 200e-9 )
-#define BUCK_HW_CONFIG_PWM_BASE              XPAR_AXI_PWM_1_S00_AXI_BASEADDR
-#define BUCK_HW_CONFIG_ADC_BASE              XPAR_ADC_PSCTL_1_S00_AXI_BASEADDR
+#define BUCK_HW_CONFIG_PWM_DEAD_TIME_NS     ((float) 300e-9 )
+#define BUCK_HW_CONFIG_PWM_BASE             XPAR_AXI_PWM_1_S00_AXI_BASEADDR
+#define BUCK_HW_CONFIG_ADC_BASE             XPAR_ADC_PSCTL_1_S00_AXI_BASEADDR
 
-#define BUCK_HW_CONFIG_IRQ_PL_CPU1           ZYNQ_CONFIG_IRQ_PL_TO_CPU1_2
-#define BUCK_HW_CONFIG_ADC_BUFFER            ( ZYNQ_CONFIG_MEM_PL_TO_CPU1_ADR + (ZYNQ_CONFIG_MEM_PL_TO_CPU1_SIZE >> 1) )
+#define BUCK_HW_CONFIG_IRQ_PL_CPU1          ZYNQ_CONFIG_IRQ_PL_TO_CPU1_3
+#define BUCK_HW_CONFIG_IRQ_PL_CPU1_PRIO     ZYNQ_CONFIG_IRQ_PL_TO_CPU1_3_PRIO
+#define BUCK_HW_CONFIG_ADC_BUFFER           ( ZYNQ_CONFIG_MEM_PL_TO_CPU1_ADR + (ZYNQ_CONFIG_MEM_PL_TO_CPU1_SIZE >> 1) )
 
-#define BUCK_HW_CONFIG_GPIO_ID               XPAR_AXI_GPIO_1_DEVICE_ID
-#define BUCK_HW_CONFIG_GPIO_CHANNEL          1
-#define BUCK_HW_CONFIG_GPIO_MASK             0b11
+#define BUCK_HW_CONFIG_GPIO_ID              XPAR_AXI_GPIO_1_DEVICE_ID
+#define BUCK_HW_CONFIG_GPIO_CHANNEL         1
+#define BUCK_HW_CONFIG_GPIO_MASK            0b11
 
-#define BUCK_HW_CONFIG_GPIO_IN_RLY_OFFS       (0U)
-#define BUCK_HW_CONFIG_GPIO_IN_RLY            (1 << BUCK_HW_CONFIG_GPIO_IN_RLY_OFFS)
-#define BUCK_HW_CONFIG_GPIO_OUT_RLY_OFFS      (1U)
-#define BUCK_HW_CONFIG_GPIO_OUT_RLY           (1 << BUCK_HW_CONFIG_GPIO_OUT_RLY_OFFS)
+#define BUCK_HW_CONFIG_GPIO_IN_RLY_OFFS     (0U)
+#define BUCK_HW_CONFIG_GPIO_IN_RLY          (1 << BUCK_HW_CONFIG_GPIO_IN_RLY_OFFS)
+#define BUCK_HW_CONFIG_GPIO_OUT_RLY_OFFS    (1U)
+#define BUCK_HW_CONFIG_GPIO_OUT_RLY         (1 << BUCK_HW_CONFIG_GPIO_OUT_RLY_OFFS)
 
 /* PWM peripheral clock, in Hz */
 #define BUCK_HW_PWM_CLK                      100000000
@@ -425,7 +426,7 @@ static void buckHwInitializeAdc(void *intc, buckHwAdcIrqHandle_t irqhandle){
 
     zynqAxiAdcBufferAddressWrite(BUCK_HW_CONFIG_ADC_BASE, BUCK_HW_CONFIG_ADC_BUFFER);
 
-    zynqAxiAdcInterruptConfig(intc, BUCK_HW_CONFIG_IRQ_PL_CPU1, irqhandle);
+    zynqAxiAdcInterruptConfig(intc, BUCK_HW_CONFIG_IRQ_PL_CPU1, BUCK_HW_CONFIG_IRQ_PL_CPU1_PRIO, irqhandle);
 
     zynqAxiAdcEnableWrite(BUCK_HW_CONFIG_ADC_BASE, 1);
 }
