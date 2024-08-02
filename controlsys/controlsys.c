@@ -1,25 +1,14 @@
 /*
- * controlsys.c
+ * @file controlsys.h
  *
- *  Created on: 04.09.2022
- *      Author: mguerreiro
+ * @brief A generic control system written in C.
  */
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
 #include "controlsys.h"
-
-#include "control.h"
-
 //=============================================================================
-
-//=============================================================================
-/*------------------------------- Definitions -------------------------------*/
-//=============================================================================
-
-//=============================================================================
-
 
 //=============================================================================
 /*-------------------------------- Functions --------------------------------*/
@@ -27,23 +16,20 @@
 //-----------------------------------------------------------------------------
 void controlsysInitialize(controlsys_t *sys, controlsysConfig_t *config){
 
-	controlConfig_t controlConfig;
+	sys->binputs = config->binputs;
+	sys->boutputs = config->boutputs;
 
-	controlConfig.binputs = config->binputs;
-	controlConfig.boutputs = config->boutputs;
+	sys->fgetInputs = config->fgetInputs;
+	sys->fapplyOutputs = config->fapplyOutputs;
 
-	controlConfig.fgetInputs = config->fgetInputs;
-	controlConfig.fapplyOutputs = config->fapplyOutputs;
+	sys->frun = config->frun;
 
-	controlConfig.frun = config->frun;
-
-	controlConfig.fonEntry = config->fonEntry;
-	controlConfig.fonExit = config->fonExit;
-
-	controlInitialize(&sys->control, &controlConfig);
+	sys->fonEntry = config->fonEntry;
+	sys->fonExit = config->fonExit;
 
 	sys->fhwInterface = config->fhwInterface;
 	sys->fhwStatus = config->fhwStatus;
+
 	sys->fcontrollerInterface = config->fcontrollerInterface;
 	sys->fcontrollerStatus = config->fcontrollerStatus;
 
@@ -73,41 +59,35 @@ int32_t controlsysHardwareInterface(controlsys_t *sys,
 //-----------------------------------------------------------------------------
 int32_t controlsysRun(controlsys_t *sys){
 
-	int32_t status;
+    int32_t ninputs;
+    int32_t noutputs;
+    int32_t status;
 
-    status = controlRun(&sys->control);
+    if( sys->status == CONTROLSYS_STATUS_DISABLED ) return CONTROLSYS_STATUS_DISABLED;
 
-    if( status != CONTROL_RUN_STATUS_SUCCESS ){
-        if( status == CONTROL_RUN_STATUS_HARDWARE_ERROR)
-            sys->status = CONTROLSYS_STATUS_HARDWARE_ERROR;
-        else if( status == CONTROL_RUN_STATUS_CONTROLLER_ERROR )
-            sys->status = CONTROLSYS_STATUS_CONTROLLER_ERROR;
-        else
-            sys->status = CONTROLSYS_STATUS_UNKNOWN_RUN_ERROR;
+    if( sys->fonEntry ) sys->fonEntry();
+
+    ninputs = sys->fgetInputs( sys->binputs );
+    if( ninputs < 0 ) sys->status = CONTROLSYS_STATUS_HARDWARE_ERROR;
+
+    if( sys->status == CONTROLSYS_STATUS_ENABLED ){
+        noutputs = sys->frun( sys->binputs, ninputs, sys->boutputs, -1 );
+        if( noutputs < 0 ) sys->status = CONTROLSYS_STATUS_CONTROLLER_ERROR;
     }
-    else{
-        sys->status = CONTROL_RUN_STATUS_SUCCESS;
+
+    if( sys->status == CONTROLSYS_STATUS_ENABLED ){
+        status = sys->fapplyOutputs( sys->boutputs, noutputs );
+        if( status != 0 ) sys->status = CONTROLSYS_STATUS_HARDWARE_ERROR;
     }
 
-//	if( sys->status == CONTROLSYS_STATUS_ENABLED ){
-//	    status = controlRun(&sys->control);
-//
-//	    if( status != CONTROL_RUN_STATUS_SUCCESS ){
-//	        if( status == CONTROL_RUN_STATUS_HARDWARE_ERROR)
-//	            sys->status = CONTROLSYS_STATUS_HARDWARE_ERROR;
-//	        else if( status == CONTROL_RUN_STATUS_CONTROLLER_ERROR )
-//	            sys->status = CONTROLSYS_STATUS_CONTROLLER_ERROR;
-//	        else
-//	            sys->status = CONTROLSYS_STATUS_UNKNOWN_RUN_ERROR;
-//	    }
-//	}
+    if( sys->fonExit ) sys->fonExit();
 
 	return sys->status;
 }
 //-----------------------------------------------------------------------------
 int32_t controlsysEnable(controlsys_t *sys){
 
-	if( (sys->fhwStatus() != 0) || (sys->fcontrollerStatus() != 0) ) return -1;
+	if( (sys->fhwStatus() != 0) || (sys->fcontrollerStatus() != 0) ) return CONTROLSYS_ERR_EN;
 
 	sys->status = CONTROLSYS_STATUS_ENABLED;
 

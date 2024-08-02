@@ -1,14 +1,13 @@
 /*
- * control.h
+ * @file controlsys.h
+ * 
+ * @brief A generic control system written in C.
  *
- *  Created on: 02.09.2022
- *      Author: mguerreiro
- *
- * This is a generic control system written in C.
+ * Introduction
+ * ============
  *
  * Controlling any system requires the same conceptual steps: take measurements
- * from the system, read set-points, compute the control action and apply it
- * to the system.
+ * from the system, compute the control actions and apply them.
  *
  * This library provides a simple state machine that executes these steps
  * sequentially. The following steps are executed:
@@ -17,10 +16,16 @@
  * 2. Execute control algorithm
  * 3. Apply outputs
  *
- * The user is completely responsible for the proper actions taken at each
- * step; the state machine simply calls the functions assigned for each step.
+ * To keep the state machine flexible, the functions executed at each step are 
+ * actually callbacks supplied by the user. This has the advantage of 
+ * decoupling these steps: the get measurements callback just worry about 
+ * getting physical measurements from the system and saving them to a buffer.
+ * The control algorithm just reads the measurements from the measurements 
+ * buffer and write its outputs to an actuator buffer. Finally, the callback 
+ * applying the outputs to the physical system is just concerned with reading
+ * the actuator buffer and using those values to realize the actuation.
  *
- * A detailed description of each step is given below.
+ * A more detailed description of each step is given below.
  *
  * 1. Get measurements
  * 	  In this step, the physical measurements should be taken. This usually
@@ -36,6 +41,9 @@
  * 3. Apply outputs
  *    In this step, the control signals are actually applied. This usually
  * corresponds to setting PWM signals, relays, etc.
+ * 
+ * 
+ * 
  *
  */
 
