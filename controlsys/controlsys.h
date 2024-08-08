@@ -170,7 +170,7 @@ typedef int32_t(*controlsysRun_t)(void *inputs, int32_t ninputs, void *outputs, 
  *
  * @param n Number of outputs.
  *
- * @return Hardware status. If different than zero, the status of the
+ * @return Hardware status. If less than zero, the status of the
  * `controlsys` is set to `HARDWARE_ERROR`.
  */
 typedef int32_t(*controlsysApplyOutputs_t)(void *outputs, int32_t n);

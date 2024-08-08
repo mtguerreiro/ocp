@@ -77,7 +77,7 @@ int32_t controlsysRun(controlsys_t *sys){
 
     if( sys->status == CONTROLSYS_STATUS_ENABLED ){
         status = sys->fapplyOutputs( sys->boutputs, noutputs );
-        if( status != 0 ) sys->status = CONTROLSYS_STATUS_HARDWARE_ERROR;
+        if( status < 0 ) sys->status = CONTROLSYS_STATUS_HARDWARE_ERROR;
     }
 
     if( sys->fonExit ) sys->fonExit();
