@@ -80,20 +80,23 @@ class Startup:
 
     def set(self, params):
 
-        uinc = params['uinc']
-        ufinal = params['ufinal']
-        data = list(struct.pack('<ff', uinc, ufinal))
+        u_lower = params['u_lower']
+        u_upper = params['u_upper']
+        u_inc = params['u_inc']
+        
+        data = list(struct.pack('<fff', u_lower, u_upper, u_inc))
         
         return data
     
 
     def get(self, data):
 
-        pars = struct.unpack('<ff', data)
+        pars = struct.unpack('<fff', data)
 
         params = {
-            'uinc': pars[0],
-            'ufinal': pars[1]
+            'u_lower': pars[0],
+            'u_upper': pars[1],
+            'u_inc': pars[2]
             }
 
         return params
@@ -196,15 +199,17 @@ class EnergyInt:
         b2 = params['b2']
 
         en = params['notch_en']
+
+        c_out = params['c_out']
         
-        data = list(struct.pack('<ffffffffff', k1, k2, k3, dt, a0, a1, a2, b1, b2, en))
+        data = list(struct.pack('<fffffffffff', k1, k2, k3, dt, a0, a1, a2, b1, b2, en, c_out))
         
         return data
     
 
     def get(self, data):
 
-        pars = struct.unpack('<ffffffffff', data)
+        pars = struct.unpack('<fffffffffff', data)
 
         params = {
             'k1': pars[0],
@@ -217,6 +222,7 @@ class EnergyInt:
             'b1': pars[7],
             'b2': pars[8],
             'notch_en': pars[9],
+            'c_out': pars[10],
             }
 
         return params
@@ -518,10 +524,10 @@ class SFBINT:
         I_2 = Io
 
         # Linearized model
-        a11 = 0/L1;                              a12 = 0;                                     a13 = -(1 - d) / L1;     a14 = 0
-        a21 = 0;                                 a22 = 0/L2;                                  a23 = N * d / L2;        a24 = -1 / L2
+        a11 = 0;                                 a12 = 0;                                     a13 = -(1 - d) / L1;     a14 = 0
+        a21 = 0;                                 a22 = 0;                                     a23 = N * d / L2;        a24 = -1 / L2
         a31 = (N**2+1)/N**2 * (1 - d) / (Cc);    a32 = -(N**2+1)/N * d / (Cc);                a33 = 0;                 a34 = 0
-        a41 = 0;                                 a42 = 1 / Co;                                a43 = 0;                 a44 = Po / (Co * Vo**2)#(-1/11)#
+        a41 = 0;                                 a42 = 1 / Co;                                a43 = 0;                 a44 = Po / (Co * Vo**2)
 
         A = np.array([[a11, a12, a13, a14],
                       [a21, a22, a23, a24],
@@ -577,12 +583,15 @@ class SFBINT:
 
         sys = control.ss(A, B, C, 0)
         print('Pole placement.\nMethod: {:}'.format(method))
-        print('Poles: {:}'.format(poles))
-        print('Zeros: {:}'.format(sys.zeros()))
-        print('Open-loop poles: {:}'.format(sys.poles()))
+        print('Desired poles: {:}'.format(poles))
         
         # State feedback
         K = scipy.signal.place_poles(Aa, Ba, poles).gain_matrix[0]
+        
+        sys_cl = control.ss(Aa - Ba @ K.reshape(1, -1), np.array([[0], [0], [0], [0], [1]]), np.array([[1, 0, 0, 0, 0]]), 0)
+        C_ctb = control.ctrb(Aa, Ba)
+        print('Closed-loop zeros: {:}'.format(sys_cl.zeros()))
+        print('Closed-loop poles: {:}'.format(sys_cl.poles()))
 
         ctl_params = {'k1':K[0], 'k2':K[1], 'k3':K[2], 'k4':K[3],
                       'ke':K[4], 'dt':dt,
