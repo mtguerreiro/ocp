@@ -17,88 +17,57 @@
 #include "cukConfig.h"
 //#include "config/stypesCuk.h"
 
-//#include "mvops.h"
-//#include "dmpc.h"
-//#include "dmpc_defs.h"
-//#include "dmpc_matrices.h"
+#include "mvops.h"
+#include "dmpc.h"
+#include "dmpc_defs.h"
+#include "dmpc_matrices.h"
 //=============================================================================
 
 //=============================================================================
 /*-------------------------------- Prototypes -------------------------------*/
 //=============================================================================
-static void cukControlEnergyMpcFilterReset(void);
-static float cukControlEnergyMpcFilterRun(float x);
 //=============================================================================
 
 //=============================================================================
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
-typedef struct{
-
-    float a0;
-    float a1;
-    float a2;
-
-    float b1;
-    float b2;
-
-    float x_1;
-    float x_2;
-
-    float y;
-    float y_1;
-    float y_2;
-
-}filter_t;
+#define V_GAIN          ((float) 1e6 )
 
 #define CUK_CONFIG_TF_N2N1_SQ   (CUK_CONFIG_TF_N2N1 * CUK_CONFIG_TF_N2N1)
 #define L_in_uH ((float)100.f)
 
-#define i1_lim      6
-#define i1_min      -i1_lim
-#define i1_max      i1_lim
 //=============================================================================
 
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
-static float u_out = 0.0f;
-static float k1 = 37914191.17733706, k2 = 11200.000048725671, k3 = -98513528579.26212, dt = 1e-05;
-static float vc = 0.0f;
 static float p_in = 0.0f, p_out = 0.0f, y_dot = 0.0f, y = 0.0f, y_r = 0.0f;
 
-static float y_e = 0.0f, y_e_1 = 0.0f;
+static float xm[DMPC_CONFIG_NXM] = {0};
+static float xm_1[DMPC_CONFIG_NXM] = {0};
 
-//float xm[DMPC_CONFIG_NXM] = {0};
-//float xm_1[DMPC_CONFIG_NXM] = {0};
-//float dx[DMPC_CONFIG_NXM] = {0};
-//
-//float ref_mpc[DMPC_CONFIG_NY];
-//
-//float u[DMPC_CONFIG_NU + DMPC_CONFIG_ND] = {0};
-//float u_1[DMPC_CONFIG_NU + DMPC_CONFIG_ND] = {0};
-//float du[DMPC_CONFIG_NU + DMPC_CONFIG_ND] = {0};
-//
-//float aux1[DMPC_CONFIG_NXM], aux2[DMPC_CONFIG_NXM];
+static float ref[DMPC_CONFIG_NY];
 
-uint32_t n_iters;
+static float u[DMPC_CONFIG_NU + DMPC_CONFIG_ND] = {0};
+static float du[DMPC_CONFIG_NU + DMPC_CONFIG_ND] = {0};
 
-float u_min;
-float u_max;
-float y_dot_min;
-float y_dot_max;
+static uint32_t first_enter = 0;
 
-uint32_t first_time = 1;
+static float u_init, u_min, u_max;
+static float x_init, x_min, x_max;
 
-static filter_t notch = {.a0 = 1.0f, .a1 = -1.8954516649246216f, .a2 = 0.9887202978134155f,
-        .b1 = -1.3892015218734741, .b2 = 0.48247018456459045f,
-        .x_1 = 0.0f, .x_2 = 0.0f, .y = 0.0f, .y_1 = 0.0f, .y_2 = 0.0f
-};
+static float il_max = 7.0f;
+static float il_min = 0.0f;
 
-static float notchEnable = 0.0f;
+static float duty = 0.0f;
 
-static uint32_t mpcPeriod = 4;
-static uint32_t mpcPeriodCounter = 0;
+float du_min_1, du_min_2;
+float du_max_1, du_max_2;
+
+float Kx[2] = {9.40077310e+01, 1.36080265e-02};
+float Ky = 3.79121039;
+
+float Co = CUK_CONFIG_C_O;
 //=============================================================================
 
 //=============================================================================
@@ -116,14 +85,15 @@ int32_t cukControlEnergyMpcSetParams(void *params, uint32_t n){
 
     float *p = (float *)params;
 
-    notch.a0 = *p++;
-    notch.a1 = *p++;
-    notch.a2 = *p++;
+    Kx[0] = *p++;
+    Kx[1] = *p++;
 
-    notch.b1 = *p++;
-    notch.b2 = *p++;
+    Ky = *p++;
 
-    notchEnable = *p++;
+    il_max = *p++;
+    il_min = *p++;
+
+    Co = *p++;
 
     return 0;
 }
@@ -132,14 +102,15 @@ int32_t cukControlEnergyMpcGetParams(void *in, uint32_t insize, void *out, uint3
 
     float *p = (float *)out;
 
-    *p++ = notch.a0;
-    *p++ = notch.a1;
-    *p++ = notch.a2;
+    *p++ = Kx[0];
+    *p++ = Kx[1];
 
-    *p++ = notch.b1;
-    *p++ = notch.b2;
+    *p++ = Ky;
 
-    *p++ = notchEnable;
+    *p++ = il_max;
+    *p++ = il_min;
+
+    *p++ = Co;
 
     return 24;
 }
@@ -155,6 +126,7 @@ int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nr
     static float x1_r, x2_r, x3_r, x4_r;
     static float e_x1_r, e_x2_r, e_x3_r, e_x4_r;
     static float v;
+    uint32_t i;
 
     x1 = m->i_1;
     x2 = m->i_2;
@@ -165,7 +137,7 @@ int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nr
     e_x1 = (0.5f) * CUK_CONFIG_L_IN * x1 * x1;
     e_x2 = (0.5f) * CUK_CONFIG_L_OUT * x2 * x2;
     e_x3 = (0.5f) * CUK_CONFIG_C_C * x3 * x3 * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
-    e_x4 = (0.5f) * CUK_CONFIG_C_O * x4 * x4;
+    e_x4 = (0.5f) * Co * x4 * x4;
     y = e_x1 + e_x2 + e_x3 + e_x4;
 
     /* Input, output and converter power */
@@ -182,87 +154,74 @@ int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nr
     e_x1_r = (0.5f) * CUK_CONFIG_L_IN * x1_r * x1_r;
     e_x2_r = (0.5f) * CUK_CONFIG_L_OUT * x2_r * x2_r;
     e_x3_r = (0.5f) * CUK_CONFIG_C_C * x3_r * x3_r * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
-    e_x4_r = (0.5f) * CUK_CONFIG_C_O * x4_r * x4_r;
+    e_x4_r = (0.5f) * Co * x4_r * x4_r;
     y_r = e_x1_r + e_x2_r + e_x3_r + e_x4_r;
 
-//    /* Integrator */
-//    y_e = y_e_1 + dt * (y_r - y);
-//    y_e_1 = y_e;
-//
-//    /* Control */
-//    v = k1 * y_r - k1 * y - k2 * y_dot - k3 * y_e;
+    /* Initialization */
+    if( first_enter == 0 ){
+        first_enter = 1;
 
+        u[0] = 0;
+        xm_1[0] = y;
+    }
 
-//    if( first_time == 1 ){
-//        first_time = 0;
-//        xm_1[0] = y_r;
-//    }
+    /* Updates bounds */
+    u_min = m->v_in / CUK_CONFIG_L_IN * (m->v_in - x3) / V_GAIN;
+    u_max = m->v_in * m->v_in / CUK_CONFIG_L_IN / V_GAIN;
 
-//    if( mpcPeriodCounter == 0 ){
-//        /* Reference */
-//        ref_mpc[0] = y_r;
-//
-//        /* Assembles state vector */
-//        xm[0] = y;
-//        xm[1] = y_dot;
-//
-//        /* */
-//        u_min = (m->v_in - x3) * m->v_in / L_in_uH;
-//        u_max = m->v_in * m->v_in / L_in_uH;
-//
-//        y_dot_min = m->v_in * i1_min - p_out;
-//        y_dot_max = m->v_in * i1_max - p_out;
-//
-//        DMPC_CONFIG_U_MIN[0] = u_min;
-//        DMPC_CONFIG_U_MAX[0] = u_max;
-//
-//        //DMPC_CONFIG_XM_MIN[0] = y_dot_min;
-//        //DMPC_CONFIG_XM_MAX[0] = y_dot_max;
-//
-//        /* Delay compensation */
-//        dmpcDelayComp(xm, xm, u);
-//
-//        /* Optimization */
-//        dmpcOpt(xm, xm_1, ref_mpc, u, &n_iters, du);
-//
-//        /* Computes u = du + u_1 */
-//        sumv(u, du, DMPC_CONFIG_NU, u);
-//
-//        /* Saves variables */
-//        uint32_t i;
-//        for(i = 0; i < DMPC_CONFIG_NXM; i++){
-//            xm_1[i] = xm[i];
-//        }
-//    }
-   mpcPeriodCounter++;
-   if( mpcPeriodCounter >= mpcPeriod ) mpcPeriodCounter = 0;
+    x_min = il_min * m->v_in - p_out;
+    x_max = il_max * m->v_in - p_out;
 
-//    v = u[0] * ((float)1e6);
+    du_min_1 = (x_min - y_dot) / 10.0f - u[0];
+    du_min_2 = u_min;
 
-    if( notchEnable > 0.5f ) v = cukControlEnergyMpcFilterRun(v);
+    du_max_1 = (x_max - y_dot) / 10.0f - u[0];
+    du_max_2 = u_max;
 
-    u_out =  1 - (m->v_dc * m->v_dc / CUK_CONFIG_L_IN - v) * CUK_CONFIG_L_IN / (x3 * m->v_dc);
+    /* Assembles state vector */
+    xm[0] = y;
+    xm[1] = y_dot;
 
-    if( u_out > 1.0f ) u_out = 1.0f;
-    if( u_out < 0.0f ) u_out = 0.0f;
+    /* Delay compensation */
+    dmpcDelayComp(xm, xm, u);
 
-    o->u = u_out;
+    /* Optimization */
+    du[0] = -Kx[0] * (xm[0] - xm_1[0]) - Kx[1] * (xm[1] - xm_1[1]) - Ky * (xm[0] - y_r);
+
+    if( du[0] < du_min_1 ) du[0] = du_min_1;
+    if( du[0] < du_min_2 ) du[0] = du_min_2;
+
+    if( du[0] > du_max_1 ) du[0] = du_max_1;
+    if( du[0] > du_max_2 ) du[0] = du_max_2;
+
+    /* Computes u = du + u_1 */
+    sumv(u, du, DMPC_CONFIG_NU, u);
+
+    /* Saves variables */
+    for(i = 0; i < DMPC_CONFIG_NXM; i++){
+        xm_1[i] = xm[i];
+    }
+
+    v = u[0] * V_GAIN;
+
+    duty =  1 - (m->v_dc * m->v_dc / CUK_CONFIG_L_IN - v) * CUK_CONFIG_L_IN / (x3 * m->v_dc);
+
+    o->u = duty;
+
+    if( o->u > 1.0f ) o->u = 1.0f;
+    else if ( o->u < 0.0f ) o->u = 0.0f;
 
     return sizeof(cukConfigControl_t);
 }
 //-----------------------------------------------------------------------------
 void cukControlEnergyMpcReset(void){
 
-    cukControlEnergyMpcFilterReset();
+    uint32_t i;
 
-//    xm_1[0] = 0.0f;
-//    xm_1[1] = 0.0f;
+    first_enter = 0;
 
-    y_e_1 = 0.0f;
-    u_out = 0.0f;
-    first_time = 1;
-
-    mpcPeriodCounter = 0;
+    for(i = 0; i < DMPC_CONFIG_NXM; i++) xm_1[i] = 0.0f;
+    for(i = 0; i < (DMPC_CONFIG_NU + DMPC_CONFIG_ND); i++) u[i] = 0.0f;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -271,29 +230,6 @@ void cukControlEnergyMpcReset(void){
 /*----------------------------- Static functions ----------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-static void cukControlEnergyMpcFilterReset(void){
-
-    notch.x_1 = 0.0f;
-    notch.x_2 = 0.0f;
-
-    notch.y = 0.0f;
-    notch.y_1 = 0.0f;
-    notch.y_2 = 0.0f;
-}
-//-----------------------------------------------------------------------------
-static float cukControlEnergyMpcFilterRun(float x){
-
-    notch.y = -notch.b1 * notch.y_1 - notch.b2 * notch.y_2 + \
-            notch.a0 * x + notch.a1 * notch.x_1 + notch.a2 * notch.x_2;
-
-    notch.y_2 = notch.y_1;
-    notch.y_1 = notch.y;
-
-    notch.x_2 = notch.x_1;
-    notch.x_1 = x;
-
-    return notch.y;
-}
 //-----------------------------------------------------------------------------
 //=============================================================================
 

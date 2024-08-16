@@ -459,59 +459,24 @@ class Cuk:
         return self.enable_controller('energy_mpc', reset=reset)
 
     
-    def energy_mpc_ctl_set_notch(self, fc, Q):
-
-        ec = lrssoc.cuk.cuk_controller.EnergyMpc()
+    def energy_mpc_ctl_set_params(self, n=40, r_w=0.05, il_max=None, il_min=None):
 
         status, freq = self._hw_if.get_pwm_frequency()
         if status != 0:
             return (-1, status)
 
-        dt = 1 / float(freq)
-
-        filt = ec.discrete_notch(float(fc), float(Q), dt)
-
-        return self.set_controller_params('energy_mpc', filt)
-
-
-    def energy_mpc_ctl_get_notch(self):
-
-        status, params = self.get_controller_params('energy_mpc')
-        if status != 0:
-            return (-1, status)
-
-        filt = {
-            'a0':params['a0'], 'a1':params['a1'], 'a2':params['a2'],
-            'b1':params['b1'], 'b2':params['b2'],
-            'notch_en':params['notch_en']
-            }
+        dt = float(1) / float(freq)
         
-        return filt
+        ec = lrssoc.cuk.cuk_controller.EnergyMpc()
 
+        params = ec.gains(n=n, r_w=r_w, dt=dt)
 
-    def energy_mpc_ctl_enable_notch(self):
+        if il_max is not None:
+            params['il_max'] = il_max
+        if il_min is not None:
+            params['il_min'] = il_min
 
-        en = {'notch_en':1.0}
-        
-        return self.set_controller_params('energy_mpc', en)
-
-
-    def energy_mpc_ctl_disable_notch(self):
-
-        en = {'notch_en':0.0}
-        
-        return self.set_controller_params('energy_mpc', en)
-
-
-    def energy_mpc_ctl_status_notch(self):
-
-        status, params = self.get_controller_params('energy_mpc')
-        if status != 0:
-            return (-1, status)
-
-        en = params['notch_en']
-
-        return (0, en)
+        return self.set_controller_params('energy_mpc', params)
     
     # ------------------------------------------------------------------------
 

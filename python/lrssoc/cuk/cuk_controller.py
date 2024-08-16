@@ -9,6 +9,7 @@ import struct
 import numpy as np
 import scipy.signal
 import control
+import pyctl as ctl
 
 class References:
     """
@@ -690,17 +691,18 @@ class EnergyMpc:
     
 
     def set(self, params):
-      
-        a0 = params['a0']
-        a1 = params['a1']
-        a2 = params['a2']
 
-        b1 = params['b1']
-        b2 = params['b2']
+        Kx0 = params['Kx0']
+        Kx1 = params['Kx1']
 
-        en = params['notch_en']
+        Ky = params['Ky']
+
+        il_max = params['il_max']
+        il_min = params['il_min']
+
+        Co = params['Co']
         
-        data = list(struct.pack('<ffffff', a0, a1, a2, b1, b2, en))
+        data = list(struct.pack('<ffffff', Kx0, Kx1, Ky, il_max, il_min, Co))
         
         return data
     
@@ -710,32 +712,49 @@ class EnergyMpc:
         pars = struct.unpack('<ffffff', data)
 
         params = {
-            'a0': pars[0],
-            'a1': pars[1],
-            'a2': pars[2],
-            'b1': pars[3],
-            'b2': pars[4],
-            'notch_en': pars[5],
+            'Kx0': pars[0],
+            'Kx1': pars[1],
+            'Ky': pars[2],
+            'il_max': pars[3],
+            'il_min': pars[4],
+            'Co': pars[5],
             }
 
         return params
+    
 
+    def gains(self, n=40, r_w=0.05, dt = 1.0/100e3):
 
-    def discrete_notch(self, fc, Q, dt):
-        
-        wc = 2 * np.pi * fc
-        
-        num = [1, 0 , wc**2]
-        den = [1, wc/Q, wc**2]
-        tf = (num, den)
+        t_sim = 10e-3
 
-        num_d, den_d, _ = scipy.signal.cont2discrete(tf, dt)
-        num_d = num_d.reshape(-1) / den_d[0]
+        # Reference
+        r = 0.05
 
-        filt = {'a0':num_d[0], 'a1':num_d[1], 'a2':num_d[2], 'b1':den_d[1], 'b2':den_d[2]}
-        print(num_d, den_d)
-        
-        return filt
+        # Initial conditions
+        x_i = [0.0, 0.0, 0.0]
+        u_i = 0.0
+
+        # --- System ---
+        Am = np.array([[0, 1],
+                       [0, 0]])
+
+        Bm = np.array([[0],
+                       [1e6]])
+
+        Cm = np.array([[1, 0]])
+
+        Ad, Bd, Cd, _, _ = scipy.signal.cont2discrete((Am, Bm, Cm, 0), dt, method='zoh')
+
+        # --- System ---
+        sys = ctl.mpc.System(Ad, Bd, Cd, n_p=n, n_c=n, r_w=r_w)
+
+        # --- Sim with receding horizon ---
+        data = sys.dmpc(x_i, u_i, r, 2)
+
+        Kx = sys.K_x[0]
+        Ky = sys.K_y[0][0]
+
+        return {'Kx0':Kx[0], 'Kx1':Kx[1], 'Ky':Ky}
 
 
 class Controller:
