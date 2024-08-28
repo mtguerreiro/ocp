@@ -139,6 +139,7 @@ static int32_t ocpWinInitializeTracesMeas(void){
 
     ocpTraceAddSignal(OCP_TRACE_1, &meas->p_in, "Input power");
     ocpTraceAddSignal(OCP_TRACE_1, &meas->p_out, "Output power");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->p_load, "Load power");
 
     return 0;
 }

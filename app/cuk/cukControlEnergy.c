@@ -69,7 +69,6 @@ static float notchEnable = 0.0f;
 //-----------------------------------------------------------------------------
 void cukControlEnergyInitialize(void){
 
-    ocpTraceAddSignal(OCP_TRACE_1, &vc, "Vc");
 }
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergySetParams(void *params, uint32_t n){

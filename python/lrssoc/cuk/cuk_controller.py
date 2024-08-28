@@ -175,7 +175,6 @@ class Energy:
         num_d = num_d.reshape(-1) / den_d[0]
 
         filt = {'a0':num_d[0], 'a1':num_d[1], 'a2':num_d[2], 'b1':den_d[1], 'b2':den_d[2]}
-        print(num_d, den_d)
         
         return filt        
 
@@ -257,8 +256,6 @@ class EnergyInt:
             return 0
             
         poles = [p1, p2, p3]
-        print('Pole placement.\nMethod: {:}'.format(method))
-        print('Poles: {:}'.format(poles))
         
         # Augmented model        
         A = np.array([[ 0.0, 1.0, 0.0],
@@ -271,8 +268,6 @@ class EnergyInt:
         K = scipy.signal.place_poles(A, B, poles).gain_matrix.reshape(-1)
 
         gains = {'k1':K[0], 'k2':K[1], 'k3':K[2], 'dt':dt}
-
-        print('Kains: {:}'.format(gains))
 
         return gains
     
@@ -289,7 +284,6 @@ class EnergyInt:
         num_d = num_d.reshape(-1) / den_d[0]
 
         filt = {'a0':num_d[0], 'a1':num_d[1], 'a2':num_d[2], 'b1':den_d[1], 'b2':den_d[2]}
-        print(num_d, den_d)
         
         return filt
 
@@ -423,9 +417,6 @@ class SFB:
 
         
         sys = control.ss(A, B, C, 0)
-        print('Pole placement.\nMethod: {:}'.format(method))
-        print('Poles: {:}'.format(poles))
-        print('Zeros: {:}'.format(sys.zeros()))
 
         # State feedback
         K = scipy.signal.place_poles(A, B, poles).gain_matrix[0]
@@ -583,16 +574,12 @@ class SFBINT:
         poles = [p1, p2, p3, p4, p5]
 
         sys = control.ss(A, B, C, 0)
-        print('Pole placement.\nMethod: {:}'.format(method))
-        print('Desired poles: {:}'.format(poles))
         
         # State feedback
         K = scipy.signal.place_poles(Aa, Ba, poles).gain_matrix[0]
         
         sys_cl = control.ss(Aa - Ba @ K.reshape(1, -1), np.array([[0], [0], [0], [0], [1]]), np.array([[1, 0, 0, 0, 0]]), 0)
         C_ctb = control.ctrb(Aa, Ba)
-        print('Closed-loop zeros: {:}'.format(sys_cl.zeros()))
-        print('Closed-loop poles: {:}'.format(sys_cl.poles()))
 
         ctl_params = {'k1':K[0], 'k2':K[1], 'k3':K[2], 'k4':K[3],
                       'ke':K[4], 'dt':dt,
@@ -701,15 +688,17 @@ class EnergyMpc:
         il_min = params['il_min']
 
         Co = params['Co']
+
+        freq_en = params['freq_en']
         
-        data = list(struct.pack('<ffffff', Kx0, Kx1, Ky, il_max, il_min, Co))
+        data = list(struct.pack('<fffffff', Kx0, Kx1, Ky, il_max, il_min, Co, freq_en))
         
         return data
     
 
     def get(self, data):
 
-        pars = struct.unpack('<ffffff', data)
+        pars = struct.unpack('<fffffff', data)
 
         params = {
             'Kx0': pars[0],
@@ -718,23 +707,15 @@ class EnergyMpc:
             'il_max': pars[3],
             'il_min': pars[4],
             'Co': pars[5],
+            'freq_en': pars[6],
             }
 
         return params
     
 
-    def gains(self, n=40, r_w=0.05, dt = 1.0/100e3):
+    def gains(self, n=40, rw=0.05, freq_pen=False, dt = 1.0/100e3):
 
-        t_sim = 10e-3
-
-        # Reference
-        r = 0.05
-
-        # Initial conditions
-        x_i = [0.0, 0.0, 0.0]
-        u_i = 0.0
-
-        # --- System ---
+        # --- System model ---
         Am = np.array([[0, 1],
                        [0, 0]])
 
@@ -745,14 +726,33 @@ class EnergyMpc:
 
         Ad, Bd, Cd, _, _ = scipy.signal.cont2discrete((Am, Bm, Cm, 0), dt, method='zoh')
 
-        # --- System ---
-        sys = ctl.mpc.System(Ad, Bd, Cd, n_p=n, n_c=n, r_w=r_w)
+        # --- Freq penalties ---
+        # Freq. penalties
+        lp = n
+        nq = lp + n
 
-        # --- Sim with receding horizon ---
-        data = sys.dmpc(x_i, u_i, r, 2)
+        q = np.zeros(nq)
+        if freq_pen == True:
+            q[8] = 0.1e-3
+            q[9] = 2e-3
+            q[10] = 7e-3
+            
+            q[11] = 10e-3
+            
+            q[12] = 7e-3
+            q[13] = 2e-3
+            q[14] = 0.1e-3
 
-        Kx = sys.K_x[0]
-        Ky = sys.K_y[0][0]
+            if (nq % 2) == 0:
+                q[-int(nq / 2) + 1:] = q[1:int(nq / 2)][::-1]
+            else:
+                q[-int((nq+1) / 2) + 1:] = q[1:int((nq+1) / 2)][::-1]
+            
+        # --- System with MPC ---
+        sys = ctl.mpc.System(Ad, Bd, Cd, n_pred=n, n_ctl=n, rw=rw, q=q, lp=lp)
+
+        Kx = sys.Kx[0]
+        Ky = sys.Ky[0][0]
 
         return {'Kx0':Kx[0], 'Kx1':Kx[1], 'Ky':Ky}
 

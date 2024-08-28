@@ -314,6 +314,7 @@ int32_t cukHwGetMeasurements(void *meas){
 
     dst->p_in = dst->i_1 * dst->v_dc;
     dst->p_out = i_o_filt * dst->v_dc_out;
+    dst->p_load = dst->p_out;
     //-------------------------------------------------------------------------
 
     /* Protection */

@@ -459,8 +459,8 @@ class Cuk:
         return self.enable_controller('energy_mpc', reset=reset)
 
     
-    def energy_mpc_ctl_set_params(self, n=40, r_w=0.05, il_max=None, il_min=None):
-
+    def energy_mpc_ctl_set_params(self, n=40, rw=0.05, il_max=None, il_min=None, freq_pen=False):
+        
         status, freq = self._hw_if.get_pwm_frequency()
         if status != 0:
             return (-1, status)
@@ -469,12 +469,14 @@ class Cuk:
         
         ec = lrssoc.cuk.cuk_controller.EnergyMpc()
 
-        params = ec.gains(n=n, r_w=r_w, dt=dt)
+        params = ec.gains(n=n, rw=rw, freq_pen=freq_pen, dt=dt)
 
         if il_max is not None:
             params['il_max'] = il_max
         if il_min is not None:
             params['il_min'] = il_min
+
+        params['freq_en'] = float(freq_pen)
 
         return self.set_controller_params('energy_mpc', params)
     

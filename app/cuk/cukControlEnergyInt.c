@@ -75,7 +75,6 @@ static float C_out = CUK_CONFIG_C_O;
 //-----------------------------------------------------------------------------
 void cukControlEnergyIntInitialize(void){
 
-    ocpTraceAddSignal(OCP_TRACE_1, &vc, "Vc");
 }
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergyIntSetParams(void *params, uint32_t n){
@@ -140,7 +139,7 @@ int32_t cukControlEnergyIntRun(void *meas, int32_t nmeas, void *refs, int32_t nr
     /* Energies */
     e_x1 = (0.5f) * CUK_CONFIG_L_IN * m->i_1 * m->i_1;
     e_x2 = (0.5f) * CUK_CONFIG_L_OUT * m->i_2 * m->i_2;
-    e_x3 = (0.5f) * CUK_CONFIG_C_C * vc * vc;
+    e_x3 = (0.5f) * CUK_CONFIG_C_C * vc * vc * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
     e_x4 = (0.5f) * C_out * m->v_dc_out * m->v_dc_out;
     y = e_x1 + e_x2 + e_x3 + e_x4;
 
@@ -157,7 +156,7 @@ int32_t cukControlEnergyIntRun(void *meas, int32_t nmeas, void *refs, int32_t nr
 
     e_x1_r = (0.5f) * CUK_CONFIG_L_IN * x1_r * x1_r;
     e_x2_r = (0.5f) * CUK_CONFIG_L_OUT * x2_r * x2_r;
-    e_x3_r = (0.5f) * CUK_CONFIG_C_C * x3_r * x3_r;
+    e_x3_r = (0.5f) * CUK_CONFIG_C_C * x3_r * x3_r * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
     e_x4_r = (0.5f) * C_out * x4_r * x4_r;
     y_r = e_x1_r + e_x2_r + e_x3_r + e_x4_r;
 

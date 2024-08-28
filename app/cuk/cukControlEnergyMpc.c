@@ -21,6 +21,7 @@
 #include "dmpc.h"
 #include "dmpc_defs.h"
 #include "dmpc_matrices.h"
+
 //=============================================================================
 
 //=============================================================================
@@ -32,9 +33,6 @@
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
 #define V_GAIN          ((float) 1e6 )
-
-#define CUK_CONFIG_TF_N2N1_SQ   (CUK_CONFIG_TF_N2N1 * CUK_CONFIG_TF_N2N1)
-#define L_in_uH ((float)100.f)
 
 //=============================================================================
 
@@ -61,13 +59,18 @@ static float il_min = 0.0f;
 
 static float duty = 0.0f;
 
-float du_min_1, du_min_2;
-float du_max_1, du_max_2;
+static float du_min_1, du_min_2;
+static float du_max_1, du_max_2;
 
-float Kx[2] = {9.40077310e+01, 1.36080265e-02};
-float Ky = 3.79121039;
+static float Kx[2] = {9.40077310e+01, 1.36080265e-02};
+static float Ky = 3.79121039;
 
-float Co = CUK_CONFIG_C_O;
+static float Co = CUK_CONFIG_C_O;
+
+static float du_1[DMPC_CONFIG_NC];
+static float aux[DMPC_CONFIG_NC_x_NU];
+
+static float freq_en = 0.0f;
 //=============================================================================
 
 //=============================================================================
@@ -75,9 +78,6 @@ float Co = CUK_CONFIG_C_O;
 //=============================================================================
 //-----------------------------------------------------------------------------
 void cukControlEnergyMpcInitialize(void){
-
-//    ocpTraceAddSignal(OCP_TRACE_1, &y, "Converter energy (MPC)");
-//    ocpTraceAddSignal(OCP_TRACE_1, &y_r, "Energy reference (MPC)");
 
 }
 //-----------------------------------------------------------------------------
@@ -94,6 +94,8 @@ int32_t cukControlEnergyMpcSetParams(void *params, uint32_t n){
     il_min = *p++;
 
     Co = *p++;
+
+    freq_en = *p++;
 
     return 0;
 }
@@ -112,7 +114,9 @@ int32_t cukControlEnergyMpcGetParams(void *in, uint32_t insize, void *out, uint3
 
     *p++ = Co;
 
-    return 24;
+    *p++ = freq_en;
+
+    return 28;
 }
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs){
@@ -168,9 +172,13 @@ int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nr
     /* Updates bounds */
     u_min = m->v_in / CUK_CONFIG_L_IN * (m->v_in - x3) / V_GAIN;
     u_max = m->v_in * m->v_in / CUK_CONFIG_L_IN / V_GAIN;
+    //DMPC_CONFIG_U_MIN[0] = u_min;
+    //DMPC_CONFIG_U_MAX[0] = u_max;
 
     x_min = il_min * m->v_in - p_out;
     x_max = il_max * m->v_in - p_out;
+    //DMPC_CONFIG_XM_MIN[0] = x_min;
+    //DMPC_CONFIG_XM_MAX[0] = x_max;
 
     du_min_1 = (x_min - y_dot) / 10.0f - u[0];
     du_min_2 = u_min;
@@ -186,7 +194,17 @@ int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nr
     dmpcDelayComp(xm, xm, u);
 
     /* Optimization */
+    //dmpcOpt(xm, xm_1, &y_r, u, 0, du, 0);
     du[0] = -Kx[0] * (xm[0] - xm_1[0]) - Kx[1] * (xm[1] - xm_1[1]) - Ky * (xm[0] - y_r);
+
+    if( freq_en > 0.5f ){
+        mulmv(DMPC_M_Fj_3, DMPC_CONFIG_NU, du_1, DMPC_CONFIG_NC_x_NU, aux);
+        du[0] = du[0] - aux[0];
+        for(i = 0; i < (DMPC_CONFIG_NC - 1); i++){
+            du_1[i] = du_1[i+1];
+        }
+        du_1[DMPC_CONFIG_NC - 1] = du[0];
+    }
 
     if( du[0] < du_min_1 ) du[0] = du_min_1;
     if( du[0] < du_min_2 ) du[0] = du_min_2;
@@ -222,6 +240,9 @@ void cukControlEnergyMpcReset(void){
 
     for(i = 0; i < DMPC_CONFIG_NXM; i++) xm_1[i] = 0.0f;
     for(i = 0; i < (DMPC_CONFIG_NU + DMPC_CONFIG_ND); i++) u[i] = 0.0f;
+
+    for(i = 0; i < DMPC_CONFIG_NC; i++) du_1[i] = 0.0f;
+
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
