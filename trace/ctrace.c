@@ -98,4 +98,38 @@ void ctraceSave(ctrace_t *trace){
 	ctracememSave( &trace->mem, trace->data, size );
 }
 //---------------------------------------------------------------------------
+void ctraceTrigModeReset(ctrace_t *trace){
+
+	ctracememTrigModeReset( &trace->mem );
+}
+//---------------------------------------------------------------------------
+int32_t ctraceTrigModeSetNumPreTrigSamples(ctrace_t *trace, size_t numPreTrigSamples){
+
+	return ctracememTrigModeSetNumPreTrigSamples( &trace->mem, numPreTrigSamples, trace->n );
+}
+//---------------------------------------------------------------------------
+int32_t ctraceTrigModeSetTraceToTrack(ctrace_t *trace, size_t traceToTrack){
+
+	return ctracememTrigModeSetTraceToTrack( &trace->mem, traceToTrack, trace->n );
+}
+//---------------------------------------------------------------------------
+int32_t ctraceTrigModeSetTrigBound(ctrace_t *trace, int32_t trigBound){
+
+	return ctracememTrigModeSetTrigBound( &trace->mem, trigBound );
+}
+//---------------------------------------------------------------------------
+void ctraceTrigModeSave(ctrace_t *trace){
+
+	uint32_t size;
+
+	size = sizeof(size_t) * trace->n;
+
+	ctracememTrigModeSave( &trace->mem, trace->data, size );
+}
+//---------------------------------------------------------------------------
+int32_t ctraceTrigModeGetTail(ctrace_t *trace){
+
+	return ctracememTrigModeGetTail(&trace->mem);
+}
+//---------------------------------------------------------------------------
 //===========================================================================
