@@ -98,8 +98,8 @@ int32_t ctracememTrigModeSetTraceToTrack(ctracemem_t *trace, size_t traceToTrack
 }
 //---------------------------------------------------------------------------
 int32_t ctracememTrigModeSetTrigBound(ctracemem_t *trace, int32_t trigBound){
-
-	trace->trigModeParams.trigBound = trigBound;
+	float trigBoundFloat = *((float*)&trigBound);
+	trace->trigModeParams.trigBound = trigBoundFloat;
 	return 0;
 }
 //---------------------------------------------------------------------------
@@ -123,7 +123,7 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
 
 	case WAIT_FOR_TRIGGER:
 	{
-		const float trigBound = (float)(trace->trigModeParams.trigBound) / 1e3;
+		const float trigBound = trace->trigModeParams.trigBound;
 		const float refValue = trace->trigModeParams.refValue;
 		const size_t traceToTrack = trace->trigModeParams.traceToTrack;
 		float floatValue = *((float*)&(**(s + traceToTrack)));

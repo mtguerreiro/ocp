@@ -147,14 +147,4 @@ class Trace:
             return (-1, status[0])
 
         return (0,)
-
-    def trig_mode_reset(self):
-        """
-        """
-        status = self._ocp_if.trace_trig_mode_reset( self._tr_id )
-
-        if status[0] < 0 :
-            return (-1, status)
-
-        return (0,)
     

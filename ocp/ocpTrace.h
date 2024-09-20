@@ -52,8 +52,6 @@ int32_t ocpTraceEnableTrigMode(uint32_t id);
 //---------------------------------------------------------------------------
 int32_t ocpTraceEnableManualMode(uint32_t id);
 //-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeReset(uint32_t id);
-//-----------------------------------------------------------------------------
 int32_t ocpTraceTrigModeSetNumPreTrigSamples(uint32_t id, size_t numPreTrigSamples);
 //-----------------------------------------------------------------------------
 int32_t ocpTraceTrigModeSetTraceToTrack(uint32_t id, size_t traceToTrack);

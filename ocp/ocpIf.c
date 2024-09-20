@@ -66,9 +66,6 @@ static int32_t ocpIfTraceEnableTrigMode(void *in, uint32_t insize,
 static int32_t ocpIfTraceEnableManualMode(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceTrigModeReset(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
-//-----------------------------------------------------------------------------
 static int32_t ocpIfTraceSetNumPreTrigSamples(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
@@ -151,9 +148,6 @@ static int32_t ocpIfMasterTraceEnableTrigMode(void *in, uint32_t insize,
 static int32_t ocpIfMasterTraceEnableManualMode(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceTrigModeReset(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
-//-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceSetNumPreTrigSamples(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
@@ -207,8 +201,6 @@ static int32_t ocpIfMasterTraceGetAddressSecondCore(uint32_t id, void *address);
 static int32_t ocpIfMasterTraceEnableTrigModeSecondCore(uint32_t id);
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceEnableManualModeSecondCore(uint32_t id);
-//-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceTrigModeResetSecondCore(uint32_t id);
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceSetNumPreTrigSamplesSecondCore(uint32_t id, int32_t numPreTrigSamples);
 //-----------------------------------------------------------------------------
@@ -286,7 +278,6 @@ int32_t ocpIfInitialize(void){
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_ADDRESS, ocpIfTraceGetAddress );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_ENABLE_TRIG_MODE, ocpIfTraceEnableTrigMode );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_ENABLE_MANUAL_MODE, ocpIfTraceEnableManualMode );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_TRIG_MODE_RESET, ocpIfTraceTrigModeReset );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES, ocpIfTraceSetNumPreTrigSamples );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRACE_TO_TRACK, ocpIfTraceSetTraceToTrack );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_BOUND, ocpIfTraceSetTrigBound );
@@ -319,7 +310,6 @@ int32_t ocpIfInitialize(void){
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRACES_NAMES, ocpIfMasterTraceGetTracesNames );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_ENABLE_TRIG_MODE, ocpIfMasterTraceEnableTrigMode );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_ENABLE_MANUAL_MODE, ocpIfMasterTraceEnableManualMode );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_TRIG_MODE_RESET, ocpIfMasterTraceTrigModeReset );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES, ocpIfMasterTraceSetNumPreTrigSamples );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRACE_TO_TRACK, ocpIfMasterTraceSetTraceToTrack );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_BOUND, ocpIfMasterTraceSetTrigBound );
@@ -522,19 +512,6 @@ static int32_t ocpIfTraceEnableManualMode(void *in, uint32_t insize,
 	id = *( (uint32_t *)in );
 
 	status = ocpTraceEnableManualMode(id);
-
-	return status;
-}
-//-----------------------------------------------------------------------------
-static int32_t ocpIfTraceTrigModeReset(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
-
-	uint32_t id;
-	int32_t status;
-
-	id = *( (uint32_t *)in );
-
-	status = ocpTraceTrigModeReset(id);
 
 	return status;
 }
@@ -1002,29 +979,6 @@ static int32_t ocpIfMasterTraceEnableManualMode(void *in, uint32_t insize,
 	return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceTrigModeReset(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
-
-	uint32_t id;
-	int32_t status;
-	int32_t nTracesSecondCore;
-
-	id = *( (uint32_t *)in );
-
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
-
-	if( id < nTracesSecondCore ){
-		status = ocpIfMasterTraceTrigModeResetSecondCore(id);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		status = ocpTraceTrigModeReset(id);
-	}
-
-	return status;
-}
-//-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceSetNumPreTrigSamples(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize){
 
@@ -1434,19 +1388,6 @@ static int32_t ocpIfMasterTraceEnableManualModeSecondCore(uint32_t id){
 	uint32_t cmd[2];
 
 	cmd[0] = OCP_IF_CMD_TRACE_ENABLE_MANUAL_MODE;
-	cmd[1] = id;
-
-	status = ipcClientRequest( (void *)&cmd, 8, 0, 0, OCP_IF_CONFIG_DUAL_CORE_COMM_TO );
-
-	return status;
-}
-//-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceTrigModeResetSecondCore(uint32_t id){
-
-	int32_t status;
-	uint32_t cmd[2];
-
-	cmd[0] = OCP_IF_CMD_TRACE_TRIG_MODE_RESET;
 	cmd[1] = id;
 
 	status = ipcClientRequest( (void *)&cmd, 8, 0, 0, OCP_IF_CONFIG_DUAL_CORE_COMM_TO );

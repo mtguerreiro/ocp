@@ -444,15 +444,6 @@ class Boost:
 
         return (0,)
 
-    def trig_mode_reset_trace(self):
-        """
-        """
-        status, = self._tr_if.trig_mode_reset()
-        if status != 0:
-            return (-1, status)
-
-        return (0,)
-
     # ========================================================================
     
     # ========================================================================

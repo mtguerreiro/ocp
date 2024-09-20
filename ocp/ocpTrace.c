@@ -78,7 +78,15 @@ int32_t ocpTraceReset(uint32_t id){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	ctraceReset( &xifcontrol.traces[id] );
+	switch ( xifcontrol.traces[id].traceMode ) {
+	case CTRACE_MANUAL:
+	default:
+		ctraceReset( &xifcontrol.traces[id] );
+	break;
+	case CTRACE_TRIGGER:
+		ctraceTrigModeReset( &xifcontrol.traces[id] );
+	break;
+	}
 
 	return 0;
 }
@@ -135,8 +143,8 @@ int32_t ocpTraceEnableTrigMode(uint32_t id){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	ocpTraceTrigModeReset(id);
 	xifcontrol.traces[id].traceMode = CTRACE_TRIGGER;
+	ocpTraceReset(id);
 
 	return 0;
 }
@@ -145,17 +153,8 @@ int32_t ocpTraceEnableManualMode(uint32_t id){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	ocpTraceReset(id);
 	xifcontrol.traces[id].traceMode = CTRACE_MANUAL;
-
-	return 0;
-}
-//-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeReset(uint32_t id){
-
-	if( id >= OCP_TRACE_END ) return -1;
-
-	ctraceTrigModeReset( &xifcontrol.traces[id] );
+	ocpTraceReset(id);
 
 	return 0;
 }
