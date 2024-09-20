@@ -37,7 +37,22 @@ typedef int32_t (*ipcClientIrqSend)(void);
  */
 typedef int32_t (*ipcClientIrqReceive)(uint32_t timeout);
 
+/**
+ * @brief Obtains the lock.
+ * 
+ * The current implementation of the IPC library is not thread-safe. To prevent
+ * issues of concurrency, the client library tries to get the lock before 
+ * sending each request. The specific locking mechanism is supplied by the 
+ * user.
+ *
+ * @param timeout Timeout to obtain lock.
+ */
 typedef int32_t (*ipcClientLock)(uint32_t timeout);
+
+/**
+ * @brief Relases the lock.
+ * 
+ */
 typedef void (*ipcClientUnlock)(void);
 
 #define IPC_CLIENT_ERR_MEM_WRITE		-1	/*!< Failed to write to memory */

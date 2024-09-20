@@ -4,13 +4,13 @@
  * @brief Server for the inter-processor communication (IPC) library.
  *
  * The purpose of the IPC library is to allow two cores of a dual-core system
- * to exchange data, based on a client-server methodology. For this, the IPC
- * library implements a small protocol based on some assumptions.
+ * to exchange data, based on a client-server model. For this, the IPC
+ * library implements a small protocol based on the following assumptions:
  *
- * - Both cores share some memory region.
+ * - Both cores share some memory region
  * - The client core always initiates a transaction, and the server core
- *   always reply to a request.
- * - Each core can generate an interrupt signal on the other.
+ *   always reply to a request
+ * - Each core can generate an interrupt signal on the other
  *
  * The protocol
  * ============
@@ -22,39 +22,40 @@
  * | SIZE (4 bytes) | DATA (n bytes) |
  * -----------------------------------
  *
- * - SIZE is the number of bytes that to be sent to the server.
+ * - The SIZE field is the number of bytes to be sent to the server.
  *
- * - DATA is the data to be sent to the server.
+ * - The DATA field is the data to be sent to the server.
  *
  * The server replies to all requests, following the same format. If the
- * request requires no answer, the server still writes SIZE, but the value
- * will be zero.
+ * request requires no answer, the server still sends the SIZE field back, but 
+ * the value will be zero.
  *
  * Inner workings
- * =============
+ * ==============
  *
  * Internally, the data exchange between the two cores works based on memory
  * sharing and interrupt signals.
  *
  * - The client first writes the request to a memory region known and
  *   accessible by the server (server's address, or client->server memory).
- *   The request has the format given above.
+ *   The request consists of the size and data fields.
  *
  * - After writing all data, the client generates and interrupt on the server,
  *   and waits for an interrupt from the server.
  *
  * - Upon receiving an interrupt from the client, the server accesses the
- *   memory region designated for receiving data from the client.
+ *   memory region designated to receive data from the client.
  *
- * - The server processes the request and writes its response to a memory
- *   region known and accessible by the client (client's address, or
- *   server->client memory). If there is no response to be written, the server
- *   still writes SIZE, but as 0.
+ * - The server processes the request by calling a callback assigned by the
+ *   user and writes the response to a memory region known and accessible by 
+ *   the client (client's address, or server->client memory). If there is no
+ *   response to be written, the server still writes the SIZE field, but writes
+ *   0 to it.
  *
  * - After writing all data, the server generates an interrupt on the client.
  *
  * - Upon receiving an interrupt from the server, the client accesses the
- * 	 memory region designated for receiving data from the server.
+ * 	 memory region designated to receive data from the server.
  *
  * Design decisions
  * ================
@@ -95,7 +96,7 @@
 /**
  * @brief Callback function to generate an interrupt signal on the client core.
  *
- * @return 0 on success, any other valuer otherwise.
+ * @return 0 if succeeded, any other value otherwise.
  */
 typedef int32_t (*ipcServerIrqSend)(void);
 
