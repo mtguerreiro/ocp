@@ -18,7 +18,7 @@
  *
  * To keep the state machine flexible, the functions executed at each step are
  * actually callbacks supplied by the user. This has the advantage of
- * decoupling these steps: the get measurements callback just worry about
+ * decoupling these steps: the get measurements callback just worries about
  * getting physical measurements from the system and saving them to a buffer.
  * The control algorithm just reads the measurements from the measurements
  * buffer and write its outputs to an actuator buffer. Finally, the callback
@@ -53,7 +53,7 @@
  * ==================
  *
  * To run the control system, the `controlsysRun` should be executed. This
- * function would be executed each time there is new data  available, for
+ * function would be executed each time there is new data available, for
  * example, at the end of conversion of the ADCs. The `controlsys` library
  * should not be responsible for triggering new conversions; the underlying
  * hardware should be responsible for this.
@@ -65,12 +65,12 @@
  * ==========
  *
  * It is important to note that the `controlsys` library does not run any
- * control algorithm itself, it merely calls a callback, passing the
- * measurements and expecting that the control outputs will be written in the
- * output buffer. Likewise, the library does not actually performs any
- * measurement or actuation. These are provided by callbacks, which could come
- * from a control library (where the controller is actually run) and a hardware
- * library (where the measurements are actually taken).
+ * control algorithm itself, it merely uses a callback, passing  measurements
+ * and expecting the control outputs to be written in the output buffer.
+ * Likewise, the library does not actually performs any measurement or
+ * actuation. These are provided by callbacks, which could come from a control
+ * library (where the controller is actually run) and a hardware library (where
+ * the measurements are actually taken).
  *
  * For this reason, the library provides additional callbacks that can be
  * attached to the the controller and hardware libraries, such that the user
@@ -227,9 +227,9 @@ typedef int32_t(*controlsysControllerStatus_t)(void);
  * @param insize Size of the input data, in number of bytes.
  *
  * @param out Pointer to pointer holding the output buffer's address. This is
- * implemented as a pointer to pointer for maximum flexibility. The user can
- * either write the command's response to the buffer given initially, or the
- * user can overwrite the pointer to point to another buffer.
+ * implemented as a pointer to pointer for flexibility. The user can either
+ * write the command's response to the buffer given initially, or the user can
+ * overwrite the pointer to point to another buffer.
  *
  * @param maxoutsize Size of the initial output buffer.
  *
@@ -281,16 +281,16 @@ typedef struct {
 
     controlsysRun_t frun;
 
-	controlsysHardwareInterface_t fhwInterface;
-	controlsysHardwareStatus_t fhwStatus;
+    controlsysHardwareInterface_t fhwInterface;
+    controlsysHardwareStatus_t fhwStatus;
 
-	controlsysControllerInterface_t fcontrollerInterface;
-	controlsysControllerStatus_t fcontrollerStatus;
+    controlsysControllerInterface_t fcontrollerInterface;
+    controlsysControllerStatus_t fcontrollerStatus;
 
-	controlsysEnable_t fenable;
-	controlsysDisable_t fdisable;
+    controlsysEnable_t fenable;
+    controlsysDisable_t fdisable;
 
-	controlsysStatus_t status;
+    controlsysStatus_t status;
 }controlsys_t;
 
 typedef controlsys_t controlsysConfig_t;
@@ -323,9 +323,9 @@ void controlsysInitialize(controlsys_t *sys, controlsysConfig_t *config);
  * @param insize Size of the input data, in number of bytes.
  *
  * @param out Pointer to pointer holding the output buffer's address. This is
- * implemented as a pointer to pointer for maximum flexibility. The user can
- * either write the command's response to the buffer given initially, or the
- * user can overwrite the pointer to point to another buffer.
+ * implemented as a pointer to pointer for flexibility. The user can either
+ * write the command's response to the buffer given initially, or the user can
+ * overwrite the pointer to point to another buffer.
  *
  * @param maxoutsize Size of the initial output buffer.
  *
@@ -345,9 +345,9 @@ int32_t controlsysControllerInterface(controlsys_t *sys,
  * @param insize Size of the input data, in number of bytes.
  *
  * @param out Pointer to pointer holding the output buffer's address. This is
- * implemented as a pointer to pointer for maximum flexibility. The user can
- * either write the command's response to the buffer given initially, or the
- * user can overwrite the pointer to point to another buffer.
+ * implemented as a pointer to pointer for flexibility. The user can either
+ * write the command's response to the buffer given initially, or the user can
+ * overwrite the pointer to point to another buffer.
  *
  * @param maxoutsize Size of the initial output buffer.
  *
