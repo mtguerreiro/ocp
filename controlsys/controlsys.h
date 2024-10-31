@@ -322,12 +322,13 @@ void controlsysInitialize(controlsys_t *sys, controlsysConfig_t *config);
  *
  * @param insize Size of the input data, in number of bytes.
  *
- * @param out Pointer to pointer holding the output buffer's address. This is
- * implemented as a pointer to pointer for flexibility. The user can either
- * write the command's response to the buffer given initially, or the user can
- * overwrite the pointer to point to another buffer.
+ * @param out Pointer to pointer holding the output buffer's address. Usually,
+ * the data is written to the buffer pointer by this pointer. However, there
+ * can be cases where the controller might point to another buffer where the
+ * response is stored.
  *
- * @param maxoutsize Size of the initial output buffer.
+ * @param maxoutsize Maximum size that the initial output buffer is willing to
+ * accept.
  *
  * @return The size of the query's response (>= 0) or an error (< 0).
  */
@@ -344,12 +345,13 @@ int32_t controlsysControllerInterface(controlsys_t *sys,
  *
  * @param insize Size of the input data, in number of bytes.
  *
- * @param out Pointer to pointer holding the output buffer's address. This is
- * implemented as a pointer to pointer for flexibility. The user can either
- * write the command's response to the buffer given initially, or the user can
- * overwrite the pointer to point to another buffer.
+ * @param out Pointer to pointer holding the output buffer's address. Usually,
+ * the data is written to the buffer pointer by this pointer. However, there
+ * can be cases where the hardware might point to another buffer where the
+ * response is stored.
  *
- * @param maxoutsize Size of the initial output buffer.
+ * @param maxoutsize Maximum size that the initial output buffer is willing to
+ * accept.
  *
  * @return The size of the query's response (>= 0) or an error (< 0).
  */
@@ -359,14 +361,6 @@ int32_t controlsysHardwareInterface(controlsys_t *sys,
 //-----------------------------------------------------------------------------
 /**
  * @brief Runs the control system once.
- *
- * This runs the main state machine of the control system: get measurements,
- * run control algorithm and apply control outputs.
- *
- * Execution of these steps depends on the status of each step. Unless `sys` is
- * disabled, the get measurements step is always executed. The other two steps
- * are only executed if `sys` is enabled, which is only possible if there are
- * no errors (from controller and hardware).
  *
  * Typically, this function would be placed at an interrupt generated when
  * new data is available.
