@@ -18,10 +18,7 @@
 
 #include "stddef.h"
 
-#include "../utils/rp.h"
-
-#include "ctlrif/ctlrif.h"
-#include "ctlrif/pynq/buckcontrol.h"
+#include "../rp/rp.h"
 
 #ifdef OCP_CONFIG_MASTER_CORE
 #include "ipcClient.h"
