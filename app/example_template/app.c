@@ -6,8 +6,10 @@
 
 #include "stdio.h"
 
+/* OCP config */
+#include "ocpConfig.h"
+
 /* Open controller project */
-#include "ocp/ocpConfig.h"
 #include "ocp/ocpTrace.h"
 #include "ocp/ocpCS.h"
 #include "ocp/ocpIf.h"
@@ -64,10 +66,11 @@ static float texec = 0.0f;
 //-----------------------------------------------------------------------------
 int32_t appInit(void){
 
+    appOcpTracesInit();
+
     appHwInit();
     appControllerInit();
 
-    appOcpTracesInit();
     appOcpControlSystemInit();
 
     return 0;
@@ -88,7 +91,7 @@ static int32_t appOcpTracesInit(void){
     config.data = (void **)trace0Data;
     config.names = trace0Names;
 
-    ocpTraceInitialize(APP_OCP_TRACE_ID, &config, "App Trace");
+    ocpTraceInitialize(APP_OCP_TRACE_ID, &config, "App trace");
 
     return 0;
 }
@@ -119,18 +122,6 @@ static int32_t appOcpControlSystemInit(void){
     ocpCSInitialize(APP_OCP_CS_ID, &config, "App controller");
 
     return 0;
-}
-//-----------------------------------------------------------------------------
-//=============================================================================
-
-//=============================================================================
-/*----------------------------------- IRQ -----------------------------------*/
-//=============================================================================
-//-----------------------------------------------------------------------------
-void appAdcIrq(void *callbackRef){
-
-    ocpCSRun(APP_OCP_CS_ID);
-    ocpTraceSave(APP_OCP_TRACE_ID);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
