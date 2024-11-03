@@ -42,11 +42,11 @@ void *ocpIfThreadProcess(void *param);
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
-int server_socket, client_socket;
-socklen_t client_len;
-struct sockaddr_in server_addr, client_addr;
+static int server_socket, client_socket;
+static socklen_t client_len;
+static struct sockaddr_in server_addr, client_addr;
 
-char buffer[256];
+static char buffer[256];
 
 //=============================================================================
 
@@ -66,7 +66,6 @@ void *ocpIfThread(void *ptr){
         printf("%s: Error creating socket. socket returned %d\n\r", __FUNCTION__, server_socket);
         return 0;
     }
-
 
     /* Sets up the server address structure */
     memset(&server_addr, 0, sizeof(server_addr));

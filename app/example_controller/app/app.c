@@ -13,10 +13,12 @@
 #include "ocp/ocpTrace.h"
 #include "ocp/ocpCS.h"
 #include "ocp/ocpIf.h"
+#include "ocp/ocpOpil.h"
 
 /* App */
 #include "appHw.h"
 #include "appController.h"
+#include "appOpil.h"
 //============================================================================
 
 
@@ -27,6 +29,10 @@
 static int32_t appOcpTracesInit(void);
 //-----------------------------------------------------------------------------
 static int32_t appOcpControlSystemInit(void);
+//-----------------------------------------------------------------------------
+static int32_t appOpilInit(void);
+//-----------------------------------------------------------------------------
+void appAdcIrq(void *callbackRef);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
@@ -70,6 +76,7 @@ int32_t appInit(void){
 
     appHwInit();
     appControllerInit();
+    appOpilInit();
 
     appOcpControlSystemInit();
 
@@ -106,8 +113,8 @@ static int32_t appOcpControlSystemInit(void){
     config.fhwInterface = appHwIf;
     config.fhwStatus = appHwStatus;
 
-    config.fgetInputs = appHwGetMeasurements;
-    config.fapplyOutputs = appHwUpdateControl;
+    config.fgetInputs = appOpilGetMeasurements;
+    config.fapplyOutputs = appOpilUpdateControl;
 
     config.frun = appControllerRun;
     config.fcontrollerInterface = appControllerIf;
@@ -122,6 +129,36 @@ static int32_t appOcpControlSystemInit(void){
     ocpCSInitialize(APP_OCP_CS_ID, &config, "App controller");
 
     return 0;
+}
+//-----------------------------------------------------------------------------
+static int32_t appOpilInit(void){
+
+    ocpOpilConfig_t config;
+
+    config.updateMeas = appOpilUpdateMeasurements;
+    config.updateSimData = appOpilUpdateSimData;
+
+    config.initControl = 0;
+    config.runControl = appAdcIrq;
+
+    config.getControl = appOpilGetControl;
+    config.getControllerData = appOpilGetControllerData;
+
+    ocpOpilInitialize(&config);
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+//=============================================================================
+
+//=============================================================================
+/*----------------------------------- IRQ -----------------------------------*/
+//=============================================================================
+//-----------------------------------------------------------------------------
+void appAdcIrq(void *callbackRef){
+
+    ocpCSRun(APP_OCP_CS_ID);
+    ocpTraceSave(APP_OCP_TRACE_ID);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

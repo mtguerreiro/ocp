@@ -6,18 +6,12 @@
 #include <stdlib.h>
 #include <pthread.h>
 
-
 #include "ocp/ocpIf.h"
 
-#include "app.h"
+#include "app/app.h"
 
 #include "threads/ocpIfThread.h"
-//=============================================================================
-
-//=============================================================================
-/*-------------------------------- Prototypes -------------------------------*/
-//=============================================================================
-int32_t mainOcpWinInit(void);
+#include "threads/ocpOpilThread.h"
 //=============================================================================
 
 //=============================================================================
@@ -26,37 +20,18 @@ int32_t mainOcpWinInit(void);
 //-----------------------------------------------------------------------------
 int main(void){
 
-    pthread_t ocpIfThreadHandle;
+    pthread_t ocpIfThreadHandle, ocpOpilThreadHandle;
 
-    /* Initializes OCP interface */
     ocpIfInitialize();
 
     appInit();
 
-    //pthread_create( &opilThreadHandle, NULL, opilThread, NULL);
     pthread_create( &ocpIfThreadHandle, NULL, ocpIfThread, NULL);
+    pthread_create( &ocpOpilThreadHandle, NULL, ocpOpilThread, NULL);
 
-    /* Wait till threads are complete before main continues. Unless we  */
-    /* wait we run the risk of executing an exit which will terminate   */
-    /* the process and all threads before the threads have completed.   */
-
-    //pthread_join( opilThreadHandle, NULL);
     pthread_join( ocpIfThreadHandle, NULL);
 
     exit(0);
 }
-//-----------------------------------------------------------------------------
-//=============================================================================
-
-//=============================================================================
-/*---------------------------- Static functions -----------------------------*/
-//=============================================================================
-//-----------------------------------------------------------------------------
-// int32_t mainOcpWinInit(void){
-
-//     ocpWinInitialize( 0 );
-
-//     return 0;
-// }
 //-----------------------------------------------------------------------------
 //=============================================================================

@@ -24,7 +24,6 @@ int main(void){
 
     pthread_t ocpIfThreadHandle;
 
-    /* Initializes OCP interface */
     ocpIfInitialize();
 
     appInit();

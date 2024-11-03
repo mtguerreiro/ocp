@@ -4,6 +4,8 @@
 //=============================================================================
 #include "appController.h"
 
+// TODO: appConfig?
+#include "config/stypes.h"
 //============================================================================
 
 
@@ -17,8 +19,13 @@ int32_t appControllerInit(void){
 }
 //-----------------------------------------------------------------------------
 int32_t appControllerRun(void *inputs, int32_t ninputs, void *outputs, int32_t nmaxoutputs){
+    
+    stypesMeasurements_t *meas = (stypesMeasurements_t *)inputs;
+    stypesControl_t *out = (stypesControl_t *)outputs;
 
-    return 0;
+    out->D = 0.5f;
+
+    return sizeof(stypesControl_t);
 }
 //-----------------------------------------------------------------------------
 int32_t appControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){

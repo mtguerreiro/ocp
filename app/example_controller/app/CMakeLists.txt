@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.12)
 
-add_library(threads ocpIfThread.c ocpOpilThread.c)
+add_library(app app.c appController.c appHw.c appOpil.c)
 
-target_link_libraries(threads ocp opil opil_linux_comm opil_ctlrif)
+target_link_libraries(app ocp opil)
 
-target_include_directories(threads PRIVATE
+target_include_directories(app PRIVATE
                            "${PROJECT_SOURCE_DIR}"
                            "../${OCP_PATH}"
                            "${OPIL_PATH}"
