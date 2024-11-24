@@ -13,7 +13,7 @@
 
 #include "ocp/ocpIf.h"
 
-#include "config/stypes.h"
+#include "stypes.h"
 
 //=============================================================================
 

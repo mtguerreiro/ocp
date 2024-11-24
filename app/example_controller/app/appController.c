@@ -5,7 +5,7 @@
 #include "appController.h"
 
 // TODO: appConfig?
-#include "config/stypes.h"
+#include "stypes.h"
 //============================================================================
 
 

@@ -5,8 +5,7 @@
 #include "appOpil.h"
 
 //TODO: appConfig?
-#include "config/stypes.h"
-//#include "config/stypesBuck.h"
+#include "stypes.h"
 //=============================================================================
 
 //=============================================================================
