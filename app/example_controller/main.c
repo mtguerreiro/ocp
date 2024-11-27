@@ -26,10 +26,10 @@ int main(void){
 
     appInit();
 
-    pthread_create( &ocpIfThreadHandle, NULL, ocpIfThread, NULL);
-    pthread_create( &ocpOpilThreadHandle, NULL, ocpOpilThread, NULL);
+    pthread_create( &ocpIfThreadHandle, NULL, ocpIfThread, NULL );
+    pthread_create( &ocpOpilThreadHandle, NULL, ocpOpilThread, NULL );
 
-    pthread_join( ocpIfThreadHandle, NULL);
+    pthread_join( ocpIfThreadHandle, NULL );
 
     exit(0);
 }

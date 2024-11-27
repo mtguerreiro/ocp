@@ -6,6 +6,22 @@
 
 // TODO: appConfig?
 #include "stypes.h"
+
+#include "stdio.h"
+//============================================================================
+
+//=============================================================================
+/*--------------------------------- Globals ---------------------------------*/
+//=============================================================================
+static float ki = 0.0530530303030496;
+static float kv = -0.04430925432587546;
+static float k_ev = -98.62715371027674;
+
+static float e = 0.0f;
+static float ts = 1.0f / 100000.0f;
+
+static float v_ref = 6.0f;
+static float dt = 1.0f / 100000.0f;
 //============================================================================
 
 
@@ -14,6 +30,9 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 int32_t appControllerInit(void){
+
+    /* Resets integrator */
+    e = 0.0f;
     
     return 0;
 }
@@ -23,13 +42,40 @@ int32_t appControllerRun(void *inputs, int32_t ninputs, void *outputs, int32_t n
     stypesMeasurements_t *meas = (stypesMeasurements_t *)inputs;
     stypesControl_t *out = (stypesControl_t *)outputs;
 
-    out->D = 0.5f;
+    float i, v;
+    float u;
+
+    i = meas->i;
+    v = meas->v_out;
+
+    e = e + dt * (v_ref - v);
+
+    u = - ki * i - kv * v - k_ev * e;
+
+    if( u > 1.0f ) u = 1.0f;
+    else if( u < 0.0f ) u = 0.0f;
+
+    out->D = u;
 
     return sizeof(stypesControl_t);
 }
 //-----------------------------------------------------------------------------
 int32_t appControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    float *p = (float *)in;
+
+    ki = *p++;
+    kv = *p++;
+    k_ev = *p++;
+
+    dt = *p++;
+
+    v_ref = *p++;
+
+    printf("v_ref: %.2f\n\r", v_ref);
+    fflush( stdout );
+
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t appControllerStatus(void){
