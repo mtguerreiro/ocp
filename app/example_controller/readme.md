@@ -1,5 +1,7 @@
 # Introduction
 
+This example shows how to use `ocp`. 
+
 This is a basic template to create new applications with `ocp`. 
 
 # Initialization

@@ -1,38 +1,26 @@
-/*
- * stypesBuck.h
- *
- *  Created on: 24 de mai de 2023
- *      Author: LRS
- */
 
-#ifndef S_TYPES_H_
-#define S_TYPES_H_
+#ifndef APP_CONFIG_H_
+#define APP_CONFIG_H_
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
 #include "stdint.h"
-#include "stddef.h"
 
-//=============================================================================
+#include "ocpConfig.h"
+//============================================================================
 
 //=============================================================================
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
-typedef struct{
-	float i;
-	float v_out;
-}stypesMeasurements_t;
 
-typedef struct{
-}stypesSimData_t;
+/* IDs for the trace and control system */
+#define APP_CONFIG_OCP_CS_ID                           OCP_CS_1
+#define APP_CONFIG_OCP_TRACE_ID                        OCP_TRACE_1
 
-typedef struct{
-	float u;
-}stypesControl_t;
+/* Size of trace */
+#define APP_CONFIG_OCP_TRACE_0_SIZE_BYTES              (10 * 1024 * 1024)
 
-typedef struct{
-}stypesControllerData_t;
 //=============================================================================
 
-#endif /* S_TYPES_H_ */
+#endif /* APP_CONFIG_H_ */

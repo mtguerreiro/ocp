@@ -1,6 +1,6 @@
 # Introduction
 
-This is a basic template to create new applications with `ocp`. 
+This is an introductory example that can also be used as a basic template to create new applications with `ocp`. 
 
 # Initialization
 
@@ -38,7 +38,7 @@ Note that the trace and the control system can be initialized with names. In thi
 
 In this example, all the controller and hardware files are empty. However, it is already possible to interact with your control system.
 
-Build the files and run the target (here, we're assuming you've opened this folder in Visual Studio Code).  
+Build the files and run the target (here, we're assuming you've opened this folder in Visual Studio Code - alternatively, you can just build with CMake if you don't want to use VS Code).  
 
 Then, run the Python script `python_ex_template.py` with IDLE within the Python interpreter.
 

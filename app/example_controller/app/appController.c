@@ -4,10 +4,12 @@
 //=============================================================================
 #include "appController.h"
 
-// TODO: appConfig?
 #include "stypes.h"
 
-#include "stdio.h"
+#include "appConfig.h"
+
+/* OCP */
+#include "ocp/ocpTrace.h"
 //============================================================================
 
 //=============================================================================
@@ -22,6 +24,10 @@ static float ts = 1.0f / 100000.0f;
 
 static float v_ref = 6.0f;
 static float dt = 1.0f / 100000.0f;
+
+static float i;
+static float v;
+static float u;
 //============================================================================
 
 
@@ -31,9 +37,13 @@ static float dt = 1.0f / 100000.0f;
 //-----------------------------------------------------------------------------
 int32_t appControllerInit(void){
 
-    /* Resets integrator */
-    e = 0.0f;
+    ocpTraceAddSignal(OCP_TRACE_1, (void *)( &i ), "Inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, (void *)( &v ), "Output voltage");
     
+    ocpTraceAddSignal(OCP_TRACE_1, (void *)( &u ), "Duty-cycle");
+    
+    ocpTraceAddSignal(OCP_TRACE_1, (void *)( &v_ref ), "Reference");
+
     return 0;
 }
 //-----------------------------------------------------------------------------
@@ -41,9 +51,6 @@ int32_t appControllerRun(void *inputs, int32_t ninputs, void *outputs, int32_t n
     
     stypesMeasurements_t *meas = (stypesMeasurements_t *)inputs;
     stypesControl_t *out = (stypesControl_t *)outputs;
-
-    float i, v;
-    float u;
 
     i = meas->i;
     v = meas->v_out;
@@ -55,7 +62,7 @@ int32_t appControllerRun(void *inputs, int32_t ninputs, void *outputs, int32_t n
     if( u > 1.0f ) u = 1.0f;
     else if( u < 0.0f ) u = 0.0f;
 
-    out->D = u;
+    out->u = u;
 
     return sizeof(stypesControl_t);
 }
@@ -71,9 +78,6 @@ int32_t appControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsi
     dt = *p++;
 
     v_ref = *p++;
-
-    printf("v_ref: %.2f\n\r", v_ref);
-    fflush( stdout );
 
     return 0;
 }
