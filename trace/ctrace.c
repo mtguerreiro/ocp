@@ -93,7 +93,7 @@ void ctraceSave(ctrace_t *trace){
 
 	uint32_t size;
 
-	size = sizeof(size_t) * trace->n;
+	size = sizeof(ctracemem_size_t) * trace->n;
 
 	ctracememSave( &trace->mem, trace->data, size );
 }

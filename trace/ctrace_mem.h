@@ -18,10 +18,13 @@
 //===========================================================================
 /*------------------------------ Definitions ------------------------------*/
 //===========================================================================
+
+typedef uint32_t ctracemem_size_t;
+
 typedef struct ctracemem_t{
-	size_t *start;
-	size_t *end;
-	size_t *p;
+	ctracemem_size_t *start;
+	ctracemem_size_t *end;
+	ctracemem_size_t *p;
 	int32_t maxsize;
 }ctracemem_t;
 //===========================================================================

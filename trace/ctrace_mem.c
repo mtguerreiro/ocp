@@ -36,7 +36,7 @@ int32_t ctracememGetSize(ctracemem_t *trace){
 
 	int32_t size;
 
-	size = (trace->end - trace->start) * sizeof(size_t);
+	size = (trace->end - trace->start) * sizeof(ctracemem_size_t);
 
 	return size;
 }
@@ -45,7 +45,7 @@ int32_t ctracememSetSize(ctracemem_t *trace, int32_t size){
 
 	if( size > trace->maxsize ) return -1;
 
-	size = size / sizeof(size_t);
+	size = size / sizeof(ctracemem_size_t);
 
 	trace->end = trace->start + size;
 	trace->p = trace->start;
@@ -60,9 +60,9 @@ void ctracememReset(ctracemem_t *trace){
 //---------------------------------------------------------------------------
 void ctracememSave(ctracemem_t *trace, void **src, uint32_t size){
 
-	size_t **s = (size_t **)src;
+	ctracemem_size_t **s = (ctracemem_size_t **)src;
 
-	size = size / sizeof(size_t);
+	size = size / sizeof(ctracemem_size_t);
 
 	if( (trace->p + size) > trace->end ) return;
 
