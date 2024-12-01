@@ -67,13 +67,13 @@ The size of the trace, e.g. how many bytes it can store, can be set dynamically.
 
 In this case, the trace can store up to 10 MB of data. All signals in a single trace are stored simultaneously at an event defined by the user in the C code of the application. A common case is to set the trace so that it stores its signals every time the controller is executed. 
 
-The size of the trace can be dynamically set (up to its maximum size). For example, let's say we want to record the trace signals for 100 control events. Each trace is saved as a float in the controller's memory, which takes 4 bytes. Thus, if we have four signals and want to store 100 samples of each, we need to set the trace to have a size of `4*4*100`:
+The size of the trace can be dynamically set (up to its maximum size). For example, let's say we want to record the trace signals for 200 control events. Each trace is saved as a float in the controller's memory, which takes 4 bytes. Thus, if we have 4 signals and want to store 200 samples of each, we need to set the trace to have a size of `4*4*200`:
 
 ```python
->>> ocp.trace_set_size(0, 4 * 4 * 100)
+>>> ocp.trace_set_size(0, 4 * 4 * 200)
 (0,)
 >>> ocp.trace_get_size(0)
-(0, 1600)
+(0, 3200)
 ```
 
 ## Setting controller parameters
@@ -102,6 +102,7 @@ This function shows the parameters that can be set through the controller interf
 In the Python side, there is a `ocp.cs_controller_if` function, which takes as argument a data packet to be delivered to the `appControllerIf` function in C. Because we know what the C function expects, we can build a data packet in Python so that we can set the parameters in the controller.
 
 In Python, we can create a function to assemble this data packet as follows (defined in the `buck.py` file):
+
 ```python
 def format_params(ki, kv, k_ev, v_ref):
 
@@ -121,6 +122,7 @@ Since we can transmit data to the controller using the controller's interface, w
 In this example, we implement the function to design the controller and pack its parameters in binary format in the `buck.py` file. This file has two functions: `get_gains`, to get the gains of the controller according to settling time and overshoot specifications; and `format_gains` (shown above), to pack all parameters in the binary format expected by the controller.
 
 Now, we can set our controller. First, we obtain its gains, then we format these gains along with the reference in a binary data packet, and finally send the packet to the controller:
+
 ```python
 >>> ki, kv, k_ev = buck.get_gains(ts=1e-3, os=5)
 >>> ctlr_bin_data = buck.format_params(ki, kv, k_ev, 6)
@@ -131,22 +133,52 @@ Now, we can set our controller. First, we obtain its gains, then we format these
 ## Running the controller
 
 Now that the controller is set, we can run a closed-loop simulation and retrieve data stored by the controller. To do so, we use PLECS to simulate the buck converter. To run the PLECS simulation, we first need to build another C program, which is responsible for interfacing the simulation and the controller. To do so, in the command prompt, navigate to the `plecs` folder and run make:
+
 ```sh
 cd plecs
 make
 ```
 
 Now, open the PLECS model and start the simulation. In `ocp`, the controller is initially disabled, and must be enabled. In the Python shell, run:
+
 ```python
->>> ocp.cs_enable(0)
+>>> ocp.trace_reset(0); ocp.cs_enable(0)
 (0,)
 ```
 
-Now, if you look at PLECS' scope, you should see that the voltage is regulated to 6 V, the reference value we had previously set in the controller.
+This resets the trace (so it starts recording data again), and enables the controller. Now, if you look at PLECS' scope, you should see that the voltage is regulated to 6 V, the reference value we had previously set in the controller.
 
 Next, we can check the trace signals to see the data the controller recorded. We can retrieve the data from the controller as follows:
+
 ```python
->>> trace_bin_data = ocp.trace_read(0)
+>>> status, trace_data = ocp.trace_read(0)
+```
+
+`ocp.trace_read` returns the data stored in the controller's memory in binary format. If you check, `trace_data` has the size that we had previously set:
+
+```python
+>>> len(trace_data)
+3200
+```
+
+Because we know that we have four float signals in the trace, we can convert this binary data to a numpy array. In `python_ex_controller.py`, we wrote a function to do exactly that. To convert the data, run: 
+
+```python
+>>> data = trace_data_to_np_array(trace_data, 4)
+```
+
+The second argument of this function is the number of signals in the trace, which is 4. Now, if we check the shape of `data`, we get:
+
+```python
+>>> data.shape
+(200, 4)
+```
+
+This means each signal has 200 samples, and there are four signals, exactly as we've configured the trace previously. Now that we have the data, we can for example compare the reference signal and the output voltage as follows:
+
+```python
+>>> plt.plot(data[:, 1])
+>>> plt.plot(data[:, 3])
 ```
 
 # Notes
