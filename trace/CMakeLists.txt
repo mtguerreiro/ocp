@@ -1,3 +1,3 @@
 cmake_minimum_required(VERSION 3.12)
 
-add_library(ctrace ctrace.c ctrace_mem.c)
+add_library(ctrace ctrace.c ctrace_mem.c ctrace_circBuf.c)

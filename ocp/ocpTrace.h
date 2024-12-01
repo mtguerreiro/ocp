@@ -21,6 +21,7 @@
 //===========================================================================
 
 typedef ctraceConfig_t ocpTraceConfig_t;
+
 //===========================================================================
 
 //===========================================================================
@@ -46,6 +47,18 @@ int32_t ocpTraceGetSignalsNames(uint32_t id, char *buffer, int32_t maxsize);
 int32_t ocpTraceGetNumberTraces(void);
 //---------------------------------------------------------------------------
 int32_t ocpTraceGetTracesNames(char *buffer, int32_t maxsize);
+//---------------------------------------------------------------------------
+int32_t ocpTraceEnableTrigMode(uint32_t id);
+//---------------------------------------------------------------------------
+int32_t ocpTraceEnableManualMode(uint32_t id);
+//-----------------------------------------------------------------------------
+int32_t ocpTraceTrigModeSetNumPreTrigSamples(uint32_t id, size_t numPreTrigSamples);
+//-----------------------------------------------------------------------------
+int32_t ocpTraceTrigModeSetTraceToTrack(uint32_t id, size_t traceToTrack);
+//-----------------------------------------------------------------------------
+int32_t ocpTraceTrigModeSetTrigBound(uint32_t id, int32_t trigBound);
+//---------------------------------------------------------------------------
+int32_t ocpTraceTrigModeGetTail(uint32_t id);
 //---------------------------------------------------------------------------
 int32_t ocpTraceSave(uint32_t id);
 //---------------------------------------------------------------------------

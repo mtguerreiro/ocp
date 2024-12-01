@@ -29,6 +29,12 @@ typedef struct ctraceConfig_t{
 	char *names;
 }ctraceConfig_t;
 
+/* Save Mode enum */
+typedef enum {
+	CTRACE_MANUAL,
+	CTRACE_TRIGGER
+}ctraceMode_t;
+
 /* Trace context */
 typedef struct ctrace_t{
 
@@ -36,6 +42,7 @@ typedef struct ctrace_t{
 	void **data;
 	char *names;
 	char *np;
+	ctraceMode_t traceMode;
 	ctracemem_t mem;
 }ctrace_t;
 
@@ -65,6 +72,18 @@ int32_t ctraceGetNumberSignals(ctrace_t *trace);
 int32_t ctraceGetSignalsNames(ctrace_t *trace, char *buffer, int32_t maxsize);
 //---------------------------------------------------------------------------
 void ctraceSave(ctrace_t *trace);
+//---------------------------------------------------------------------------
+void ctraceTrigModeReset(ctrace_t *trace);
+//---------------------------------------------------------------------------
+int32_t ctraceTrigModeSetNumPreTrigSamples(ctrace_t *trace, size_t numPreTrigSamples);
+//---------------------------------------------------------------------------
+int32_t ctraceTrigModeSetTraceToTrack(ctrace_t *trace, size_t traceToTrack);
+//---------------------------------------------------------------------------
+int32_t ctraceTrigModeSetTrigBound(ctrace_t *trace, int32_t trigBound);
+//---------------------------------------------------------------------------
+void ctraceTrigModeSave(ctrace_t *trace);
+//---------------------------------------------------------------------------
+int32_t ctraceTrigModeGetTail(ctrace_t *trace);
 //---------------------------------------------------------------------------
 //===========================================================================
 

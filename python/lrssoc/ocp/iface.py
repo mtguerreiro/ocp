@@ -8,6 +8,8 @@ import time
 import struct
 import lrssoc
 
+from struct import pack, unpack
+
 class Commands:
     """
     """
@@ -21,15 +23,21 @@ class Commands:
         self.trace_get_number_traces = 6
         self.trace_get_traces_names = 7
         self.trace_get_address = 8
-        self.cs_status = 9
-        self.cs_enable = 10
-        self.cs_disable = 11
-        self.cs_controller_if = 12
-        self.cs_hardware_if = 13
-        self.cs_get_number_controllers = 14
-        self.cs_get_controllers_names = 15
-        self.platform_id = 16
-        self.platform_if = 17
+        self.trace_enable_trig_mode = 9             #Added for Trig Mode
+        self.trace_enable_manual_mode = 10          #Added for Trig Mode
+        self.trace_set_num_pre_trig_samples = 11    #Added for Trig Mode
+        self.trace_set_trace_to_track = 12          #Added for Trig Mode
+        self.trace_set_trig_bound = 13              #Added for Trig Mode
+        self.trace_get_tail = 14                    #Added for Trig Mode
+        self.cs_status = 15
+        self.cs_enable = 16
+        self.cs_disable = 17
+        self.cs_controller_if = 18
+        self.cs_hardware_if = 19
+        self.cs_get_number_controllers = 20
+        self.cs_get_controllers_names = 21
+        self.platform_id = 22
+        self.platform_if = 23
 
         
 class Interface:
@@ -685,3 +693,266 @@ class Interface:
             return (-1, status)
         
         return (0, rx_data)
+
+## Additional functions for Trig Mode
+
+    def trace_enable_trig_mode(self, tr_id):
+        """Switches to Trig Mode.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace's ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+            
+        Raises
+        ------
+        TypeError
+            If `tr_id` is not of `int` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element an error code, if any. If the command was executed
+            successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+      
+        cmd = self.cmd.trace_enable_trig_mode
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+       
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_enable_trig_mode.__name__
+            print('{:}: Error enabling Trig Mode. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+
+        return (0,)
+
+    def trace_enable_manual_mode(self, tr_id):
+        """Switches to Manual Mode.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace's ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+            
+        Raises
+        ------
+        TypeError
+            If `tr_id` is not of `int` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element an error code, if any. If the command was executed
+            successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+      
+        cmd = self.cmd.trace_enable_manual_mode
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+       
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_enable_manual_mode.__name__
+            print('{:}: Error enabling Manual Mode. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+
+        return (0,)
+
+    def trace_set_num_pre_trig_samples(self, tr_id, num):
+        """Sets the number of samples to be stored prior to the trigger sample in Trig Mode.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace's ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+
+        num : int
+            Number of samples to be stored prior to the trigger sample. The maximum size is determined by the
+            trace size.
+            
+        Raises
+        ------
+        TypeError
+            If `tr_id` or `num` are not of `int` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element an error code, if any. If the command was executed
+            successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+
+        if type(num) is not int:
+            raise TypeError('`num` must be of int type.')
+        
+        cmd = self.cmd.trace_set_num_pre_trig_samples
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(num, msb=False) )
+       
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_set_num_pre_trig_samples.__name__
+            print('{:}: Error setting Number of Pre Trigger Samples. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+
+        return (0,)
+
+    def trace_set_trace_to_track(self, tr_id, trace):
+        """Sets the trace (particular measurement value, e.g. output voltage) for which the trigger is defined in Trig Mode.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace's ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+
+        trace : int
+            Trace to track. The maximum size is determined by the
+            trace size.
+            
+        Raises
+        ------
+        TypeError
+            If `tr_id` or `trace` are not of `int` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element an error code, if any. If the command was executed
+            successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+
+        if type(trace) is not int:
+            raise TypeError('`trace` must be of int type.')
+        
+        cmd = self.cmd.trace_set_trace_to_track
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(trace, msb=False) )
+       
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_set_trace_to_track.__name__
+            print('{:}: Error setting Trace to track. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+
+        return (0,)
+
+    def trace_set_trig_bound(self, tr_id, bound):
+        """Sets the bound value at which the trigger is set when crossed in Trig Mode.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace's ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+
+        bound : float
+            Bound value for trigger.
+            
+        Raises
+        ------
+        TypeError
+            If `tr_id` is not of `int` or `bound` is neither of `int` nor `float` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element an error code, if any. If the command was executed
+            successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+
+        if type(bound) is not float and not int:
+            raise TypeError('`bound` must be of float type.')
+
+        cmd = self.cmd.trace_set_trig_bound
+
+        bound = pack('f', float(bound))
+        bound = unpack('i', bound)[0]
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(bound, msb=False) )
+       
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_set_trig_bound.__name__
+            print('{:}: Error setting Trigger bound. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+
+        return (0,)
+
+    def trace_get_tail(self, tr_id):
+        """Gets the position of the tail in the circular buffer used for Trig Mode. Necessary for reordering the buffer.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace's ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+
+        Raises
+        ------
+        TypeError
+            If `id` is not of `int` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element is the tail position, or an error code. If the command was
+            executed successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+        
+        cmd = self.cmd.trace_get_tail
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_get_tail.__name__
+            print('{:}: Error getting tail of circular buffer. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+        
+        tail = lrssoc.conversions.u8_to_u32(data, msb=False)
+
+        return (0, tail)

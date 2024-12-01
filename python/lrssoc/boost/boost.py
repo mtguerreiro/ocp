@@ -8,7 +8,6 @@ import lrssoc
 import numpy as np
 import matplotlib.pyplot as plt
 
-
 class Boost:
     """
 
@@ -244,8 +243,108 @@ class Boost:
 
         return self.get_controller_params('energycint')
     
+ #added for new controller
+    # ------------------------------------------------------------------------  
+    # -------------------------- EnergycMPC controller --------------------------
+    # ------------------------------------------------------------------------
+    def energycmpc_ctl_enable(self, reset=False):
+
+        return self.enable_controller('energycmpc', reset=reset)
+    
+
+    def energycmpc_ctl_set_params(self, uinc=None, ufinal=None):
+
+        params = {}
+        if L is not None:
+            params['L'] = float(L)
+        if C is not None:
+            params['C'] = float(C)
+        if d_min is not None:
+            params['d_min'] = float(d_min)
+        if d_max is not None:
+            params['d_max'] = float(d_max)    
+        if i_l_min is not None:
+            params['i_l_min'] = float(i_l_min)
+        if i_l_max is not None:
+            params['i_l_max'] = float(i_l_max)
+
+        return self.set_controller_params('energycmpc', params)
+
+    def energycmpc_ctl_get_params(self):
+
+        return self.get_controller_params('energycmpc')
+
+ #added for new controller
+    # ------------------------------------------------------------------------  
+    # -------------------------- EnergycintFPGA controller --------------------------
+    # ------------------------------------------------------------------------
+    def energycintFPGA_ctl_enable(self, reset=False):
+
+        return self.enable_controller('energycintFPGA', reset=reset)
+    
+
+    def energycintFPGA_ctl_set_params(self, uinc=None, ufinal=None):
+
+        params = {}
+        if Li is not None:
+            params['Li'] = float(Li)
+        if Co is not None:
+            params['Co'] = float(Co)
+        if K1 is not None:
+            params['K1'] = float(K1)
+        if K2 is not None:
+            params['K2'] = float(K2)    
+        if K3 is not None:
+            params['K3'] = float(K3)
+
+        return self.set_controller_params('energycintFPGA', params)
 
 
+    def energycintFPGA_ctl_get_params(self):
+
+        return self.get_controller_params('energycintFPGA')
+    
+    #-------------------------------------------------------------------------
+     #added for new controller
+    # ------------------------------------------------------------------------  
+    # -------------------------- Linearization controller --------------------
+    # This controller works with 2 frequencies and two processes:
+    # - Process 1: Linearization part that converts rho to u (duty cycle) and is
+    #  executed according to switching frequency SF (100 kHz).
+    # - Process 2: Selected controller that produces rho and it is being executed 
+    # according to control frequency CF (CF must be a factor of SF).
+    # ------------------------------------------------------------------------
+    def linearization_ctl_enable(self, reset=False):
+
+        return self.enable_controller('linearization', reset=reset)
+    
+
+    def linearization_ctl_set_params(self, uinc=None, ufinal=None):
+
+        params = {}
+        if L is not None:
+            params['L'] = float(L)
+        if C is not None:
+            params['C'] = float(C)
+        if KI is not None:
+            params['KI'] = float(KI)
+        if K1 is not None:
+            params['K1'] = float(K1)    
+        if K2 is not None:
+            params['K2'] = float(K2)
+        if alpha is not None:
+            params['alpha'] = float(alpha)
+        if control_f is not None:
+            params['control_f'] = float(control_f)
+        if control_s is not None:
+            params['control_s'] = float(control_s)
+
+        return self.set_controller_params('linearization', params)
+
+
+    def linearization_ctl_get_params(self):
+
+        return self.get_controller_params('linearization')
     
     # ------------------------------------------------------------------------
     
@@ -299,6 +398,51 @@ class Boost:
             return (-1, status)
 
         return (0, size)
+    
+    def enable_trig_mode(self):
+        """
+        """
+        status = self._tr_if.enable_trig_mode()
+        if status[0] != 0:
+            return (-1, status[0])
+
+        return (0,)
+
+    def enable_manual_mode(self):
+        """
+        """
+        status = self._tr_if.enable_manual_mode()
+        if status[0] != 0:
+            return (-1, status[0])
+
+        return (0,)
+
+    def set_num_pre_trig_samples(self, num):
+        """
+        """
+        status = self._tr_if.set_num_pre_trig_samples(num)
+        if status[0] != 0:
+            return (-1, status[0])
+
+        return (0,)
+
+    def set_trace_to_track(self, trace):
+        """
+        """
+        status = self._tr_if.set_trace_to_track(trace)
+        if status[0] != 0:
+            return (-1, status[0])
+
+        return (0,)
+
+    def set_trig_bound(self, bound):
+        """
+        """
+        status = self._tr_if.set_trig_bound(bound)
+        if status[0] != 0:
+            return (-1, status[0])
+
+        return (0,)
 
     # ========================================================================
     
@@ -428,8 +572,12 @@ class Boost:
         #d2 = 'sr_r_050424_1.csv'  v_o (vector2 = 1), v_o_ref (vectorref2 = 6), from trace (op2 = 0), no time vector (t2 = 0)
         #plot_compare( d1, d2, 2, 1, 7, 6, 10, 1, 0, 0, 0):
 
-
-
-        
+    def trig_mode_reorder(self, data):
+        status, tail = self._tr_if.trig_mode_get_tail()
+        if status != 0:
+            print('Error getting tail position')
+            return (-1, status)
+        data[:] = np.roll(data, -tail)
+        return (0,)
         
     # ========================================================================

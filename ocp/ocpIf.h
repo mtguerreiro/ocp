@@ -157,6 +157,72 @@ typedef enum{
      */
 	OCP_IF_CMD_TRACE_GET_ADDRESS,
 
+	/**
+	 * Command
+	 *  ---------------------------------------------------
+	 *  | ENABLE TRIG MODE (uint32) |  TRACE ID (uint32) |
+	 *  ---------------------------------------------------
+	 *
+	 * Response
+	 * No Response
+	 */
+	OCP_IF_CMD_TRACE_ENABLE_TRIG_MODE,
+
+	/**
+	 * Command
+	 *  ---------------------------------------------------
+	 *  | ENABLE MANUAL MODE (uint32) |  TRACE ID (uint32) |
+	 *  ---------------------------------------------------
+	 *
+	 * Response
+	 * No Response
+	 */
+	OCP_IF_CMD_TRACE_ENABLE_MANUAL_MODE,
+
+	/**
+	 * Command
+	 *  -----------------------------------------------------------------------------------------
+	 *  | SET NUM PRE TRIG SAMPLES (uint32) |  TRACE ID (uint32) | NUM_PRE_TRIG_SAMPLES (uint32) |
+	 *  -----------------------------------------------------------------------------------------
+	 *
+	 * Response
+	 * No Response
+	 */
+	OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES,
+
+	/**
+	 * Command
+	 *  -----------------------------------------------------------------------------
+	 *  | SET TRACE TO TRACK (uint32) |  TRACE ID (uint32) | TRACE_TO_TRACK (uint32) |
+	 *  -----------------------------------------------------------------------------
+	 *
+	 * Response
+	 * No Response
+	 */
+	OCP_IF_CMD_TRACE_SET_TRACE_TO_TRACK,
+
+	/**
+	 * Command
+	 *  ---------------------------------------------------------------------
+	 *  | SET TRIG BOUND (uint32) |  TRACE ID (uint32) | TRIG_BOUND (uint32) |
+	 *  ---------------------------------------------------------------------
+	 *
+	 * Response
+	 * No Response
+	 */
+	OCP_IF_CMD_TRACE_SET_TRIG_BOUND,
+
+	/**
+	 * Command
+	 *  ------------------------------------------
+	 *  | GET TAIL (uint32) |  TRACE ID (uint32) |
+	 *  ------------------------------------------
+	 *
+	 * Response
+	 * Tail position of circular buffer in Trigger Mode
+	 */
+	OCP_IF_CMD_TRACE_GET_TAIL,
+
     /**
      * Command
      *  ----------------------------------------------

@@ -97,4 +97,80 @@ class Trace:
         size = int( trace_size / n_traces / 4 )
 
         return (0, size)
-    
+
+    def enable_trig_mode(self):
+        """
+        """
+        status = self._ocp_if.trace_enable_trig_mode( self._tr_id )
+
+        if status[0] < 0 :
+            return (-1, status)
+
+        return (0,)
+
+    def enable_manual_mode(self):
+        """
+        """
+        status = self._ocp_if.trace_enable_manual_mode( self._tr_id )
+
+        if status[0] < 0 :
+            return (-1, status)
+
+        return (0,)
+
+    def set_num_pre_trig_samples(self, num):
+        """
+        """
+        status = self._ocp_if.trace_set_num_pre_trig_samples( self._tr_id, num )
+
+        if status[0] < 0 :
+            return (-1, status[0])
+
+        return (0,)
+
+    def set_trace_to_track(self, trace):
+        """
+        """
+        status = self._ocp_if.trace_set_trace_to_track( self._tr_id, trace )
+
+        if status[0] < 0 :
+            return (-1, status[0])
+
+        return (0,)
+
+    def set_trig_bound(self, bound):
+        """
+        """
+        status = self._ocp_if.trace_set_trig_bound( self._tr_id, bound )
+
+        if status[0] < 0 :
+            return (-1, status[0])
+
+        return (0,)
+
+    def trig_mode_get_tail(self):
+        """
+        """        
+        status, tail = self._ocp_if.trace_get_tail( self._tr_id )
+        if status != 0 :
+            return (-1, status)
+
+        tail = int( tail )
+
+        return (0, tail)
+
+    def get_size(self):
+        """
+        """
+        status, n_traces = self._ocp_if.trace_get_number_signals( self._tr_id )
+        if status != 0 :
+            print('Error getting number of traces')
+            return (-1, status)
+        
+        status, trace_size = self._ocp_if.trace_get_size( self._tr_id )
+        if status != 0 :
+            return (-1, status)
+
+        size = int( trace_size / n_traces / 4 )
+
+        return (0, size)
