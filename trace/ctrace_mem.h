@@ -19,7 +19,7 @@
 //===========================================================================
 /*------------------------------ Definitions ------------------------------*/
 //===========================================================================
-typedef uint32_t ctracemem_size_t;
+typedef ctrace_circ_buf_size_t ctracemem_size_t;
 
 typedef enum {
 	SET_REF_VALUE = 0,
@@ -130,7 +130,7 @@ void ctracememTrigModeReset(ctracemem_t *trace);
  * @param numTraces Total number of traces, used for error generation if numPreTrigSamples exceeds the trace size.
  * @return -1 if numPreTrigSamples exceeds trace size, 0 otherwise.
  */
-int32_t ctracememTrigModeSetNumPreTrigSamples(ctracemem_t *trace, size_t numPreTrigSamples, size_t numTraces);
+int32_t ctracememTrigModeSetNumPreTrigSamples(ctracemem_t *trace, uint32_t numPreTrigSamples, uint32_t numTraces);
 //---------------------------------------------------------------------------
 /**
  * @brief Sets particular trace for which the trigger is defined.
@@ -142,7 +142,7 @@ int32_t ctracememTrigModeSetNumPreTrigSamples(ctracemem_t *trace, size_t numPreT
  * @param numTraces Total number of traces, used for error generation if traceToTrack does not belong to any measurement.
  * @return -1 if traceToTrack does not belong to a measurement, 0 otherwise.
  */
-int32_t ctracememTrigModeSetTraceToTrack(ctracemem_t *trace, size_t traceToTrack, size_t numTraces);
+int32_t ctracememTrigModeSetTraceToTrack(ctracemem_t *trace, uint32_t traceToTrack, uint32_t numTraces);
 //---------------------------------------------------------------------------
 /**
  * @brief Sets the trigger bound value.

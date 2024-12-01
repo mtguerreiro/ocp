@@ -75,9 +75,9 @@ void ctraceSave(ctrace_t *trace);
 //---------------------------------------------------------------------------
 void ctraceTrigModeReset(ctrace_t *trace);
 //---------------------------------------------------------------------------
-int32_t ctraceTrigModeSetNumPreTrigSamples(ctrace_t *trace, size_t numPreTrigSamples);
+int32_t ctraceTrigModeSetNumPreTrigSamples(ctrace_t *trace, uint32_t numPreTrigSamples);
 //---------------------------------------------------------------------------
-int32_t ctraceTrigModeSetTraceToTrack(ctrace_t *trace, size_t traceToTrack);
+int32_t ctraceTrigModeSetTraceToTrack(ctrace_t *trace, uint32_t traceToTrack);
 //---------------------------------------------------------------------------
 int32_t ctraceTrigModeSetTrigBound(ctrace_t *trace, int32_t trigBound);
 //---------------------------------------------------------------------------
