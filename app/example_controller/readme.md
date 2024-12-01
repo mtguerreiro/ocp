@@ -1,79 +1,153 @@
 # Introduction
 
-This example shows how to use `ocp`. 
+This example shows how to use `ocp` for closed-loop control and data logging. To demonstrate closed-loop control, a buck converter is simulated with a software, which exchanges measurements and control signals with the controller. 
 
-This is a basic template to create new applications with `ocp`. 
+In this example, we use Python to set the parameters of the controller (for example, gains and reference signal), to enable the controller, and retrieve logged data. The main goal of this example is to show some of the interesting possibilities when using Python to interact with the C controller. Refer to the `example_control_system` for an even more complete example. 
 
-# Initialization
+Before going over this example, it is recommend to take a look at the introductory example (`example_intro`), since this example skips some of the initialization details. 
 
-Initializing `ocp` requires initializing its interface, the traces, and the control system. 
+# File structure
 
-Initializing the interface should be done first. The interface does not depend on the application, so its initialization can be done before initializing the application.
+This example is structured in the following way:
 
-Next, the traces should be initialized. Since the traces are predefined in the `ocpConfig.h` file, each application can initialize its own trace. 
+- `main.c:` This file contains the `main` function, used to initialize `ocp`,the controller, and to interface with the simulation software.
+- `ocpConfig.h`: Defines the number of traces and controllers in the system.
+- `stypes.h`: Configuration file for the simulation, containing a description of the input and output signals.
+- `buck.py` and `python_ex_controller.py`: Python files for this example. `buck.py` has definitions that are specific to the controller, and `python_ex_controller.py` shows how to interact with the controller.
+- Folder `app`: contains the source files for the controller.
+- Folder `plecs`: contains the simulation of the converter.
 
-Initializing the trace just requires its maximum size and a buffer. To initialize a control system, you need to at least provide the following functions:
+The structure of the files in the `app` folder is discussed in the introductory example, and thus this won't be discussed here again.
 
-- Hardware interface
-- Hardware status
-- Get measurements
-- Update control
-- Run control
-- Controller interface
-- Controller status
+# Running the example
 
-These functions can be divided in two types: hardware functions and controller functions.
+- SETTING OPIL HERE
 
-## File structure 
+## Starting the controller and interacting with it
 
-Thus, one way to organize your application is to create four source files: `main.c`, `app.c`, `appHw.c`, and `appController.c`.
+First, we can build and run the C program, which will initialize the controller and be ready to exchange data with the simulation. To do so, build and run this example with Visual Studio Code, or alternatively, build the program with CMake and run the executable.
 
-`main.c` contains the `main` function, and can be used to initialize `ocp`'s interface, and the application. `app.c` can be used to initialize and connect everything together, while `appHw.c` and `appController.c` will contain the specific hardware and controller functions.
+Once the program is running, we can use the Python interface to query the controller. Next, run the `python_ex_controller.py` from within a Python interpreter (we use IDLE for this), and now the controller should be accessible from the Python interpreter. For example, we can query the number and name of the controllers in the application:
 
-This file is used to initialize the hardware, the controller, and link them to `ocp`. If you look at the initialization function of `app.c`, you'll see that it first initializes the trace. This is important because during hardware and controller initialization, they might add signals to the trace.
-
-After initializing the trace, the hardware and the controller are initialized. Last, `ocp`'s control system is initialized, which links the hardware and controller functions to `ocp`.
-
-Note that the trace and the control system can be initialized with names. In this template, their are initialized with "App trace" and "App controller", respectively. 
-
-## Running
-
-In this example, all the controller and hardware files are empty. However, it is already possible to interact with your control system.
-
-Build the files and run the target (here, we're assuming you've opened this folder in Visual Studio Code).  
-
-Then, run the Python script `python_ex_template.py` with IDLE within the Python interpreter.
-
-Now, run `ocp.cs_get_number_controllers()` in the interpreter. The result should look like the following
 ```python
 >>> ocp.cs_get_number_controllers()
 (0, 1)
-```
-
-With this command, we queried our controller about how many controllers it has. We can also query the name of the controllers:
-```python
 >>> ocp.cs_get_controllers_names()
 (0, [b'App controller'])
 ```
-Note that when we initialized our control system in `app.c`, we gave this as the name of the controller.
 
-We can also interact with the trace. For example, we can query the name of the traces in the controller:
+In `ocp`, `traces` are used to log data. These traces can be used to log measurements, control signals and debug signals. In the same way that we can query the controllers in the application, we can query the traces:
+
 ```python
+>>> ocp.trace_get_number_traces()
+(0, 1)
 >>> ocp.trace_get_traces_names()
 (0, [b'App trace'])
 ```
 
-We can also get and set the size of the trace:
+In this example, there is a single trace and a single controller in the system. They are defined in the `ocpConfig.h` file, and their names are defined during the application's initialization.
+
+We can address individual traces (as well as controllers) by specifying it during a query. For example, we can find how many signals a trace contains and their labels, as follows:
+
 ```python
->>> ocp.trace_get_size(0)
-(0, 104857600)
->>> ocp.trace_set_size(0, 1024)
-(0,) 
->>> ocp.trace_get_size(0)
-(0, 1024)
+>>> ocp.trace_get_number_signals(0)
+(0, 4)
+>>> ocp.trace_get_signals_names(0)
+(0, [b'Inductor current', b'Output voltage', b'Duty-cycle', b'Reference'])
 ```
 
-Note that to query and set the size of the trace, we have to give the ID of the trace that we want to query. This ID must match the one used to initialize the trace, as we did in `app.c`.
+Note that we passed `0` as the argument to  `ocp.trace_get_number_signals` and `ocp.trace_get_signals_names`, because  traces are addressed by an integer (their ID) starting from zero. In this case, there is only one trace, so its ID is `0`. From the output of the command, we can see that the trace has 4 signals, with the indicated labels.  
+
+The size of the trace, e.g. how many bytes it can store, can be set dynamically. Initially, its size is set to its maximum possible size. If we query the size of the trace, we get:
+
+```python
+>>> ocp.trace_get_size(0)
+(0, 10485760)
+```
+
+In this case, the trace can store up to 10 MB of data. All signals in a single trace are stored simultaneously at an event defined by the user in the C code of the application. A common case is to set the trace so that it stores its signals every time the controller is executed. 
+
+The size of the trace can be dynamically set (up to its maximum size). For example, let's say we want to record the trace signals for 100 control events. Each trace is saved as a float in the controller's memory, which takes 4 bytes. Thus, if we have four signals and want to store 100 samples of each, we need to set the trace to have a size of `4*4*100`:
+
+```python
+>>> ocp.trace_set_size(0, 4 * 4 * 100)
+(0,)
+>>> ocp.trace_get_size(0)
+(0, 1600)
+```
+
+## Setting controller parameters
+
+The Python interface allows setting parameters of the controller dynamically. Each controller has a "controller interface" function that can be used to exchange data with the controller. In this example, the implementation only sends data to the controller, but  `example_control_system` shows how to do both.
+
+If we check the `appControllerIf` function in the `app/appController.c` file, we'll see the following code:
+
+```c
+int32_t appControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    float *p = (float *)in;
+
+    ki = *p++;
+    kv = *p++;
+    k_ev = *p++;
+
+    v_ref = *p++;
+
+    return 0;
+}
+```
+
+This function shows the parameters that can be set through the controller interface. Namely, it is possible to set the gains `ki`, `kv`, and `k_ev`, and the reference signal `v_ref`.  
+
+In the Python side, there is a `ocp.cs_controller_if` function, which takes as argument a data packet to be delivered to the `appControllerIf` function in C. Because we know what the C function expects, we can build a data packet in Python so that we can set the parameters in the controller.
+
+In Python, we can create a function to assemble this data packet as follows (defined in the `buck.py` file):
+```python
+def format_params(ki, kv, k_ev, v_ref):
+
+    data_bin = struct.pack('<ffff', ki, kv, k_ev, v_ref)
+
+    return data_bin
+```
+
+This function takes the parameters of the controller as arguments, and packs them in a binary format so that they can be sent to the controller. 
+
+Ideally, we don't want to set the gains of the controller directly. We'd like to specify some requirements such as settling time and overshoot, and then obtain the gains of the controller. For a state feedback controller, this is possible by using pole placement. 
+
+Although the equations to design a state feedback controller are not complicated, implementing them in Python is straightforward, while coding them in C would require a lot more work. 
+
+Since we can transmit data to the controller using the controller's interface, we can design the controller in Python, and simply transmit the parameters to the controller. In this way, all the complexity of the design method can be written in Python, which is much easier to debug, test, and integrate with external libraries. The C code is only responsible for executing the control law and setting the parameters of the controller, leading to a smaller and more robust  C code that is easier to maintain.
+
+In this example, we implement the function to design the controller and pack its parameters in binary format in the `buck.py` file. This file has two functions: `get_gains`, to get the gains of the controller according to settling time and overshoot specifications; and `format_gains` (shown above), to pack all parameters in the binary format expected by the controller.
+
+Now, we can set our controller. First, we obtain its gains, then we format these gains along with the reference in a binary data packet, and finally send the packet to the controller:
+```python
+>>> ki, kv, k_ev = buck.get_gains(ts=1e-3, os=5)
+>>> ctlr_bin_data = buck.format_params(ki, kv, k_ev, 6)
+>>> ocp.cs_controller_if(0, ctlr_bin_data)
+(0, b'')
+```
+
+## Running the controller
+
+Now that the controller is set, we can run a closed-loop simulation and retrieve data stored by the controller. To do so, we use PLECS to simulate the buck converter. To run the PLECS simulation, we first need to build another C program, which is responsible for interfacing the simulation and the controller. To do so, in the command prompt, navigate to the `plecs` folder and run make:
+```sh
+cd plecs
+make
+```
+
+Now, open the PLECS model and start the simulation. In `ocp`, the controller is initially disabled, and must be enabled. In the Python shell, run:
+```python
+>>> ocp.cs_enable(0)
+(0,)
+```
+
+Now, if you look at PLECS' scope, you should see that the voltage is regulated to 6 V, the reference value we had previously set in the controller.
+
+Next, we can check the trace signals to see the data the controller recorded. We can retrieve the data from the controller as follows:
+```python
+>>> trace_bin_data = ocp.trace_read(0)
+```
 
 # Notes
 

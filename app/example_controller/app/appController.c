@@ -75,8 +75,6 @@ int32_t appControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsi
     kv = *p++;
     k_ev = *p++;
 
-    dt = *p++;
-
     v_ref = *p++;
 
     return 0;

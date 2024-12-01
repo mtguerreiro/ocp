@@ -49,15 +49,8 @@ def get_gains(ts=1e-3, os=5):
     return (ki, kv, k_ev)
 
 
-def format_gains(ki, kv, k_ev):
+def format_params(ki, kv, k_ev, v_ref):
 
-    data_bin = struct.pack('<fff', ki, kv, k_ev)
-
-    return data_bin
-
-
-def format_params(ki, kv, k_ev, dt, v_ref):
-
-    data_bin = struct.pack('<fffff', ki, kv, k_ev, dt, v_ref)
+    data_bin = struct.pack('<ffff', ki, kv, k_ev, v_ref)
 
     return data_bin

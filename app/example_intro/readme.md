@@ -40,7 +40,7 @@ In this example, all the controller and hardware files are empty. However, it is
 
 Build the files and run the target (here, we're assuming you've opened this folder in Visual Studio Code - alternatively, you can just build with CMake if you don't want to use VS Code).  
 
-Then, run the Python script `python_ex_template.py` with IDLE within the Python interpreter.
+Then, run the Python script `python_ex_template.py` with a Python interpreter (we use IDLE for this).
 
 Now, run `ocp.cs_get_number_controllers()` in the interpreter. The result should look like the following
 ```python
