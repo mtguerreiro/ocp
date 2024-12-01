@@ -71,10 +71,10 @@ void ctracememSave(ctracemem_t *trace, void **src, uint32_t size){
 //---------------------------------------------------------------------------
 void ctracememTrigModeReset(ctracemem_t *trace){
 
-	trace->trigModeBuffer->mem = trace->start;
-	trace->trigModeBuffer->head = 0;
-	trace->trigModeBuffer->tail = 0;
-	trace->trigModeBuffer->size = trace->end - trace->start;
+	trace->trigModeBuffer.mem = trace->start;
+	trace->trigModeBuffer.head = 0;
+	trace->trigModeBuffer.tail = 0;
+	trace->trigModeBuffer.size = trace->end - trace->start;
 
 	trace->trigModeParams.fsmState = SET_REF_VALUE;
 }
@@ -118,7 +118,7 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
 		const uint32_t traceToTrack = trace->trigModeParams.traceToTrack;
 		float floatValue = *((float*)&(**(s + traceToTrack)));
 		trace->trigModeParams.refValue = floatValue;
-		while(sampleCounter--) circBuf_write( trace->trigModeBuffer, **s++ );
+		while(sampleCounter--) circBuf_write( &trace->trigModeBuffer, **s++ );
 		trace->trigModeParams.fsmState = WAIT_FOR_TRIGGER;
 	}
 	break;
@@ -132,23 +132,23 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
 		if ( (trigBound >= refValue && floatValue >= trigBound) || (trigBound < refValue && floatValue <= trigBound)  ) {
 			trace->trigModeParams.fsmState = TRIGGER_JUST_SET;
 		}
-		while(sampleCounter--) circBuf_write( trace->trigModeBuffer, **s++ );
+		while(sampleCounter--) circBuf_write( &trace->trigModeBuffer, **s++ );
 	}
 	break;
 
 	case TRIGGER_JUST_SET:
 	{
 		const uint32_t numPreTrigSamples = trace->trigModeParams.numPreTrigSamples;
-		circBuf_SetTail(trace->trigModeBuffer, size * numPreTrigSamples);
-		while(sampleCounter--) circBuf_write( trace->trigModeBuffer, **s++ );
+		circBuf_SetTail( &trace->trigModeBuffer, size * numPreTrigSamples );
+		while(sampleCounter--) circBuf_write( &trace->trigModeBuffer, **s++ );
 		trace->trigModeParams.fsmState = SAVE_UNTIL_END;
 	}
 	break;
 
 	case SAVE_UNTIL_END:
 	{
-		while(sampleCounter--) circBuf_write( trace->trigModeBuffer, **s++ );
-		if( trace->trigModeBuffer->head == trace->trigModeBuffer->tail)
+		while(sampleCounter--) circBuf_write( &trace->trigModeBuffer, **s++ );
+		if( trace->trigModeBuffer.head == trace->trigModeBuffer.tail)
 			trace->trigModeParams.fsmState = WAIT_FOR_RESET;
 	}
 	break;
@@ -160,7 +160,7 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
 }
 //---------------------------------------------------------------------------
 int32_t ctracememTrigModeGetTail(ctracemem_t *trace) {
-
-	return trace->trigModeBuffer->tail;
+	
+	return trace->trigModeBuffer.tail;
 }
 //===========================================================================

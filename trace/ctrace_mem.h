@@ -41,7 +41,7 @@ typedef struct ctracemem_t{
 	ctracemem_size_t *start;
 	ctracemem_size_t *end;
 	ctracemem_size_t *p;
-	circBuf_t* trigModeBuffer;
+	circBuf_t trigModeBuffer;
 	trigModeParams_t trigModeParams;
 	int32_t maxsize;
 }ctracemem_t;
