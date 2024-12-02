@@ -21,7 +21,25 @@ The structure of the files in the `app` folder is discussed in the introductory 
 
 # Running the example
 
-- SETTING OPIL HERE
+This example uses PLECS to simulate a converter, and uses `opil` (get it [here](https://gitlab.rhrk.uni-kl.de/lrs/opil)) to interface PLECS with the controller. It is assumed that you have the `ocp` and `opil` folders in the same location, like so:
+
+```
+top_level_folder
+└───ocp
+│   │   CMakeLists.txt
+│   │   .gitignore
+│   └───app
+│   └───controlsys
+│       ....
+└───opil
+    │   CMakeLists.txt
+    │   .gitignore
+    │   opilhost.c
+    │   ...
+    └───comm
+    └───ctlrif
+        ....
+```
 
 ## Starting the controller and interacting with it
 
@@ -181,11 +199,3 @@ This means each signal has 200 samples, and there are four signals, exactly as w
 >>> plt.plot(data[:, 3])
 ```
 
-# Notes
-
-- It is assumed that the python package `lrssoc` is installed in your system. This package can be found in the main directory of the repository, inside the `python` folder. To install the package, navigate to the `python` folder with the command prompt, and run
-```sh
-python -m pip install -e .
-``` 
-
-- It is assumed that you are using Visual Studio Code, have CMake installed, and the CMake extension for Visual Studio is also installed.

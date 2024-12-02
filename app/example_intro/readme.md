@@ -75,11 +75,3 @@ Note that to query and set the size of the trace, we have to give the ID of the 
 
 Python communicates with the controller using TCP sockets. Thus, as far as Python is concerned, it has no idea whether the controller is actually a physical one, or is being emulated (as we're doing here). 
 
-# Notes
-
-- It is assumed that the python package `lrssoc` is installed in your system. This package can be found in the main directory of the repository, inside the `python` folder. To install the package, navigate to the `python` folder with the command prompt, and run
-```sh
-python -m pip install -e .
-``` 
-
-- It is assumed that you are using Visual Studio Code, have CMake installed, and the CMake extension for Visual Studio is also installed.
