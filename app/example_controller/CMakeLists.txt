@@ -2,13 +2,13 @@ cmake_minimum_required(VERSION 3.15)
 
 project(ocp_example)
 
+set(OCP_PATH "../../../ocp/")
+set(OPIL_PATH "../../../opil/")
+
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-set(OCP_PATH "../../../ocp/")
 add_subdirectory(${OCP_PATH} "${PROJECT_BINARY_DIR}/ocp")
-
-set(OPIL_PATH "/home/marco/projects/opil/")
 add_subdirectory(${OPIL_PATH} "${PROJECT_BINARY_DIR}/opil")
 
 add_subdirectory(threads)
