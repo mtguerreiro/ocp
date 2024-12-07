@@ -1,0 +1,36 @@
+
+#ifndef APP_CONFIG_H_
+#define APP_CONFIG_H_
+
+//=============================================================================
+/*-------------------------------- Includes ---------------------------------*/
+//=============================================================================
+#include "stdint.h"
+
+#include "ocpConfig.h"
+#include "stypes.h"
+//============================================================================
+
+//=============================================================================
+/*------------------------------- Definitions -------------------------------*/
+//=============================================================================
+
+/* IDs for the trace and control system */
+#define APP_CONFIG_OCP_CS_ID                           OCP_CS_1
+#define APP_CONFIG_OCP_TRACE_ID                        OCP_TRACE_1
+
+/* Size of trace */
+#define APP_CONFIG_OCP_TRACE_0_SIZE_BYTES              (10 * 1024 * 1024)
+
+/* Measurements, control and reference types */
+typedef stypesMeasurements_t appMeasurements_t;
+
+typedef stypesControl_t appControl_t;
+
+typedef struct{
+    float vref;
+}appReferences_t;
+
+//=============================================================================
+
+#endif /* APP_CONFIG_H_ */
