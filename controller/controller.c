@@ -1,109 +1,169 @@
-/*
- * controller.c
- *
- *  Created on: 10 de set de 2022
- *      Author: marco
- */
 
-#ifdef SOC_CPU1
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
 #include "controller.h"
-
-#include "../utils/rp.h"
-
-/* Controllers */
-#include "pidctl.h"
-#include "prpictl.h"
 
 //=============================================================================
 
 //=============================================================================
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
-typedef void(*controllerInit)(void);
-typedef int32_t(*controllerSP)(void *in, uint32_t insize);
-typedef int32_t(*controllerGP)(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
-typedef int32_t(*controllerR)(void *inputs, int32_t ninputs, void *outputs, int32_t nmaxoutputs);
 
-typedef struct{
-	rphandle_t handles[CONTROLLER_IF_END];
-	rpctx_t rp;
-}controllerIF_t;
-
-typedef struct{
-
-	controllerInit initialize[CONTROLLER_END];
-	controllerSP setParams[CONTROLLER_END];
-	controllerGP getParams[CONTROLLER_END];
-	controllerR run[CONTROLLER_END];
-
-	uint32_t active;
-
-	controllerIF_t interface;
-
-}controller_t;
-
-static controller_t controllers = {.active = CONTROLLER_END};
 
 //=============================================================================
 
 //=============================================================================
 /*-------------------------------- Prototypes -------------------------------*/
 //=============================================================================
-static int32_t controllerInterfaceGetController(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
-static int32_t controllerInterfaceSetController(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
-static int32_t controllerInterfaceGetControllerParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
-static int32_t controllerInterfaceSetControllerParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+static int32_t controllerSwitch(controller_t *controller,
+    void *meas, int32_t nmeas,
+    void *refs, int32_t nrefs,
+    void *outputs, int32_t nmaxoutputs);
 //=============================================================================
 
 //=============================================================================
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void controllerInitialize(void){
+void controllerInit(controller_t *controller, controllerConfig_t *config){
 
-	uint32_t k;
+    uint32_t k;
 
-	/* Initializes the request processor */
-	rpInitialize(&controllers.interface.rp, CONTROLLER_IF_END, controllers.interface.handles);
-	rpRegisterHandle(&controllers.interface.rp, CONTROLLER_IF_GET, controllerInterfaceGetController);
-	rpRegisterHandle(&controllers.interface.rp, CONTROLLER_IF_SET, controllerInterfaceSetController);
-	rpRegisterHandle(&controllers.interface.rp, CONTROLLER_IF_GET_PARAMS, controllerInterfaceGetControllerParams);
-	rpRegisterHandle(&controllers.interface.rp, CONTROLLER_IF_SET_PARAMS, controllerInterfaceSetControllerParams);
+    controller->refs.buffer = config->refBuffer;
+    controller->refs.size = config->refSize;
 
-	/* Register the available controllers */
-//	controllers.initialize[CONTROLLER_PRPI] = prpictlInitialize;
-//	controllers.setParams[CONTROLLER_PRPI] = prpictlSetParams;
-//	controllers.getParams[CONTROLLER_PRPI] = prpictlGetParams;
-//	controllers.run[CONTROLLER_PRPI] = prpictlRun;
+    controller->cbs = config->cbsBuffer;
+    controller->nControllers = config->nControllers;
 
-	/* Initializes all registered controllers */
-	for(k = 0; k < CONTROLLER_END; k++){
-		controllers.initialize[k]();
-	}
+    /* 
+     * Initializing active as nControllers ensures controllerRun does not run
+     * until a valid controller is set. 
+     */
+    controller->active = config->nControllers;
+    controller->previous = config->nControllers;
+
+    for(k = 0; k < config->nControllers; k++){
+        config->getCbs[k]( (void *) &controller->cbs[k] );
+    }
+
+    for(k = 0; k < config->nControllers; k++){
+        if( controller->cbs[k].init != 0 )
+            controller->cbs[k].init();
+    }
 }
 //-----------------------------------------------------------------------------
-int32_t controllerInterface(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+int32_t controllerRun(controller_t *controller,
+    void *meas, int32_t nmeas, 
+    void *outputs, int32_t nmaxoutputs){
+    
+    int32_t status;
+    uint32_t active = controller->active;
+    uint32_t previous = controller->previous;
 
-	int32_t status;
+    if( active >= controller->nControllers ) return CONTROLLER_ERR_INVALID_ID;
 
-	status = rpRequest(&controllers.interface.rp, in, insize, out, maxoutsize);
+    if( active != previous ){
+        status = controllerSwitch(
+            controller, meas, nmeas,
+            controller->refs.buffer, controller->refs.size,
+            outputs, nmaxoutputs);
+        if( status < 0 ) return status;
+    }
 
-	return status;
+    status = controller->cbs[active].run(
+        meas, nmeas,
+        controller->refs.buffer, controller->refs.size, 
+        outputs, nmaxoutputs
+    );
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-int32_t controllerRun(void *inputs, int32_t ninputs, void *outputs, int32_t nmaxoutputs){
+int32_t controllerSetRef(controller_t *controller, void *ref, uint32_t size){
 
-	int32_t status = CONTROLLER_ERR_INACTIVE_CTL;
-	uint32_t ctl = controllers.active;
+    uint32_t k;
+    uint8_t *src = (uint8_t *)ref;
+    uint8_t *dst = (uint8_t *)controller->refs.buffer;
 
-	if( ctl != CONTROLLER_END ){
-		status = controllers.run[ctl](inputs, ninputs, outputs, nmaxoutputs);
-	}
+    if( size != controller->refs.size ) return CONTROLLER_ERR_INVALID_REF_SIZE;
 
-	return status;
+    for(k = 0; k < size; k++){
+        *dst++ = *src++;
+    }
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t controllerGetRef(controller_t *controller, void *buffer, uint32_t size){
+
+    uint32_t k;
+    uint8_t *src = (uint8_t *)controller->refs.buffer;
+    uint8_t *dst = (uint8_t *)buffer;
+
+    if( size < controller->refs.size ) return CONTROLLER_ERR_INVALID_REF_BUF_SIZE;
+
+    for(k = 0; k < controller->refs.size; k++){
+        *dst++ = *src++;
+    }
+
+    return controller->refs.size;
+}
+//-----------------------------------------------------------------------------
+int32_t controllerSet(controller_t *controller, uint32_t id){
+
+    if( id >= controller->nControllers ) return CONTROLLER_ERR_INVALID_ID;
+
+    controller->active = id;
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+uint32_t controllerGet(controller_t *controller){
+
+    return controller->active;
+}
+//-----------------------------------------------------------------------------
+int32_t controllerReset(controller_t *controller, uint32_t id){
+
+    if( id >= controller->nControllers ) return CONTROLLER_ERR_INVALID_ID;
+
+    if( controller->cbs[id].reset != 0 )
+        controller->cbs[id].reset();
+    
+    return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t controllerSetParams(controller_t *controller, uint32_t id,
+    void *params, uint32_t size){
+    
+    int32_t status;
+
+    if( id >= controller->nControllers )
+        return CONTROLLER_ERR_INVALID_ID;
+
+    if( controller->cbs[id].setParams == 0 )
+        return CONTROLLER_ERR_NO_SET_PARAM;
+
+    status = controller->cbs[id].setParams(params, size);
+
+    return status;
+}
+//-----------------------------------------------------------------------------
+int32_t controllerGetParams(controller_t *controller, uint32_t id,
+    void *buffer, uint32_t size){
+    
+    int32_t status;
+
+    if( id >= controller->nControllers )
+        return CONTROLLER_ERR_INVALID_ID;
+
+    if( controller->cbs[id].getParams == 0 )
+        return CONTROLLER_ERR_NO_SET_PARAM;
+
+    status = controller->cbs[id].getParams(buffer, size);
+
+    return status;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -112,60 +172,38 @@ int32_t controllerRun(void *inputs, int32_t ninputs, void *outputs, int32_t nmax
 /*----------------------------- Static functions ----------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-static int32_t controllerInterfaceGetController(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+static int32_t controllerSwitch(controller_t *controller,
+    void *meas, int32_t nmeas,
+    void *refs, int32_t nrefs,
+    void *outputs, int32_t nmaxoutputs){
 
-	uint32_t *p;
+    int32_t status;
+    uint32_t active = controller->active;
+    uint32_t previous = controller->previous;
 
-	p = (uint32_t *)( *out );
-	*p = controllers.active;
+    if( (previous != controller->nControllers) && (controller->cbs[previous].lastExit != 0) ){
+        status = controller->cbs[previous].lastExit(
+            meas, nmeas, 
+            controller->refs.buffer, controller->refs.size,
+            outputs, nmaxoutputs
+            );
+        
+        if( status < 0 ) return status;
+    }
 
-	return sizeof( controllers.active );
-}
-//-----------------------------------------------------------------------------
-static int32_t controllerInterfaceSetController(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+    controller->previous = active;
 
-	uint32_t ctl;
+    if( controller->cbs[active].firstEntry != 0 ){
+        status = controller->cbs[previous].firstEntry(
+            meas, nmeas, 
+            controller->refs.buffer, controller->refs.size,
+            outputs, nmaxoutputs
+            );
+        
+        if( status < 0 ) return status;
+    }
 
-	ctl = *( (uint32_t *) in );
-
-	if( ctl >= CONTROLLER_END ) return CONTROLLER_ERR_INVALID_CTL;
-
-	controllers.active = ctl;
-
-	return 0;
-}
-//-----------------------------------------------------------------------------
-static int32_t controllerInterfaceGetControllerParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
-
-	uint32_t status;
-	uint32_t *p;
-	uint32_t ctl;
-
-	p = (uint32_t *)in;
-	ctl = *p++;
-
-	if( ctl >= CONTROLLER_END ) return CONTROLLER_ERR_INVALID_CTL;
-
-	status = controllers.getParams[ctl]((void *)p, insize, *out, maxoutsize);
-
-	return status;
-}
-//-----------------------------------------------------------------------------
-static int32_t controllerInterfaceSetControllerParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
-
-	uint32_t status;
-	uint32_t *p;
-	uint32_t ctl;
-
-	p = (uint32_t *)in;
-	ctl = *p++;
-
-	if( ctl >= CONTROLLER_END ) return CONTROLLER_ERR_INVALID_CTL;
-
-	status = controllers.setParams[ctl]((void *)p, insize - sizeof( ctl ) );
-
-	return status;
+    return 0;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
-#endif /* SOC_CPU1 */

@@ -11,13 +11,13 @@ class Commands:
     """
     """
     def __init__(self):
-        self.set = 0
-        self.get = 1
-        self.set_params = 2
-        self.get_params = 3
+        self.set_refs = 0
+        self.get_refs = 1
+        self.set = 2
+        self.get = 3
         self.reset = 4
-        self.set_refs = 5
-        self.get_refs = 6
+        self.set_params = 5
+        self.get_params = 6
 
 
 class Controller:
@@ -33,13 +33,47 @@ class Controller:
     ----------
         
     """
-    def __init__(self, ocp_if):
+    def __init__(self, ctl_if, cs_id=0):
 
         self._cmd = Commands()
-        self._ocp_if = ocp_if
-        
+        self._cs_id = cs_id
+        self._ctl_if = ctl_if
 
-    def set(self, cs_id, ctl_id):
+
+    def set_ref(self, ref):
+        cmd = self._cmd.set_refs
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( ref )
+
+        status, _ = self._ctl_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error setting controller refs. Error code {:}\r\n'.format(status))
+            return (-1, status)
+        
+        return (0,)
+
+
+    def get_ref(self):
+        """
+        """
+        cmd = self._cmd.get_refs
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        
+        status, rx_data = self._ctl_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error getting controller refs. Error code {:}\r\n'.format(status))
+            return (-1, status)
+       
+        return (0, rx_data)
+    
+
+    def set(self, ctl_id):
         """
 
         Parameters
@@ -55,7 +89,7 @@ class Controller:
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
         tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
 
-        status, _ = self._ocp_if.cs_controller_if(cs_id, tx_data)
+        status, _ = self._ctl_if(self._cs_id, tx_data)
 
         if status < 0:
             print('Error setting the controller. Error code {:}\r\n'.format(status))
@@ -64,7 +98,7 @@ class Controller:
         return (0,)
 
 
-    def get(self, cs_id):
+    def get(self):
         """
 
         Parameters
@@ -79,7 +113,7 @@ class Controller:
         tx_data = []
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
 
-        status, rx_data = self._ocp_if.cs_controller_if(cs_id, tx_data)
+        status, rx_data = self._ctl_if(self._cs_id, tx_data)
 
         if status < 0:
             print('Error getting the controller. Error code {:}\r\n'.format(status))
@@ -90,7 +124,25 @@ class Controller:
         return (0, controller)
 
 
-    def set_params(self, cs_id, ctl_id, params):
+    def reset(self, ctl_id):
+        """
+        """
+        cmd = self._cmd.reset
+
+        tx_data = []
+        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
+
+        status, _ = self._ctl_if(self._cs_id, tx_data)   
+
+        if status < 0:
+            print('Error resetting controller. Error code {:}\r\n'.format(status))
+            return (-1, status)
+        
+        return (0,)
+
+
+    def set_params(self, ctl_id, params):
         """
 
         Parameters
@@ -106,7 +158,7 @@ class Controller:
         tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
         tx_data.extend( params )
 
-        status, _ = self._ocp_if.cs_controller_if(cs_id, tx_data)
+        status, _ = self._ctl_if(self._cs_id, tx_data)
 
         if status < 0:
             print('Error setting controller params. Error code {:}\r\n'.format(status))
@@ -115,7 +167,7 @@ class Controller:
         return (0,)
 
 
-    def get_params(self, cs_id, ctl_id):
+    def get_params(self, ctl_id):
         """
         """
         cmd = self._cmd.get_params
@@ -124,61 +176,10 @@ class Controller:
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
         tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
 
-        status, rx_data = self._ocp_if.cs_controller_if(cs_id, tx_data)   
+        status, rx_data = self._ctl_if(self._cs_id, tx_data)   
 
         if status < 0:
             print('Error getting controller params. Error code {:}\r\n'.format(status))
-            return (-1, status)
-       
-        return (0, rx_data)
-
-
-    def reset(self, cs_id, ctl_id):
-        """
-        """
-        cmd = self._cmd.reset
-
-        tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
-
-        status, _ = self._ocp_if.cs_controller_if(cs_id, tx_data)   
-
-        if status < 0:
-            print('Error resetting controller. Error code {:}\r\n'.format(status))
-            return (-1, status)
-        
-        return (0,)
-
-
-    def set_ref(self, cs_id, ref):
-        cmd = self._cmd.set_refs
-
-        tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( ref )
-
-        status, _ = self._ocp_if.cs_controller_if(cs_id, tx_data)   
-
-        if status < 0:
-            print('Error setting controller refs. Error code {:}\r\n'.format(status))
-            return (-1, status)
-        
-        return (0,)
-
-
-    def get_ref(self, cs_id):
-        """
-        """
-        cmd = self._cmd.get_refs
-
-        tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        
-        status, rx_data = self._ocp_if.cs_controller_if(cs_id, tx_data)   
-
-        if status < 0:
-            print('Error getting controller refs. Error code {:}\r\n'.format(status))
             return (-1, status)
        
         return (0, rx_data)
