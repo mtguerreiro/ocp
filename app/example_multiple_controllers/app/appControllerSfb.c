@@ -49,8 +49,6 @@ int32_t appControllerSfbInit(void){
     ocpTraceAddSignal(OCP_TRACE_1, (void *)( &v ), "Output voltage");
     
     ocpTraceAddSignal(OCP_TRACE_1, (void *)( &u ), "Duty-cycle");
-    
-    ocpTraceAddSignal(OCP_TRACE_1, (void *)( &v_ref ), "Reference");
 
     return 0;
 }
@@ -87,8 +85,6 @@ int32_t appControllerSfbSetParams(void *params, uint32_t size){
     kv = *p++;
     k_ev = *p++;
 
-    v_ref = *p++;
-
     return 0;
 }
 //-----------------------------------------------------------------------------
@@ -100,9 +96,7 @@ int32_t appControllerSfbGetParams(void *buffer, uint32_t size){
     *p++ = kv;
     *p++ = k_ev;
 
-    *p++ = v_ref;
-
-    return 16;
+    return 12;
 }
 //-----------------------------------------------------------------------------
 void appControllerSfbReset(void){

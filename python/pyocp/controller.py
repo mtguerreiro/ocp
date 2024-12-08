@@ -7,6 +7,57 @@ Module ``controller``
 import pyocp
 import struct
 
+class ControllerTemplate:
+    """
+    """
+    def __init__(self, ctl_id, ctl_if):
+
+        self._ctl_id = ctl_id
+        self._ctl_if = ctl_if
+        
+
+    def set(self):
+
+        return self._ctl_if.set(self._ctl_id)
+
+
+    def set_params(self, params):
+
+        status, new_params = self.get_params()
+        if status < 0:
+            return (-1, status)
+        
+        for param, val in params.items():
+            if param in new_params:
+                new_params[param] = val
+
+        params = self.encode(new_params)
+            
+        return self._ctl_if.set_params(self._ctl_id, params)
+
+    
+    def get_params(self):
+
+        status, params = self._ctl_if.get_params(self._ctl_id)
+
+        if status < 0:
+            return (-1, status)
+
+        params = self.decode(params)
+        
+        return (0, params)
+
+
+    def encode(self, params):
+
+        return params
+
+
+    def decode(self, params):
+
+        return params
+
+
 class Commands:
     """
     """

@@ -23,30 +23,3 @@ def trace_data_to_np_array(trace_data, n_signals):
     data = data.reshape(round(n / n_signals / 4), n_signals)
 
     return data
-
-
-def encode_ref(ref):
-
-    fmt = '<' + 'f'
-    ref_bin = struct.pack(fmt, ref)
-
-    return ref_bin
-
-
-def decode_ref(ref_bin):
-
-    fmt = '<' + 'f'
-    ref = struct.unpack(fmt, ref_bin)
-
-    return ref
-
-
-def decode_params(params_bin):
-
-    n = len(params_bin)
-
-    fmt = '<' + 'f' * round(n / 4)
-
-    params = struct.unpack(fmt, params_bin)
-    
-    return params
