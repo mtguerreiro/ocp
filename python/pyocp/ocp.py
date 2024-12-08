@@ -6,7 +6,7 @@ Module ``iface``
 import socket
 import time
 import struct
-import lrssoc
+import pyocp
 
 class Commands:
     """
@@ -54,7 +54,7 @@ class Interface:
     """
     def __init__(self, comm_type='ethernet', settings={}):
 
-        self.hwp = lrssoc.hwp.Protocol(comm_type=comm_type, settings=settings)
+        self.hwp = pyocp.hwp.Protocol(comm_type=comm_type, settings=settings)
         
         self.cmd = Commands()
 
@@ -89,7 +89,7 @@ class Interface:
         cmd = self.cmd.trace_read
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -132,7 +132,7 @@ class Interface:
         cmd = self.cmd.trace_reset
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -172,7 +172,7 @@ class Interface:
         cmd = self.cmd.trace_get_size
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
 
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -181,7 +181,7 @@ class Interface:
             print('{:}: Error getting trace size. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
         
-        size = lrssoc.conversions.u8_to_u32(data, msb=False)
+        size = pyocp.conversions.u8_to_u32(data, msb=False)
 
         return (0, size)
 
@@ -221,8 +221,8 @@ class Interface:
         cmd = self.cmd.trace_set_size
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(size, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(size, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -262,7 +262,7 @@ class Interface:
         cmd = self.cmd.trace_get_number_signals
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
 
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -271,7 +271,7 @@ class Interface:
             print('{:}: Error getting number of signals. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
         
-        n = lrssoc.conversions.u8_to_u32(data, msb=False)
+        n = pyocp.conversions.u8_to_u32(data, msb=False)
 
         return (0, n)
 
@@ -305,7 +305,7 @@ class Interface:
         cmd = self.cmd.trace_get_signals_names
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
 
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -340,7 +340,7 @@ class Interface:
             print('{:}: Error getting number of traces. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
         
-        n = lrssoc.conversions.u8_to_u32(data, msb=False)
+        n = pyocp.conversions.u8_to_u32(data, msb=False)
 
         return (0, n)
 
@@ -399,7 +399,7 @@ class Interface:
         cmd = self.cmd.trace_enable_trig_mode
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -439,7 +439,7 @@ class Interface:
         cmd = self.cmd.trace_enable_manual_mode
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -486,8 +486,8 @@ class Interface:
         cmd = self.cmd.trace_set_num_pre_trig_samples
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(num, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(num, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -534,8 +534,8 @@ class Interface:
         cmd = self.cmd.trace_set_trace_to_track
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(trace, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(trace, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -583,8 +583,8 @@ class Interface:
         bound = struct.pack('f', float(bound))
         bound = struct.unpack('i', bound)[0]
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(bound, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(bound, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -624,7 +624,7 @@ class Interface:
         cmd = self.cmd.trace_get_tail
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(tr_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
 
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -633,7 +633,7 @@ class Interface:
             print('{:}: Error getting tail of circular buffer. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
         
-        tail = lrssoc.conversions.u8_to_u32(data, msb=False)
+        tail = pyocp.conversions.u8_to_u32(data, msb=False)
 
         return (0, tail)
     
@@ -666,7 +666,7 @@ class Interface:
         cmd = self.cmd.cs_status
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cs_id, msb=False) )
 
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -675,7 +675,7 @@ class Interface:
             print('{:}: Error getting control system status. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
         
-        status = lrssoc.conversions.u8_to_u32(data, msb=False)
+        status = pyocp.conversions.u8_to_u32(data, msb=False)
 
         return (0, status)
 
@@ -708,7 +708,7 @@ class Interface:
         cmd = self.cmd.cs_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cs_id, msb=False) )
 
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -748,7 +748,7 @@ class Interface:
         cmd = self.cmd.cs_disable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cs_id, msb=False) )
 
         status, data = self.hwp.request(cmd, tx_data)
 
@@ -791,7 +791,7 @@ class Interface:
         cmd = self.cmd.cs_controller_if
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cs_id, msb=False) )
         if data is not None: tx_data.extend( data )
 
         status, rx_data = self.hwp.request(cmd, tx_data)
@@ -835,7 +835,7 @@ class Interface:
         cmd = self.cmd.cs_hardware_if
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cs_id, msb=False) )
         if data is not None: tx_data.extend( data )
 
         status, rx_data = self.hwp.request(cmd, tx_data)
@@ -868,7 +868,7 @@ class Interface:
             print('{:}: Error getting number of controllers. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
         
-        n = lrssoc.conversions.u8_to_u32(data, msb=False)
+        n = pyocp.conversions.u8_to_u32(data, msb=False)
 
         return (0, n)
 

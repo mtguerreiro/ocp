@@ -10,7 +10,6 @@ For more details, refer to the uiface.c file.
 
 """
 import socket
-import lrssoc
 
 class Comm:
     def __init__(self, comm_type='ethernet', settings={}):

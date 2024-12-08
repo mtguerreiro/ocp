@@ -4,7 +4,7 @@ Module ``controller``
 
 
 """
-import lrssoc
+import pyocp
 import struct
 
 class Commands:
@@ -20,7 +20,7 @@ class Commands:
         self.get_params = 6
 
 
-class Controller:
+class Interface:
     """
 
     Parameters
@@ -44,8 +44,8 @@ class Controller:
         cmd = self._cmd.set_refs
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(self._cs_id, msb=False) )
         tx_data.extend( ref )
 
         status, _ = self._ctl_if(self._cs_id, tx_data)
@@ -63,8 +63,8 @@ class Controller:
         cmd = self._cmd.get_refs
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(self._cs_id, msb=False) )
         
         status, rx_data = self._ctl_if(self._cs_id, tx_data)
 
@@ -88,9 +88,9 @@ class Controller:
         cmd = self._cmd.set
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(self._cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(ctl_id, msb=False) )
 
         status, _ = self._ctl_if(self._cs_id, tx_data)
 
@@ -114,8 +114,8 @@ class Controller:
         cmd = self._cmd.get
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(self._cs_id, msb=False) )
 
         status, rx_data = self._ctl_if(self._cs_id, tx_data)
 
@@ -123,7 +123,7 @@ class Controller:
             print('Error getting the controller. Error code {:}\r\n'.format(status))
             return (-1, status)
         
-        controller = lrssoc.conversions.u8_to_u32(rx_data, msb=False)
+        controller = pyocp.conversions.u8_to_u32(rx_data, msb=False)
         
         return (0, controller)
 
@@ -134,9 +134,9 @@ class Controller:
         cmd = self._cmd.reset
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(self._cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(ctl_id, msb=False) )
 
         status, _ = self._ctl_if(self._cs_id, tx_data)   
 
@@ -159,9 +159,9 @@ class Controller:
         cmd = self._cmd.set_params
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(self._cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(ctl_id, msb=False) )
         tx_data.extend( params )
 
         status, _ = self._ctl_if(self._cs_id, tx_data)
@@ -179,9 +179,9 @@ class Controller:
         cmd = self._cmd.get_params
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(self._cs_id, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(ctl_id, msb=False) )
 
         status, rx_data = self._ctl_if(self._cs_id, tx_data)   
 

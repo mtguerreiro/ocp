@@ -1,10 +1,10 @@
 from setuptools import setup
 
-setup(name='lrssoc',
+setup(name='pyocp',
       version='0.1.0',
-      description='PC interface for the LRS-SOC controller',
-      #url='https://github.com/mtguerreiro/pynoise.git',
+      description='Open Controller Project',
+      #url='',
       author='LRS',
-      author_email='guerreiro@eit.uni-kl.de',
-      packages=['lrssoc'],
+      author_email='marcotulio.guerreiro@gmail.com',
+      packages=['pyocp'],
       )

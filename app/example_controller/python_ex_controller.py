@@ -1,4 +1,4 @@
-import lrssoc
+import pyocp
 import buck
 
 import struct
@@ -10,7 +10,7 @@ host = 'localhost'
 port = 8080
 settings = {'host':host, 'port':port}
 
-ocp = lrssoc.ocp.iface.Interface(comm_type='ethernet', settings=settings)
+ocp = pyocp.ocp.Interface(comm_type='ethernet', settings=settings)
 
 def trace_data_to_np_array(trace_data, n_signals):
 

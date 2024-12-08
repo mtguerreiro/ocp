@@ -9,13 +9,13 @@ For more details, refer to the uiface.c file.
 
 """
 import socket
-import lrssoc
+import pyocp
 
 class Protocol:
 
     def __init__(self, comm_type='ethernet', settings={}):
 
-        self.comm = lrssoc.hwc.Comm(comm_type=comm_type, settings=settings)
+        self.comm = pyocp.hwc.Comm(comm_type=comm_type, settings=settings)
 
     
     def request(self, cmd, data=None):
@@ -57,8 +57,8 @@ class Protocol:
 
         size = data_size + 4
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(size, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(size, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         if data_size != 0:
             tx_data.extend(data)
