@@ -45,6 +45,7 @@ class Controller:
 
         tx_data = []
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
         tx_data.extend( ref )
 
         status, _ = self._ctl_if(self._cs_id, tx_data)
@@ -63,6 +64,7 @@ class Controller:
 
         tx_data = []
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
         
         status, rx_data = self._ctl_if(self._cs_id, tx_data)
 
@@ -87,6 +89,7 @@ class Controller:
 
         tx_data = []
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
         tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
 
         status, _ = self._ctl_if(self._cs_id, tx_data)
@@ -112,6 +115,7 @@ class Controller:
 
         tx_data = []
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
 
         status, rx_data = self._ctl_if(self._cs_id, tx_data)
 
@@ -131,6 +135,7 @@ class Controller:
 
         tx_data = []
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
         tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
 
         status, _ = self._ctl_if(self._cs_id, tx_data)   
@@ -155,6 +160,7 @@ class Controller:
 
         tx_data = []
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
         tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
         tx_data.extend( params )
 
@@ -174,6 +180,7 @@ class Controller:
 
         tx_data = []
         tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( lrssoc.conversions.u32_to_u8(self._cs_id, msb=False) )
         tx_data.extend( lrssoc.conversions.u32_to_u8(ctl_id, msb=False) )
 
         status, rx_data = self._ctl_if(self._cs_id, tx_data)   

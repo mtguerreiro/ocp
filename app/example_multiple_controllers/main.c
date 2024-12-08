@@ -8,6 +8,8 @@
 
 #include "ocp/ocpIf.h"
 
+#include "controller/controllerIf.h"
+
 #include "app/app.h"
 
 #include "threads/ocpIfThread.h"
@@ -23,6 +25,7 @@ int main(void){
     pthread_t ocpIfThreadHandle, ocpOpilThreadHandle;
 
     ocpIfInitialize();
+    controllerIfInit();
 
     appInit();
 

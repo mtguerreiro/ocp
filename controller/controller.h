@@ -97,10 +97,6 @@ int32_t controllerSetParams(controller_t *controller, uint32_t id,
 int32_t controllerGetParams(controller_t *controller, uint32_t id,
     void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
-int32_t controllerIf(controller_t *controller,
-    void *in, uint32_t insize,
-    void **out, uint32_t maxoutsize);
-//-----------------------------------------------------------------------------
 //=============================================================================
 
 #endif /* CONTROLLER_H_ */

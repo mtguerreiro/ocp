@@ -16,7 +16,7 @@ add_subdirectory(app)
 
 add_executable(ocp_example main.c)
 
-target_link_libraries(ocp_example PUBLIC opil ocp threads app)
+target_link_libraries(ocp_example PUBLIC opil ocp threads app controller)
 
 target_include_directories(ocp_example PUBLIC
                            "${PROJECT_BINARY_DIR}"

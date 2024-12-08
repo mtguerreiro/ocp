@@ -7,13 +7,6 @@
 //=============================================================================
 
 //=============================================================================
-/*------------------------------- Definitions -------------------------------*/
-//=============================================================================
-
-
-//=============================================================================
-
-//=============================================================================
 /*-------------------------------- Prototypes -------------------------------*/
 //=============================================================================
 static int32_t controllerSwitch(controller_t *controller,
@@ -194,7 +187,7 @@ static int32_t controllerSwitch(controller_t *controller,
     controller->previous = active;
 
     if( controller->cbs[active].firstEntry != 0 ){
-        status = controller->cbs[previous].firstEntry(
+        status = controller->cbs[active].firstEntry(
             meas, nmeas, 
             controller->refs.buffer, controller->refs.size,
             outputs, nmaxoutputs
