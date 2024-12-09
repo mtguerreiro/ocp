@@ -2,7 +2,7 @@
 
 This example shows how to use `ocp` for closed-loop control and data logging. To demonstrate closed-loop control, a buck converter is simulated with a software, which exchanges measurements and control signals with the controller. 
 
-In this example, we use Python to set the parameters of the controller (for example, gains and reference signal), to enable the controller, and retrieve logged data. The main goal of this example is to show some of the interesting possibilities when using Python to interact with the C controller. Refer to the `example_control_system` for an even more complete example. 
+In this example, we use Python to set the parameters of the controller (for example, gains and reference signal), to enable the controller, and retrieve logged data. The main goal of this example is to show some of the interesting possibilities when using Python to interact with the C controller. Refer to the `example_controllers` for an example handling multiple controllers under the same control system.
 
 Before going over this example, it is recommend to take a look at the introductory example (`example_intro`), since this example skips some of the initialization details. 
 
@@ -10,8 +10,8 @@ Before going over this example, it is recommend to take a look at the introducto
 
 This example is structured in the following way:
 
-- `main.c:` This file contains the `main` function, used to initialize `ocp`,the controller, and to interface with the simulation software.
-- `ocpConfig.h`: Defines the number of traces and controllers in the system.
+- `main.c:` This file contains the `main` function, used to initialize `ocp`, the controller, and to interface with the simulation software.
+- `ocpConfig.h`: Defines the number of traces and control systems in the system.
 - `stypes.h`: Configuration file for the simulation, containing a description of the input and output signals.
 - `buck.py` and `python_ex_controller.py`: Python files for this example. `buck.py` has definitions that are specific to the controller, and `python_ex_controller.py` shows how to interact with the controller.
 - Folder `app`: contains the source files for the controller.

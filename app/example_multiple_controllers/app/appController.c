@@ -16,6 +16,7 @@
 
 /* Controllers */
 #include "appControllerSfb.h"
+#include "appControllerCascaded.h"
 //============================================================================
 
 //=============================================================================
@@ -23,6 +24,7 @@
 //=============================================================================
 typedef enum{
     APP_CONTROLLER_SFB,
+    APP_CONTROLLER_CASCADED,
     APP_CONTROLLER_END
 }appControllersEnum_t;
 
@@ -50,6 +52,7 @@ int32_t appControllerInit(void){
 
     controllerGetCbs_t ctlGetCbs[APP_CONTROLLER_END] = {0};
     ctlGetCbs[APP_CONTROLLER_SFB] = appControlSfbGetCallbacks;
+    ctlGetCbs[APP_CONTROLLER_CASCADED] = appControlCascadedGetCallbacks;
 
     config.refBuffer = (void *)&xappControler.refs;
     config.refSize = sizeof(xappControler.refs);
