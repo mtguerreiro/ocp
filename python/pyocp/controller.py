@@ -31,7 +31,7 @@ class ControllerTemplate:
             if param in new_params:
                 new_params[param] = val
 
-        params = self.encode(new_params)
+        params = self._encode(new_params)
             
         return self._ctl_if.set_params(self._ctl_id, params)
 
@@ -43,17 +43,54 @@ class ControllerTemplate:
         if status < 0:
             return (-1, status)
 
-        params = self.decode(params)
+        params = self._decode(params)
         
         return (0, params)
 
 
-    def encode(self, params):
+    def _encode(self, params):
 
         return params
 
 
-    def decode(self, params):
+    def _decode(self, params):
+
+        return params
+
+
+class ReferenceTemplate:
+    """
+    """
+    def __init__(self, ctl_if):
+
+        self._ctl_if = ctl_if
+        
+
+    def set_ref(self, ref):
+
+        ref_bin = self._encode(ref)
+
+        return self._ctl_if.set_ref(ref_bin)
+
+
+    def get_ref(self):
+
+        status, ref_bin = self._ctl_if.get_ref()
+
+        if status < 0:
+            return (-1, status)
+
+        ref = self._decode(ref_bin)
+        
+        return (0, ref)
+
+
+    def _encode(self, params):
+
+        return params
+
+
+    def _decode(self, params):
 
         return params
 

@@ -28,6 +28,10 @@ static float kv = -0.04430925432587546;
 static float k_ev = -98.62715371027674;
 
 static float e = 0.0f;
+
+static float ev = 0.0f;
+static float ev_1 = 0.0f;
+
 static float ts = 1.0f / 100000.0f;
 
 static float v_ref = 6.0f;
@@ -66,7 +70,9 @@ int32_t appControllerSfbRun(void *meas, int32_t nmeas,
     v = m->v_out;
     v_ref = r->vref;
 
-    e = e + dt * (v_ref - v);
+    ev = v_ref - v;
+    e = e + (dt / 2.0f) * ( ev + ev_1 );
+    ev_1 = ev;
 
     u = - ki * i - kv * v - k_ev * e;
 
@@ -103,6 +109,9 @@ int32_t appControllerSfbGetParams(void *buffer, uint32_t size){
 void appControllerSfbReset(void){
 
     e = 0.0f;
+
+    ev = 0.0f;
+    ev_1 = 0.0f;
 }
 //-----------------------------------------------------------------------------
 int32_t appControllerSfbFirstEntry(void *meas, int32_t nmeas,

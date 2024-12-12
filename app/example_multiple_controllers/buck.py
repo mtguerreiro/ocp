@@ -7,32 +7,30 @@ import pyocp
 from dataclasses import dataclass
 
 @dataclass
-class ModelParams:
+class _ModelParams:
     V_in : float = 12
     R : float = 10
     L : float = 47e-6
-    C : float = 220e-6
+    Co : float = 220e-6
 
 
-class Controllers:
+class _Controllers:
 
     def __init__(self, ctl_if):
 
-        self.sfb = SFB(0, ctl_if)
-        self.cascaded = Cascaded(1, ctl_if)
+        self.sfb = _SFB(0, ctl_if)
+        self.cascaded = _Cascaded(1, ctl_if)
 
 
-class Cascaded(pyocp.controller.ControllerTemplate):
+class _Cascaded(pyocp.controller.ControllerTemplate):
 
     def __init__(self, ctl_id, ctl_if):
 
         super().__init__(ctl_id, ctl_if)
-
-        self._ctl_id = ctl_id
-        self._model_params = ModelParams
+        self._model_params = _ModelParams
 
 
-    def decode(self, params_bin):
+    def _decode(self, params_bin):
         
         fmt = '<' + 'f' * round( len(params_bin) / 4 )
         data = struct.unpack(fmt, params_bin)
@@ -49,7 +47,7 @@ class Cascaded(pyocp.controller.ControllerTemplate):
         return params
 
 
-    def encode(self, params):
+    def _encode(self, params):
 
         fmt = '<' + 'f' * len(params)
         
@@ -66,16 +64,15 @@ class Cascaded(pyocp.controller.ControllerTemplate):
         return params_bin
 
 
-class SFB(pyocp.controller.ControllerTemplate):
+class _SFB(pyocp.controller.ControllerTemplate):
     
     def __init__(self, ctl_id, ctl_if):
+        
         super().__init__(ctl_id, ctl_if)
-
-        self._ctl_id = ctl_id
-        self._model_params = ModelParams
+        self._model_params = _ModelParams
 
 
-    def decode(self, params_bin):
+    def _decode(self, params_bin):
         
         fmt = '<' + 'f' * round( len(params_bin) / 4 )
         data = struct.unpack(fmt, params_bin)
@@ -88,7 +85,7 @@ class SFB(pyocp.controller.ControllerTemplate):
         return params
 
 
-    def encode(self, params):
+    def _encode(self, params):
 
         fmt = '<' + 'f' * len(params)
         
@@ -108,12 +105,12 @@ class SFB(pyocp.controller.ControllerTemplate):
 
     def set_gains(self, ts=1e-3, os=5):
 
-        params = self.get_gains(ts=ts, os=os)
+        params = self._get_gains(ts=ts, os=os)
 
         return self.set_params(params)
 
 
-    def get_gains(self, ts=1e-3, os=5):
+    def _get_gains(self, ts=1e-3, os=5):
 
         # Model
         V_in = self._model_params.V_in
@@ -160,7 +157,30 @@ class SFB(pyocp.controller.ControllerTemplate):
         return {'ki':ki, 'kv':kv, 'k_ev':k_ev}
 
 
-class Interface(Controllers):
+class _Reference(pyocp.controller.ReferenceTemplate):
+
+    def __init__(self, ctl_if):
+        super().__init__(ctl_if)
+
+
+    def _decode(self, ref_bin):
+        
+        fmt = '<f'
+        ref = struct.unpack(fmt, ref_bin)
+
+        return ref
+
+
+    def _encode(self, ref):
+
+        fmt = '<f'
+        
+        ref_bin = struct.pack(fmt, ref)
+
+        return ref_bin
+
+
+class Interface(_Controllers, _Reference):
     
     def __init__(self, comm_type, settings, cs_id=0, tr_id=0):
         self._ocp = pyocp.ocp.Interface(comm_type='ethernet', settings=settings)
@@ -169,8 +189,9 @@ class Interface(Controllers):
 
         self._ctl_if = pyocp.controller.Interface(self._ocp.cs_controller_if, cs_id)
 
-        super().__init__(self._ctl_if)
-    
+        _Controllers.__init__(self, self._ctl_if)
+        _Reference.__init__(self, self._ctl_if)
+        
 
     def cs_enable(self):
 

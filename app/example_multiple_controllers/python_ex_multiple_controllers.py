@@ -12,6 +12,8 @@ settings = {'host':host, 'port':port}
 
 ocp = pyocp.ocp.Interface(comm_type='ethernet', settings=settings)
 
+b = buck.Interface('ethernet', settings)
+
 def trace_data_to_np_array(trace_data, n_signals):
 
     n = len(trace_data)
