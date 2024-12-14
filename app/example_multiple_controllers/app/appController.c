@@ -65,6 +65,8 @@ int32_t appControllerInit(void){
 
     controllerIfRegister(&xappControler.controller, APP_CONFIG_OCP_CS_ID);
 
+    ocpTraceAddSignal(APP_CONFIG_OCP_TRACE_ID, (void *)&xappControler.refs.vref, "Voltage reference");
+
     return 0;
 }
 //-----------------------------------------------------------------------------

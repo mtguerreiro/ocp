@@ -23,9 +23,9 @@
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
-static float ki = 0.0530530303030496;
-static float kv = -0.04430925432587546;
-static float k_ev = -98.62715371027674;
+static float ki = 0.02015303075313568;
+static float kv = -0.07867603003978729;
+static float k_ev = -4.631767272949219;
 
 static float e = 0.0f;
 
@@ -48,12 +48,6 @@ static float u;
 //=============================================================================
 //-----------------------------------------------------------------------------
 int32_t appControllerSfbInit(void){
-
-    /* Move this elsewhere */
-    ocpTraceAddSignal(OCP_TRACE_1, (void *)( &i ), "Inductor current");
-    ocpTraceAddSignal(OCP_TRACE_1, (void *)( &v ), "Output voltage");
-    
-    ocpTraceAddSignal(OCP_TRACE_1, (void *)( &u ), "Duty-cycle");
 
     return 0;
 }

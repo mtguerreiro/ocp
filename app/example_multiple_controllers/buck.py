@@ -64,6 +64,56 @@ class _Cascaded(pyocp.controller.ControllerTemplate):
         return params_bin
 
 
+    def get_model_params(self):
+
+        return self._model_params
+        
+
+    def set_model_params(self, params):
+
+        self._model_params = params
+
+
+    def set_gains(self, ts=1e-3, os=5):
+
+        params = self._get_gains(ts=ts, os=os)
+
+        return self.set_params(params)
+
+
+    def _get_gains(self, ts=1e-3, os=5):
+
+        # Model
+        V_in = self._model_params.V_in
+        R = self._model_params.R
+        L = self._model_params.L
+        CO = self._model_params.Co
+        
+        ts_v = ts
+        os_v = os
+        
+        os_i = os_v
+        ts_i = ts_v / 5
+
+        zeta_i, wn_i = self._zeta_wn(ts_i, os_i)
+        ki = (L / V_in) * 2 * zeta_i * wn_i
+        k_ei = (L / V_in) * ( - wn_i**2 )
+
+        zeta_v, wn_v = self._zeta_wn(ts_v, os_v)
+        kv = ( CO ) * ( 2 * zeta_v * wn_v - 1 / R / CO )
+        k_ev = ( CO ) * ( - wn_v**2 )
+
+        return {'ki': ki, 'k_ei': k_ei, 'kv': kv, 'k_ev':k_ev}
+
+
+    def _zeta_wn(self, ts, os):
+
+        zeta = -np.log(os / 100) / np.sqrt( np.pi**2 + np.log(os / 100)**2 )
+        wn = 4 / ts / zeta
+
+        return (zeta, wn)
+
+
 class _SFB(pyocp.controller.ControllerTemplate):
     
     def __init__(self, ctl_id, ctl_if):
@@ -97,6 +147,11 @@ class _SFB(pyocp.controller.ControllerTemplate):
 
         return params_bin
 
+
+    def get_model_params(self):
+
+        return self._model_params
+    
 
     def set_model_params(self, params):
 
@@ -193,12 +248,12 @@ class Interface(_Controllers, _Reference):
         _Reference.__init__(self, self._ctl_if)
         
 
-    def cs_enable(self):
+    def enable(self):
 
         return self._ocp.cs_enable(self._cs_id)
 
 
-    def cs_disable(self):
+    def disable(self):
 
         return self._ocp.cs_disable(self._cs_id)
 

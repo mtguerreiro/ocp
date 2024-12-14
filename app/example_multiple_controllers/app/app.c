@@ -85,13 +85,23 @@ int32_t appInit(void){
 static int32_t appOcpTracesInit(void){
 
     ocpTraceConfig_t config;
+    stypesMeasurements_t *meas;
+    stypesControl_t *control;
 
+    /* Initializes app's trace */
     config.mem = (void *)traceBuffer;
     config.size = APP_CONFIG_OCP_TRACE_0_SIZE_BYTES;
     config.data = (void **)trace0Data;
     config.names = trace0Names;
 
     ocpTraceInitialize(APP_CONFIG_OCP_TRACE_ID, &config, "App trace");
+
+    /* Adds measurements and controls to trace */
+    meas = (stypesMeasurements_t *)(bInputs);
+    control = (stypesControl_t *)(bOutputs);
+    ocpTraceAddSignal(APP_CONFIG_OCP_TRACE_ID, (void *)&meas->i, "Inductor current");
+    ocpTraceAddSignal(APP_CONFIG_OCP_TRACE_ID, (void *)&meas->v_out, "Output voltage");
+    ocpTraceAddSignal(APP_CONFIG_OCP_TRACE_ID, (void *)&control->u, "Duty-cycle");
 
     return 0;
 }
