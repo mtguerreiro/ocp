@@ -16,7 +16,7 @@ class ControllerTemplate:
         self._ctl_if = ctl_if
         
 
-    def set(self):
+    def enable(self):
 
         return self._ctl_if.set(self._ctl_id)
 

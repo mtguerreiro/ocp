@@ -14,7 +14,30 @@ class _ModelParams:
     Co : float = 220e-6
 
 
-class _Controllers:
+class Reference(pyocp.controller.ReferenceTemplate):
+
+    def __init__(self, ctl_if):
+        super().__init__(ctl_if)
+
+
+    def _decode(self, ref_bin):
+        
+        fmt = '<f'
+        ref = struct.unpack(fmt, ref_bin)
+
+        return ref
+
+
+    def _encode(self, ref):
+
+        fmt = '<f'
+        
+        ref_bin = struct.pack(fmt, ref)
+
+        return ref_bin
+
+
+class Controllers:
 
     def __init__(self, ctl_if):
 
@@ -210,50 +233,3 @@ class _SFB(pyocp.controller.ControllerTemplate):
         k_ev = K[2]
         
         return {'ki':ki, 'kv':kv, 'k_ev':k_ev}
-
-
-class _Reference(pyocp.controller.ReferenceTemplate):
-
-    def __init__(self, ctl_if):
-        super().__init__(ctl_if)
-
-
-    def _decode(self, ref_bin):
-        
-        fmt = '<f'
-        ref = struct.unpack(fmt, ref_bin)
-
-        return ref
-
-
-    def _encode(self, ref):
-
-        fmt = '<f'
-        
-        ref_bin = struct.pack(fmt, ref)
-
-        return ref_bin
-
-
-class Interface(_Controllers, _Reference):
-    
-    def __init__(self, comm_type, settings, cs_id=0, tr_id=0):
-        self._ocp = pyocp.ocp.Interface(comm_type='ethernet', settings=settings)
-        self._cs_id = cs_id
-        self._tr_id = tr_id
-
-        self._ctl_if = pyocp.controller.Interface(self._ocp.cs_controller_if, cs_id)
-
-        _Controllers.__init__(self, self._ctl_if)
-        _Reference.__init__(self, self._ctl_if)
-        
-
-    def enable(self):
-
-        return self._ocp.cs_enable(self._cs_id)
-
-
-    def disable(self):
-
-        return self._ocp.cs_disable(self._cs_id)
-
