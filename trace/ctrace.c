@@ -1,13 +1,4 @@
-/*
- * ctrace.c
- *
- *  Created on: 21 de ago de 2022
- *      Author: marco
- */
 
-/*
- * TODO: limit signal name
- */
 //===========================================================================
 /*------------------------------- Includes --------------------------------*/
 //===========================================================================
@@ -18,6 +9,11 @@
 /*------------------------------ Definitions ------------------------------*/
 //===========================================================================
 
+/*
+ * TODOs
+ *  - limit signal name
+ *  - thread-safe?
+ */
 //===========================================================================
 
 //===========================================================================
@@ -95,7 +91,10 @@ void ctraceSave(ctrace_t *trace){
 
 	size = sizeof(ctracemem_size_t) * trace->n;
 
-	ctracememSave( &trace->mem, trace->data, size );
+	if( trace->traceMode == CTRACE_MANUAL )
+		ctracememSave( &trace->mem, trace->data, size );
+	else if( trace->traceMode == CTRACE_TRIGGER )
+		ctracememTrigModeSave( &trace->mem, trace->data, size );
 }
 //---------------------------------------------------------------------------
 void ctraceTrigModeReset(ctrace_t *trace){
@@ -108,23 +107,14 @@ int32_t ctraceTrigModeSetNumPreTrigSamples(ctrace_t *trace, uint32_t numPreTrigS
 	return ctracememTrigModeSetNumPreTrigSamples( &trace->mem, numPreTrigSamples, trace->n );
 }
 //---------------------------------------------------------------------------
-int32_t ctraceTrigModeSetTraceToTrack(ctrace_t *trace, uint32_t traceToTrack){
+int32_t ctraceTrigModeSetTrigSignal(ctrace_t *trace, uint32_t signal){
 
-	return ctracememTrigModeSetTraceToTrack( &trace->mem, traceToTrack, trace->n );
+	return ctracememTrigModeSetTrigSignal( &trace->mem, signal, trace->n );
 }
 //---------------------------------------------------------------------------
-int32_t ctraceTrigModeSetTrigBound(ctrace_t *trace, int32_t trigBound){
+int32_t ctraceTrigModeSetTrigLevel(ctrace_t *trace, uint32_t level){
 
-	return ctracememTrigModeSetTrigBound( &trace->mem, trigBound );
-}
-//---------------------------------------------------------------------------
-void ctraceTrigModeSave(ctrace_t *trace){
-
-	uint32_t size;
-
-	size = sizeof(ctracemem_size_t) * trace->n;
-
-	ctracememTrigModeSave( &trace->mem, trace->data, size );
+	return ctracememTrigModeSetTrigLevel( &trace->mem, level );
 }
 //---------------------------------------------------------------------------
 int32_t ctraceTrigModeGetTail(ctrace_t *trace){

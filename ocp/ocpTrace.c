@@ -170,18 +170,18 @@ int32_t ocpTraceSetNumPreTrigSamples(uint32_t id, uint32_t samples){
 	return ctraceTrigModeSetNumPreTrigSamples( &xifcontrol.traces[id], samples );
 }
 //-----------------------------------------------------------------------------
-int32_t ocpTraceSetTraceToTrack(uint32_t id, uint32_t trace){
+int32_t ocpTraceSetTrigSignal(uint32_t id, uint32_t signal){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	return ctraceTrigModeSetTraceToTrack( &xifcontrol.traces[id], trace );
+	return ctraceTrigModeSetTrigSignal( &xifcontrol.traces[id], signal );
 }
 //-----------------------------------------------------------------------------
 int32_t ocpTraceSetTrigLevel(uint32_t id, uint32_t level){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	return ctraceTrigModeSetTrigBound( &xifcontrol.traces[id], level );
+	return ctraceTrigModeSetTrigLevel( &xifcontrol.traces[id], level );
 }
 //-----------------------------------------------------------------------------
 int32_t ocpTraceGetTail(uint32_t id){
@@ -195,15 +195,7 @@ int32_t ocpTraceSave(uint32_t id){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	switch ( xifcontrol.traces[id].traceMode ) {
-	case CTRACE_MANUAL:
-	default:
-		ctraceSave( &xifcontrol.traces[id] );
-	break;
-	case CTRACE_TRIGGER:
-		ctraceTrigModeSave( &xifcontrol.traces[id] );
-	break;
-	}
+	ctraceSave( &xifcontrol.traces[id] );
 
 	return 0;
 }

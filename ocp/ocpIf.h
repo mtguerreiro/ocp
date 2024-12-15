@@ -194,14 +194,14 @@ typedef enum{
 
 	/**
 	 * Command
-	 *  ----------------------------------------------------------------------
-	 *  | SET TRACE TO TRACK (uint32) |  TRACE ID (uint32) | SIGNAL (uint32) |
-	 *  ----------------------------------------------------------------------
+	 *  -------------------------------------------------------------------
+	 *  | SET TRIG SIGNAL (uint32) |  TRACE ID (uint32) | SIGNAL (uint32) |
+	 *  -------------------------------------------------------------------
 	 *
 	 * Response
 	 * No Response
 	 */
-	OCP_IF_CMD_TRACE_SET_SIGNAL_TO_TRACK,
+	OCP_IF_CMD_TRACE_SET_TRIG_SIGNAL,
 
 	/**
 	 * Command

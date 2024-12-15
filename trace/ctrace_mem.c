@@ -88,19 +88,19 @@ int32_t ctracememTrigModeSetNumPreTrigSamples(ctracemem_t *trace, uint32_t numPr
 	return 0;
 }
 //---------------------------------------------------------------------------
-int32_t ctracememTrigModeSetTraceToTrack(ctracemem_t *trace, uint32_t traceToTrack, uint32_t numTraces){
+int32_t ctracememTrigModeSetTrigSignal(ctracemem_t *trace, uint32_t signal, uint32_t numTraces){
 
-	if (traceToTrack >= numTraces) return -1;
+	if (signal >= numTraces) return -1;
 
-	trace->trigModeParams.traceToTrack = traceToTrack;
+	trace->trigModeParams.signal = signal;
 
 	return 0;
 }
 //---------------------------------------------------------------------------
-int32_t ctracememTrigModeSetTrigBound(ctracemem_t *trace, int32_t trigBound){
+int32_t ctracememTrigModeSetTrigLevel(ctracemem_t *trace, uint32_t level){
 
-	float trigBoundFloat = *((float*)&trigBound);
-	trace->trigModeParams.trigBound = trigBoundFloat;
+	float levelFloat = *((float*)&level);
+	trace->trigModeParams.level = levelFloat;
 
 	return 0;
 }
@@ -115,8 +115,8 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
 	switch( trace->trigModeParams.fsmState ) {
 	case SET_REF_VALUE:
 	{
-		const uint32_t traceToTrack = trace->trigModeParams.traceToTrack;
-		float floatValue = *((float*)&(**(s + traceToTrack)));
+		const uint32_t signal = trace->trigModeParams.signal;
+		float floatValue = *((float*)&(**(s + signal)));
 		trace->trigModeParams.refValue = floatValue;
 		while(sampleCounter--) circBuf_write( &trace->trigModeBuffer, **s++ );
 		trace->trigModeParams.fsmState = WAIT_FOR_TRIGGER;
@@ -125,11 +125,11 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
 
 	case WAIT_FOR_TRIGGER:
 	{
-		const float trigBound = trace->trigModeParams.trigBound;
+		const float level = trace->trigModeParams.level;
 		const float refValue = trace->trigModeParams.refValue;
-		const uint32_t traceToTrack = trace->trigModeParams.traceToTrack;
-		float floatValue = *((float*)&(**(s + traceToTrack)));
-		if ( (trigBound >= refValue && floatValue >= trigBound) || (trigBound < refValue && floatValue <= trigBound)  ) {
+		const uint32_t signal = trace->trigModeParams.signal;
+		float floatValue = *((float*)&(**(s + signal)));
+		if ( (level >= refValue && floatValue >= level) || (level < refValue && floatValue <= level)  ) {
 			trace->trigModeParams.fsmState = TRIGGER_JUST_SET;
 		}
 		while(sampleCounter--) circBuf_write( &trace->trigModeBuffer, **s++ );
@@ -163,4 +163,5 @@ int32_t ctracememTrigModeGetTail(ctracemem_t *trace) {
 	
 	return trace->trigModeBuffer.tail;
 }
+//---------------------------------------------------------------------------
 //===========================================================================

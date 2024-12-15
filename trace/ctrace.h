@@ -1,9 +1,3 @@
-/*
- * ctrace.h
- *
- *  Created on: 21 de ago de 2022
- *      Author: marco
- */
 
 #ifndef CTRACE_H_
 #define CTRACE_H_
@@ -46,9 +40,6 @@ typedef struct ctrace_t{
 	ctracemem_t mem;
 }ctrace_t;
 
-/*
- * TODO: thread-safe?
- */
 //===========================================================================
 
 //===========================================================================
@@ -77,11 +68,9 @@ void ctraceTrigModeReset(ctrace_t *trace);
 //---------------------------------------------------------------------------
 int32_t ctraceTrigModeSetNumPreTrigSamples(ctrace_t *trace, uint32_t numPreTrigSamples);
 //---------------------------------------------------------------------------
-int32_t ctraceTrigModeSetTraceToTrack(ctrace_t *trace, uint32_t traceToTrack);
+int32_t ctraceTrigModeSetTrigSignal(ctrace_t *trace, uint32_t signal);
 //---------------------------------------------------------------------------
-int32_t ctraceTrigModeSetTrigBound(ctrace_t *trace, int32_t trigBound);
-//---------------------------------------------------------------------------
-void ctraceTrigModeSave(ctrace_t *trace);
+int32_t ctraceTrigModeSetTrigLevel(ctrace_t *trace, uint32_t signal);
 //---------------------------------------------------------------------------
 int32_t ctraceTrigModeGetTail(ctrace_t *trace);
 //---------------------------------------------------------------------------

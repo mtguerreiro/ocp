@@ -14,14 +14,14 @@ ocp = pyocp.ocp.Interface(comm_type='ethernet', settings=settings)
 
 b = buck.Interface('ethernet', settings)
 
-def trace_data_to_np_array(trace_data, n_signals):
+def cfg_cascaded():
+    b.cascaded.set_gains(ts=1e-3, os=2)
+    b.cascaded.set_params({'i_max':4})
+    b.cascaded.enable()
 
-    n = len(trace_data)
-
-    fmt = '<' + 'f' * round(n / 4)
-
-    data = np.array(struct.unpack(fmt, trace_data))
-
-    data = data.reshape(round(n / n_signals / 4), n_signals)
-
-    return data
+def cfg_trace_trig():
+    b.trace.set_size(200)
+    b.trace.set_trig_signal(4)
+    b.trace.set_n_pre_trig_samples(20)
+    b.trace.set_trig_level(5.75)
+    b.trace.set_mode(1)

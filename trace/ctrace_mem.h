@@ -31,9 +31,9 @@ typedef enum {
 
 typedef struct trigModeParams_t{
 	trigModeFSMState_t fsmState;
-	float trigBound;
+	float level;
 	uint32_t numPreTrigSamples;
-	uint32_t traceToTrack;
+	uint32_t signal;
 	float refValue;
 } trigModeParams_t;
 
@@ -133,27 +133,27 @@ void ctracememTrigModeReset(ctracemem_t *trace);
 int32_t ctracememTrigModeSetNumPreTrigSamples(ctracemem_t *trace, uint32_t numPreTrigSamples, uint32_t numTraces);
 //---------------------------------------------------------------------------
 /**
- * @brief Sets particular trace for which the trigger is defined.
+ * @brief Sets signal of particular trace for which the trigger is defined.
  *
  * The number to be set corresponds to the ID for the particular measurement.
  *
  * @param trace Pointer to trace memory region.
- * @param traceToTrack Trace for which the trigger is defined.
- * @param numTraces Total number of traces, used for error generation if traceToTrack does not belong to any measurement.
- * @return -1 if traceToTrack does not belong to a measurement, 0 otherwise.
+ * @param signal Trace for which the trigger is defined.
+ * @param numTraces Total number of traces, used for error generation if signal does not belong to any measurement.
+ * @return -1 if signal does not belong to a measurement, 0 otherwise.
  */
-int32_t ctracememTrigModeSetTraceToTrack(ctracemem_t *trace, uint32_t traceToTrack, uint32_t numTraces);
+int32_t ctracememTrigModeSetTrigSignal(ctracemem_t *trace, uint32_t signal, uint32_t numTraces);
 //---------------------------------------------------------------------------
 /**
- * @brief Sets the trigger bound value.
+ * @brief Sets the trigger level.
  *
  * After a trace reset, the trigger is set each time this value is crossed from above or from below.
  *
  * @param trace Pointer to trace memory region.
- * @param trigBound bound value; reinterpret cast is used to convert back to the float value set in the Python command.
+ * @param level level; reinterpret cast is used to convert back to the float value set in the Python command.
  * @return Always return 0.
  */
-int32_t ctracememTrigModeSetTrigBound(ctracemem_t *trace, int32_t trigBound);
+int32_t ctracememTrigModeSetTrigLevel(ctracemem_t *trace, uint32_t level);
 //---------------------------------------------------------------------------
 /**
  * @brief Saves measurement values for each trace in Trig Mode.
