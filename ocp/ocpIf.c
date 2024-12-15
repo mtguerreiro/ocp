@@ -57,19 +57,19 @@ static int32_t ocpIfTraceGetTracesNames(void *in, uint32_t insize,
 static int32_t ocpIfTraceGetAddress(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceEnableTrigMode(void *in, uint32_t insize,
+static int32_t ocpIfTraceSetMode(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceEnableManualMode(void *in, uint32_t insize,
+static int32_t ocpIfTraceGetMode(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
 static int32_t ocpIfTraceSetNumPreTrigSamples(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetTraceToTrack(void *in, uint32_t insize,
+static int32_t ocpIfTraceSetSignalToTrack(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetTrigBound(void *in, uint32_t insize,
+static int32_t ocpIfTraceSetTrigLevel(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
 static int32_t ocpIfTraceGetTail(void *in, uint32_t insize,
@@ -273,11 +273,11 @@ int32_t ocpIfInitialize(void){
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_TRACES, ocpIfTraceGetNumberTraces );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRACES_NAMES, ocpIfTraceGetTracesNames );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_ADDRESS, ocpIfTraceGetAddress );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_ENABLE_TRIG_MODE, ocpIfTraceEnableTrigMode );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_ENABLE_MANUAL_MODE, ocpIfTraceEnableManualMode );
+	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_MODE, ocpIfTraceSetMode );
+	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_MODE, ocpIfTraceGetMode );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES, ocpIfTraceSetNumPreTrigSamples );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRACE_TO_TRACK, ocpIfTraceSetTraceToTrack );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_BOUND, ocpIfTraceSetTrigBound );
+	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_SIGNAL_TO_TRACK, ocpIfTraceSetSignalToTrack );
+	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_LEVEL, ocpIfTraceSetTrigLevel );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TAIL, ocpIfTraceGetTail );
 
 	//rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_STATUS, ocpIfCSGetStatus );
@@ -487,30 +487,38 @@ static int32_t ocpIfTraceGetAddress(void *in, uint32_t insize,
 	return sizeof(size_t);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceEnableTrigMode(void *in, uint32_t insize,
+static int32_t ocpIfTraceSetMode(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize){
 
 	uint32_t id;
+	uint32_t mode;
+	uint32_t *p;
 	int32_t status;
 
-	id = *( (uint32_t *)in );
+	p = (uint32_t *)in;
 
-	status = ocpTraceEnableTrigMode(id);
+	id = *p++;
+	mode = *p++;
+
+	status = ocpTraceSetMode(id, (ocpTraceMode_t)mode);
 
 	return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceEnableManualMode(void *in, uint32_t insize,
+static int32_t ocpIfTraceGetMode(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize){
 
+	int32_t mode;
+	uint32_t *o = (uint32_t *)( *out );
+
 	uint32_t id;
-	int32_t status;
 
-	id = *( (uint32_t *)in );
+	id = *((uint32_t *)in);
+	mode = ocpTraceGetMode(id);
 
-	status = ocpTraceEnableManualMode(id);
+	*o = mode;
 
-	return status;
+	return 4;
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpIfTraceSetNumPreTrigSamples(void *in, uint32_t insize,
@@ -524,39 +532,39 @@ static int32_t ocpIfTraceSetNumPreTrigSamples(void *in, uint32_t insize,
 	id = *p++;
 	num = *p;
 
-	status = ocpTraceTrigModeSetNumPreTrigSamples(id, num);
+	status = ocpTraceSetNumPreTrigSamples(id, num);
 
 	return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetTraceToTrack(void *in, uint32_t insize,
+static int32_t ocpIfTraceSetSignalToTrack(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize){
 
 	uint32_t id;
-	uint32_t trace;
+	uint32_t signal;
 	int32_t status;
 	uint32_t *p = (uint32_t *)in;
 
 	id = *p++;
-	trace = *p;
+	signal = *p;
 
-	status = ocpTraceTrigModeSetTraceToTrack(id, trace);
+	status = ocpTraceSetTraceToTrack(id, signal);
 
 	return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetTrigBound(void *in, uint32_t insize,
+static int32_t ocpIfTraceSetTrigLevel(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize){
 
 	uint32_t id;
-	int32_t bound;
+	uint32_t level;
 	int32_t status;
 	uint32_t *p = (uint32_t *)in;
 
 	id = *p++;
-	bound = *p;
+	level = *p;
 
-	status = ocpTraceTrigModeSetTrigBound(id, bound);
+	status = ocpTraceSetTrigLevel(id, level);
 
 	return status;
 }
@@ -571,7 +579,7 @@ static int32_t ocpIfTraceGetTail(void *in, uint32_t insize,
 
 	id = *p++;
 
-	tail = ocpTraceTrigModeGetTail(id);
+	tail = ocpTraceGetTail(id);
 	if( tail < 0 ) return tail;
 
 	*o = tail;

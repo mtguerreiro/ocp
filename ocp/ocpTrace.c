@@ -139,48 +139,53 @@ int32_t ocpTraceGetTracesNames(char *buffer, int32_t maxsize){
 	return k;
 }
 //-----------------------------------------------------------------------------
-int32_t ocpTraceEnableTrigMode(uint32_t id){
+int32_t ocpTraceSetMode(uint32_t id, ocpTraceMode_t mode){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	xifcontrol.traces[id].traceMode = CTRACE_TRIGGER;
+	if( (mode != CTRACE_TRIGGER) && (mode != CTRACE_MANUAL) )
+		return -2;
+	
+	xifcontrol.traces[id].traceMode = mode;
 	ocpTraceReset(id);
 
 	return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t ocpTraceEnableManualMode(uint32_t id){
+int32_t ocpTraceGetMode(uint32_t id){
+
+	int32_t mode;
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	xifcontrol.traces[id].traceMode = CTRACE_MANUAL;
-	ocpTraceReset(id);
+	mode = (int32_t) xifcontrol.traces[id].traceMode;
 
-	return 0;
+	return mode;
 }
 //-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeSetNumPreTrigSamples(uint32_t id, size_t numPreTrigSamples){
+int32_t ocpTraceSetNumPreTrigSamples(uint32_t id, uint32_t samples){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	return ctraceTrigModeSetNumPreTrigSamples( &xifcontrol.traces[id], numPreTrigSamples );
+	return ctraceTrigModeSetNumPreTrigSamples( &xifcontrol.traces[id], samples );
 }
 //-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeSetTraceToTrack(uint32_t id, size_t traceToTrack){
+int32_t ocpTraceSetTraceToTrack(uint32_t id, uint32_t trace){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	return ctraceTrigModeSetTraceToTrack( &xifcontrol.traces[id], traceToTrack );
+	return ctraceTrigModeSetTraceToTrack( &xifcontrol.traces[id], trace );
 }
 //-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeSetTrigBound(uint32_t id, int32_t trigBound){
+int32_t ocpTraceSetTrigLevel(uint32_t id, uint32_t level){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	return ctraceTrigModeSetTrigBound( &xifcontrol.traces[id], trigBound );
+	return ctraceTrigModeSetTrigBound( &xifcontrol.traces[id], level );
 }
 //-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeGetTail(uint32_t id){
+int32_t ocpTraceGetTail(uint32_t id){
+
 	if( id >= OCP_TRACE_END ) return -1;
 
 	return ctraceTrigModeGetTail( &xifcontrol.traces[id] );

@@ -20,6 +20,8 @@
 /*------------------------------ Definitions ------------------------------*/
 //===========================================================================
 
+typedef ctraceMode_t ocpTraceMode_t;
+
 typedef ctraceConfig_t ocpTraceConfig_t;
 
 //===========================================================================
@@ -48,17 +50,17 @@ int32_t ocpTraceGetNumberTraces(void);
 //---------------------------------------------------------------------------
 int32_t ocpTraceGetTracesNames(char *buffer, int32_t maxsize);
 //---------------------------------------------------------------------------
-int32_t ocpTraceEnableTrigMode(uint32_t id);
+int32_t ocpTraceSetMode(uint32_t id, ocpTraceMode_t mode);
 //---------------------------------------------------------------------------
-int32_t ocpTraceEnableManualMode(uint32_t id);
+int32_t ocpTraceGetMode(uint32_t id);
 //-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeSetNumPreTrigSamples(uint32_t id, size_t numPreTrigSamples);
+int32_t ocpTraceSetNumPreTrigSamples(uint32_t id, uint32_t samples);
 //-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeSetTraceToTrack(uint32_t id, size_t traceToTrack);
+int32_t ocpTraceSetTraceToTrack(uint32_t id, uint32_t trace);
 //-----------------------------------------------------------------------------
-int32_t ocpTraceTrigModeSetTrigBound(uint32_t id, int32_t trigBound);
+int32_t ocpTraceSetTrigLevel(uint32_t id, uint32_t level);
 //---------------------------------------------------------------------------
-int32_t ocpTraceTrigModeGetTail(uint32_t id);
+int32_t ocpTraceGetTail(uint32_t id);
 //---------------------------------------------------------------------------
 int32_t ocpTraceSave(uint32_t id);
 //---------------------------------------------------------------------------

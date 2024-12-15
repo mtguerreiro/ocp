@@ -62,6 +62,8 @@ int32_t controllerIfRegister(controller_t *controller, uint32_t csid){
     if( csid >= OCP_CS_END ) return -1;
 
     controllers[csid] = controller;
+
+    return 0;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -123,7 +125,6 @@ static int32_t controllerIfSet(void *in, uint32_t insize, void **out, uint32_t m
 //-----------------------------------------------------------------------------
 static int32_t controllerIfGet(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status;
     uint32_t ctl;
     uint32_t *p = (uint32_t  *)*out;
     uint32_t csid = *((uint32_t *)in);

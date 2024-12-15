@@ -35,7 +35,6 @@ static float i_min = -10.0f;
 static float ei_int = 0.0f;
 static float ei = 0.0f;
 static float ei_1 = 0.0f;
-static float ts = 1.0f / 100000.0f;
 
 static float ev_int = 0.0f;
 static float ev = 0.0f;

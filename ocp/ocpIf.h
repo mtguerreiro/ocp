@@ -159,31 +159,33 @@ typedef enum{
 
 	/**
 	 * Command
-	 *  ---------------------------------------------------
-	 *  | ENABLE TRIG MODE (uint32) |  TRACE ID (uint32) |
-	 *  ---------------------------------------------------
+	 *  ----------------------------------------------------------
+	 *  | SET MODE (uint32) |  TRACE ID (uint32) | MODE (uint32) |
+	 *  ----------------------------------------------------------
 	 *
 	 * Response
 	 * No Response
 	 */
-	OCP_IF_CMD_TRACE_ENABLE_TRIG_MODE,
+	OCP_IF_CMD_TRACE_SET_MODE,
 
 	/**
 	 * Command
-	 *  ---------------------------------------------------
-	 *  | ENABLE MANUAL MODE (uint32) |  TRACE ID (uint32) |
-	 *  ---------------------------------------------------
+	 *  ------------------------------------------
+	 *  | GET MODE (uint32) |  TRACE ID (uint32) |
+	 *  ------------------------------------------
 	 *
 	 * Response
-	 * No Response
+     *  -----------------
+     *  | MODE (uint32) |
+     *  -----------------
 	 */
-	OCP_IF_CMD_TRACE_ENABLE_MANUAL_MODE,
+	OCP_IF_CMD_TRACE_GET_MODE,
 
 	/**
 	 * Command
-	 *  -----------------------------------------------------------------------------------------
-	 *  | SET NUM PRE TRIG SAMPLES (uint32) |  TRACE ID (uint32) | NUM_PRE_TRIG_SAMPLES (uint32) |
-	 *  -----------------------------------------------------------------------------------------
+	 *  ---------------------------------------------------------------------------------
+	 *  | SET NUM PRE TRIG SAMPLES (uint32) |  TRACE ID (uint32) | NUM SAMPLES (uint32) |
+	 *  ---------------------------------------------------------------------------------
 	 *
 	 * Response
 	 * No Response
@@ -192,25 +194,29 @@ typedef enum{
 
 	/**
 	 * Command
-	 *  -----------------------------------------------------------------------------
-	 *  | SET TRACE TO TRACK (uint32) |  TRACE ID (uint32) | TRACE_TO_TRACK (uint32) |
-	 *  -----------------------------------------------------------------------------
+	 *  ----------------------------------------------------------------------
+	 *  | SET TRACE TO TRACK (uint32) |  TRACE ID (uint32) | SIGNAL (uint32) |
+	 *  ----------------------------------------------------------------------
 	 *
 	 * Response
 	 * No Response
 	 */
-	OCP_IF_CMD_TRACE_SET_TRACE_TO_TRACK,
+	OCP_IF_CMD_TRACE_SET_SIGNAL_TO_TRACK,
 
 	/**
 	 * Command
-	 *  ---------------------------------------------------------------------
-	 *  | SET TRIG BOUND (uint32) |  TRACE ID (uint32) | TRIG_BOUND (uint32) |
-	 *  ---------------------------------------------------------------------
+	 *  -----------------------------------------------------------------
+	 *  | SET TRIG LEVEL (uint32) |  TRACE ID (uint32) | LEVEL (uint32) |
+	 *  -----------------------------------------------------------------
 	 *
 	 * Response
 	 * No Response
+     * 
+     * Notes
+     *  - The size of LEVEL is 4 bytes (uint32), but the type could be 
+     *    integer or float.
 	 */
-	OCP_IF_CMD_TRACE_SET_TRIG_BOUND,
+	OCP_IF_CMD_TRACE_SET_TRIG_LEVEL,
 
 	/**
 	 * Command
@@ -219,7 +225,13 @@ typedef enum{
 	 *  ------------------------------------------
 	 *
 	 * Response
-	 * Tail position of circular buffer in Trigger Mode
+     *  -----------------
+     *  | TAIL (uint32) |
+     *  -----------------
+	 * 
+     * Notes
+     *  - TAIL is the tail position of the circular buffer when the trace is
+     *    in trigger mode.
 	 */
 	OCP_IF_CMD_TRACE_GET_TAIL,
 

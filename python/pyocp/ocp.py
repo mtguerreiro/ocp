@@ -21,11 +21,11 @@ class Commands:
         self.trace_get_number_traces = 6
         self.trace_get_traces_names = 7
         self.trace_get_address = 8
-        self.trace_enable_trig_mode = 9
-        self.trace_enable_manual_mode = 10
+        self.trace_set_mode = 9
+        self.trace_get_mode = 10
         self.trace_set_num_pre_trig_samples = 11
-        self.trace_set_trace_to_track = 12
-        self.trace_set_trig_bound = 13
+        self.trace_set_signal_to_track = 12
+        self.trace_set_trig_level = 13
         self.trace_get_tail = 14
         self.cs_status = 15
         self.cs_enable = 16
@@ -62,12 +62,10 @@ class Interface:
     def trace_read(self, tr_id):
         """Reads the selected trace.
 
-        All data is interpreted as floating point.
-
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
         Raises
@@ -107,7 +105,7 @@ class Interface:
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
         size : int
@@ -150,7 +148,7 @@ class Interface:
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
         Raises
@@ -192,7 +190,7 @@ class Interface:
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
         size : int
@@ -240,7 +238,7 @@ class Interface:
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
         Raises
@@ -282,7 +280,7 @@ class Interface:
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
         Raises
@@ -371,19 +369,29 @@ class Interface:
         return (0, names)
 
 
-    def trace_enable_trig_mode(self, tr_id):
-        """Switches to Trig Mode.
+    def trace_set_mode(self, tr_id, mode):
+        """Sets the trace mode (manual or trigger).
 
+        - Manual mode (`mode = 0`): data is continuously recorded until the
+          trace buffer is full.
+
+        - Trigger mode (`mode = 1`): data is recorded only after the signal
+          being tracked crosses its threshold level.
+        
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
+
+        mode : int
+            Trace mode. Set `mode = 0` for manual mode or `mode = 1` for
+            trigger mode.
             
         Raises
         ------
         TypeError
-            If `tr_id` is not of `int` type.
+            If `tr_id` or `mode` are not of `int` type.
 
         Returns
         -------
@@ -395,35 +403,47 @@ class Interface:
         """
         if type(tr_id) is not int:
             raise TypeError('`tr_id` must be of int type.')
-      
-        cmd = self.cmd.trace_enable_trig_mode
+
+        if type(mode) is not int:
+            raise TypeError('`mode` must be of int type.')
+        
+        cmd = self.cmd.trace_set_mode
 
         tx_data = []
         tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
-       
+        tx_data.extend( pyocp.conversions.u32_to_u8(mode, msb=False) )
+        
         status, data = self.hwp.request(cmd, tx_data)
 
         if status < 0:
-            funcname = Interface.trace_enable_trig_mode.__name__
-            print('{:}: Error enabling Trig Mode. Error code {:}\r\n'.format(funcname, status))
+            funcname = Interface.trace_set_mode.__name__
+            print('{:}: Error enabling trig mode. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
 
         return (0,)
     
 
-    def trace_enable_manual_mode(self, tr_id):
-        """Switches to Manual Mode.
+    def trace_get_mode(self, tr_id):
+        """Retrieves the current trace mode (manual or trigger).
 
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
-            
+
+        Returns
+        -------
+        tuple
+            A tuple containing:
+            - The current trace mode (`0` for manual mode, `1` for trigger mode).
+            - The command's status (0 if successful).
+            - An error code, if applicable.
+
         Raises
         ------
         TypeError
-            If `tr_id` is not of `int` type.
+            If `tr_id` or `mode` are not of `int` type.
 
         Returns
         -------
@@ -431,24 +451,24 @@ class Interface:
             A tuple, where the first element is the command's status and the
             second element an error code, if any. If the command was executed
             successfully, status is zero.
-            
+
         """
         if type(tr_id) is not int:
             raise TypeError('`tr_id` must be of int type.')
-      
-        cmd = self.cmd.trace_enable_manual_mode
+        
+        cmd = self.cmd.trace_get_mode
 
-        tx_data = []
-        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
-       
-        status, data = self.hwp.request(cmd, tx_data)
+        status, data = self.hwp.request(cmd)
 
         if status < 0:
-            funcname = Interface.trace_enable_manual_mode.__name__
-            print('{:}: Error enabling Manual Mode. Error code {:}\r\n'.format(funcname, status))
+            funcname = Interface.trace_get_mode.__name__
+            print('{:}: Error getting trace mode. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
+        
+        mode = pyocp.conversions.u8_to_u32(data, msb=False)
 
-        return (0,)
+        return (0, mode)
+
     
 
     def trace_set_num_pre_trig_samples(self, tr_id, num):
@@ -457,7 +477,7 @@ class Interface:
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
         num : int
@@ -499,23 +519,22 @@ class Interface:
         return (0,)
     
 
-    def trace_set_trace_to_track(self, tr_id, trace):
+    def trace_set_signal_to_track(self, tr_id, signal):
         """Sets the trace (particular measurement value, e.g. output voltage) for which the trigger is defined in Trig Mode.
 
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
-        trace : int
-            Trace to track. The maximum size is determined by the
-            trace size.
+        signal : int
+            Signal to track.
             
         Raises
         ------
         TypeError
-            If `tr_id` or `trace` are not of `int` type.
+            If `tr_id` or `signal` are not of `int` type.
 
         Returns
         -------
@@ -528,41 +547,41 @@ class Interface:
         if type(tr_id) is not int:
             raise TypeError('`tr_id` must be of int type.')
 
-        if type(trace) is not int:
+        if type(signal) is not int:
             raise TypeError('`trace` must be of int type.')
         
-        cmd = self.cmd.trace_set_trace_to_track
+        cmd = self.cmd.trace_set_signal_to_track
 
         tx_data = []
         tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
-        tx_data.extend( pyocp.conversions.u32_to_u8(trace, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(signal, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
         if status < 0:
-            funcname = Interface.trace_set_trace_to_track.__name__
-            print('{:}: Error setting Trace to track. Error code {:}\r\n'.format(funcname, status))
+            funcname = Interface.trace_set_signal_to_track.__name__
+            print('{:}: Error setting signal to track. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
 
         return (0,)
     
 
-    def trace_set_trig_bound(self, tr_id, bound):
-        """Sets the bound value at which the trigger is set when crossed in Trig Mode.
+    def trace_set_trig_level(self, tr_id, level):
+        """Sets the level at which the trigger is set when crossed.
 
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
-        bound : float
-            Bound value for trigger.
+        level : float
+            Threshold for trigger.
             
         Raises
         ------
         TypeError
-            If `tr_id` is not of `int` or `bound` is neither of `int` nor `float` type.
+            If `tr_id` is not of `int` or `level` is neither of `int` nor `float` type.
 
         Returns
         -------
@@ -575,34 +594,37 @@ class Interface:
         if type(tr_id) is not int:
             raise TypeError('`tr_id` must be of int type.')
 
-        if type(bound) is not float and not int:
+        if (type(level) is not float) and (type(level) is not int):
             raise TypeError('`bound` must be of float type.')
 
-        cmd = self.cmd.trace_set_trig_bound
+        cmd = self.cmd.trace_set_trig_level
 
-        bound = struct.pack('f', float(bound))
-        bound = struct.unpack('i', bound)[0]
+        level = struct.pack('f', float(level))
+        level = struct.unpack('i', level)[0]
         tx_data = []
         tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
-        tx_data.extend( pyocp.conversions.u32_to_u8(bound, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(level, msb=False) )
        
         status, data = self.hwp.request(cmd, tx_data)
 
         if status < 0:
-            funcname = Interface.trace_set_trig_bound.__name__
-            print('{:}: Error setting Trigger bound. Error code {:}\r\n'.format(funcname, status))
+            funcname = Interface.trace_set_trig_level.__name__
+            print('{:}: Error setting trigger level. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
 
         return (0,)
     
 
     def trace_get_tail(self, tr_id):
-        """Gets the position of the tail in the circular buffer used for Trig Mode. Necessary for reordering the buffer.
+        """Gets the position of the tail in the circular buffer, when trace is
+        in trigger mode.
+
+        The tail is used to reoder the buffer.
 
         Parameters
         ----------
         tr_id : int
-            Trace's ID. This ID must exist in the controller, otherwise an
+            Trace ID. This ID must exist in the controller, otherwise an
             error will be returned.
 
         Raises
