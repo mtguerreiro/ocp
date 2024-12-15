@@ -468,7 +468,6 @@ class Interface:
         mode = pyocp.conversions.u8_to_u32(data, msb=False)
 
         return (0, mode)
-
     
 
     def trace_set_num_pre_trig_samples(self, tr_id, num):
@@ -519,7 +518,7 @@ class Interface:
         return (0,)
     
 
-    def trace_set_signal_to_track(self, tr_id, signal):
+    def trace_set_trig_signal(self, tr_id, signal):
         """Sets the trace (particular measurement value, e.g. output voltage) for which the trigger is defined in Trig Mode.
 
         Parameters
@@ -559,7 +558,7 @@ class Interface:
         status, data = self.hwp.request(cmd, tx_data)
 
         if status < 0:
-            funcname = Interface.trace_set_signal_to_track.__name__
+            funcname = Interface.trace_set_trig_signal.__name__
             print('{:}: Error setting signal to track. Error code {:}\r\n'.format(funcname, status))
             return (-1, status)
 

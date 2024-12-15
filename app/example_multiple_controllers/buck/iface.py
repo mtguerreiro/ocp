@@ -2,6 +2,7 @@ import struct
 
 import pyocp
 from .controllers import Controllers, Reference
+from .trace import Trace
 
 
 class Interface(Controllers, Reference):
@@ -15,7 +16,9 @@ class Interface(Controllers, Reference):
 
         Controllers.__init__(self, self._ctl_if)
         Reference.__init__(self, self._ctl_if)
-        
+
+        self.trace = Trace(tr_id=self._tr_id, ocp_if=self._ocp)
+
 
     def enable(self):
 

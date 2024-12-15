@@ -4,9 +4,9 @@ import numpy as np
 import pyocp
 
 
-class Trace:
+class Trace(pyocp.trace.TraceTemplate):
 
-    def __init__(self, ocp_if):
+    def __init__(self, ocp_if, tr_id=0):
 
-        self._ocp_if = ocp_if
+        super().__init__(tr_id=tr_id, ocp_if=ocp_if)
     
