@@ -9,7 +9,7 @@
 
 #include "opiltarget.h"
 
-#include "comm/linux/targetCommLinuxSock.h"
+#include "comm/targetCommSock.h"
 
 #include "ocp/ocpIf.h"
 
@@ -55,10 +55,10 @@ void *ocpOpilThread(void *ptr){
     opiltargetCommConfig_t comm;
     opiltargetControlConfig_t control;
 
-    comm.openConn = targetCommLinuxSockOpenConnection;
-    comm.closeConn = targetCommLinuxSockCloseConnection;
-    comm.sendData = targetCommLinuxSockSendData;
-    comm.receiveData = targetCommLinuxSockReceiveData;
+    comm.openConn = targetCommSockOpenConnection;
+    comm.closeConn = targetCommSockCloseConnection;
+    comm.sendData = targetCommSockSendData;
+    comm.receiveData = targetCommSockReceiveData;
 
     control.updateMeas = opilOcpUpdateMeasurements;
     control.updateSimData = opilOcpUpdateSimData;
