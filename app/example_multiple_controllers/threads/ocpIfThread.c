@@ -46,6 +46,8 @@ static int server_socket, client_socket;
 static socklen_t client_len;
 static struct sockaddr_in server_addr, client_addr;
 
+static char buffer[256];
+
 //=============================================================================
 
 //=============================================================================
