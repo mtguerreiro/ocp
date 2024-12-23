@@ -11,9 +11,10 @@
 
 #include <string.h>
 #include <unistd.h>
-#include <sys/types.h>
-
-#include "winsock2.h"
+#include <sys/types.h> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 /* Open controller project */
 #include "ocp/ocpIf.h"
@@ -41,10 +42,11 @@ void *ocpIfThreadProcess(void *param);
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
-static WSADATA wsaData;
-static SOCKET server_socket = INVALID_SOCKET, client_socket = INVALID_SOCKET;
+static int server_socket, client_socket;
+static socklen_t client_len;
 static struct sockaddr_in server_addr, client_addr;
-static int client_len;
+
+static char buffer[256];
 
 //=============================================================================
 
@@ -58,18 +60,10 @@ void *ocpIfThread(void *ptr){
 
     int status;
 
-    /* Initializes Winsock */
-    if( WSAStartup(MAKEWORD(2,2),&wsaData) != 0 ){
-        printf("WSAStartup failed. Error Code : %d",WSAGetLastError());
-        fflush( stdout );
-        return 0;
-    }
-
     /* Creates the server socket */
-    if( (server_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET ){
-        printf("%s: Error creating socket. Error Code : %d", __FUNCTION__, WSAGetLastError());
-        fflush( stdout );
-        WSACleanup();
+    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    if( server_socket < 0 ){
+        printf("%s: Error creating socket. socket returned %d\n\r", __FUNCTION__, server_socket);
         return 0;
     }
 
@@ -209,7 +203,7 @@ void *ocpIfThreadProcess(void *param){
     }
 
     /* Closes connection */
-    status = shutdown(sd, 0);
+    status = shutdown(sd, SHUT_RDWR);
     if( status < 0 ){
         printf("%s: Shutdown failed. shutdown returned: %d\n", __FUNCTION__, status);
     }
