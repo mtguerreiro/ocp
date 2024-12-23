@@ -458,7 +458,10 @@ class Interface:
         
         cmd = self.cmd.trace_get_mode
 
-        status, data = self.hwp.request(cmd)
+        tx_data = []
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+        
+        status, data = self.hwp.request(cmd, tx_data)
 
         if status < 0:
             funcname = Interface.trace_get_mode.__name__
