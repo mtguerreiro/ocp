@@ -56,7 +56,6 @@ static uint8_t traceBuffer[APP_CONFIG_OCP_TRACE_0_SIZE_BYTES];
 static float bInputs[APP_OCP_CONFIG_INPUT_BUF_SIZE];
 static float bOutputs[APP_OCP_CONFIG_OUTPUT_BUF_SIZE];
 
-static float texec = 0.0f;
 //=============================================================================
 
 //=============================================================================
