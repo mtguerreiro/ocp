@@ -52,6 +52,8 @@ typedef struct{
     
     float p_in;
     float p_out;
+
+    float p_load;
     //---------------------------------
 
 }cukConfigMeasurements_t;
@@ -108,6 +110,7 @@ typedef struct{
 #define CUK_CONFIG_ISENS_ACS712_OFFS        (float)((2.5f))
 
 #define CUK_CONFIG_TF_N2N1                  (float)((5.0f / 3.0f))
+#define CUK_CONFIG_TF_N2N1_SQ               (float)(CUK_CONFIG_TF_N2N1 * CUK_CONFIG_TF_N2N1)
 
 #define CUK_CONFIG_L_IN                     ((float)(100e-6))
 #define CUK_CONFIG_L_OUT                    ((float)(150e-6))

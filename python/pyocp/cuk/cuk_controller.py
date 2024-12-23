@@ -9,6 +9,7 @@ import struct
 import numpy as np
 import scipy.signal
 import control
+import pyctl as ctl
 
 class References:
     """
@@ -80,20 +81,23 @@ class Startup:
 
     def set(self, params):
 
-        uinc = params['uinc']
-        ufinal = params['ufinal']
-        data = list(struct.pack('<ff', uinc, ufinal))
+        u_lower = params['u_lower']
+        u_upper = params['u_upper']
+        u_inc = params['u_inc']
+        
+        data = list(struct.pack('<fff', u_lower, u_upper, u_inc))
         
         return data
     
 
     def get(self, data):
 
-        pars = struct.unpack('<ff', data)
+        pars = struct.unpack('<fff', data)
 
         params = {
-            'uinc': pars[0],
-            'ufinal': pars[1]
+            'u_lower': pars[0],
+            'u_upper': pars[1],
+            'u_inc': pars[2]
             }
 
         return params
@@ -171,7 +175,6 @@ class Energy:
         num_d = num_d.reshape(-1) / den_d[0]
 
         filt = {'a0':num_d[0], 'a1':num_d[1], 'a2':num_d[2], 'b1':den_d[1], 'b2':den_d[2]}
-        print(num_d, den_d)
         
         return filt        
 
@@ -196,15 +199,17 @@ class EnergyInt:
         b2 = params['b2']
 
         en = params['notch_en']
+
+        c_out = params['c_out']
         
-        data = list(struct.pack('<ffffffffff', k1, k2, k3, dt, a0, a1, a2, b1, b2, en))
+        data = list(struct.pack('<fffffffffff', k1, k2, k3, dt, a0, a1, a2, b1, b2, en, c_out))
         
         return data
     
 
     def get(self, data):
 
-        pars = struct.unpack('<ffffffffff', data)
+        pars = struct.unpack('<fffffffffff', data)
 
         params = {
             'k1': pars[0],
@@ -217,6 +222,7 @@ class EnergyInt:
             'b1': pars[7],
             'b2': pars[8],
             'notch_en': pars[9],
+            'c_out': pars[10],
             }
 
         return params
@@ -250,8 +256,6 @@ class EnergyInt:
             return 0
             
         poles = [p1, p2, p3]
-        print('Pole placement.\nMethod: {:}'.format(method))
-        print('Poles: {:}'.format(poles))
         
         # Augmented model        
         A = np.array([[ 0.0, 1.0, 0.0],
@@ -264,8 +268,6 @@ class EnergyInt:
         K = scipy.signal.place_poles(A, B, poles).gain_matrix.reshape(-1)
 
         gains = {'k1':K[0], 'k2':K[1], 'k3':K[2], 'dt':dt}
-
-        print('Kains: {:}'.format(gains))
 
         return gains
     
@@ -282,7 +284,6 @@ class EnergyInt:
         num_d = num_d.reshape(-1) / den_d[0]
 
         filt = {'a0':num_d[0], 'a1':num_d[1], 'a2':num_d[2], 'b1':den_d[1], 'b2':den_d[2]}
-        print(num_d, den_d)
         
         return filt
 
@@ -416,9 +417,6 @@ class SFB:
 
         
         sys = control.ss(A, B, C, 0)
-        print('Pole placement.\nMethod: {:}'.format(method))
-        print('Poles: {:}'.format(poles))
-        print('Zeros: {:}'.format(sys.zeros()))
 
         # State feedback
         K = scipy.signal.place_poles(A, B, poles).gain_matrix[0]
@@ -518,10 +516,10 @@ class SFBINT:
         I_2 = Io
 
         # Linearized model
-        a11 = 0/L1;                              a12 = 0;                                     a13 = -(1 - d) / L1;     a14 = 0
-        a21 = 0;                                 a22 = 0/L2;                                  a23 = N * d / L2;        a24 = -1 / L2
+        a11 = 0;                                 a12 = 0;                                     a13 = -(1 - d) / L1;     a14 = 0
+        a21 = 0;                                 a22 = 0;                                     a23 = N * d / L2;        a24 = -1 / L2
         a31 = (N**2+1)/N**2 * (1 - d) / (Cc);    a32 = -(N**2+1)/N * d / (Cc);                a33 = 0;                 a34 = 0
-        a41 = 0;                                 a42 = 1 / Co;                                a43 = 0;                 a44 = Po / (Co * Vo**2)#(-1/11)#
+        a41 = 0;                                 a42 = 1 / Co;                                a43 = 0;                 a44 = Po / (Co * Vo**2)
 
         A = np.array([[a11, a12, a13, a14],
                       [a21, a22, a23, a24],
@@ -576,13 +574,12 @@ class SFBINT:
         poles = [p1, p2, p3, p4, p5]
 
         sys = control.ss(A, B, C, 0)
-        print('Pole placement.\nMethod: {:}'.format(method))
-        print('Poles: {:}'.format(poles))
-        print('Zeros: {:}'.format(sys.zeros()))
-        print('Open-loop poles: {:}'.format(sys.poles()))
         
         # State feedback
         K = scipy.signal.place_poles(Aa, Ba, poles).gain_matrix[0]
+        
+        sys_cl = control.ss(Aa - Ba @ K.reshape(1, -1), np.array([[0], [0], [0], [0], [1]]), np.array([[1, 0, 0, 0, 0]]), 0)
+        C_ctb = control.ctrb(Aa, Ba)
 
         ctl_params = {'k1':K[0], 'k2':K[1], 'k3':K[2], 'k4':K[3],
                       'ke':K[4], 'dt':dt,
@@ -681,52 +678,83 @@ class EnergyMpc:
     
 
     def set(self, params):
-      
-        a0 = params['a0']
-        a1 = params['a1']
-        a2 = params['a2']
 
-        b1 = params['b1']
-        b2 = params['b2']
+        Kx0 = params['Kx0']
+        Kx1 = params['Kx1']
 
-        en = params['notch_en']
+        Ky = params['Ky']
+
+        il_max = params['il_max']
+        il_min = params['il_min']
+
+        Co = params['Co']
+
+        freq_en = params['freq_en']
         
-        data = list(struct.pack('<ffffff', a0, a1, a2, b1, b2, en))
+        data = list(struct.pack('<fffffff', Kx0, Kx1, Ky, il_max, il_min, Co, freq_en))
         
         return data
     
 
     def get(self, data):
 
-        pars = struct.unpack('<ffffff', data)
+        pars = struct.unpack('<fffffff', data)
 
         params = {
-            'a0': pars[0],
-            'a1': pars[1],
-            'a2': pars[2],
-            'b1': pars[3],
-            'b2': pars[4],
-            'notch_en': pars[5],
+            'Kx0': pars[0],
+            'Kx1': pars[1],
+            'Ky': pars[2],
+            'il_max': pars[3],
+            'il_min': pars[4],
+            'Co': pars[5],
+            'freq_en': pars[6],
             }
 
         return params
+    
 
+    def gains(self, n=40, rw=0.05, freq_pen=False, dt = 1.0/100e3):
 
-    def discrete_notch(self, fc, Q, dt):
-        
-        wc = 2 * np.pi * fc
-        
-        num = [1, 0 , wc**2]
-        den = [1, wc/Q, wc**2]
-        tf = (num, den)
+        # --- System model ---
+        Am = np.array([[0, 1],
+                       [0, 0]])
 
-        num_d, den_d, _ = scipy.signal.cont2discrete(tf, dt)
-        num_d = num_d.reshape(-1) / den_d[0]
+        Bm = np.array([[0],
+                       [1e6]])
 
-        filt = {'a0':num_d[0], 'a1':num_d[1], 'a2':num_d[2], 'b1':den_d[1], 'b2':den_d[2]}
-        print(num_d, den_d)
-        
-        return filt
+        Cm = np.array([[1, 0]])
+
+        Ad, Bd, Cd, _, _ = scipy.signal.cont2discrete((Am, Bm, Cm, 0), dt, method='zoh')
+
+        # --- Freq penalties ---
+        # Freq. penalties
+        lp = n
+        nq = lp + n
+
+        q = np.zeros(nq)
+        if freq_pen == True:
+            q[8] = 0.1e-3
+            q[9] = 2e-3
+            q[10] = 7e-3
+            
+            q[11] = 10e-3
+            
+            q[12] = 7e-3
+            q[13] = 2e-3
+            q[14] = 0.1e-3
+
+            if (nq % 2) == 0:
+                q[-int(nq / 2) + 1:] = q[1:int(nq / 2)][::-1]
+            else:
+                q[-int((nq+1) / 2) + 1:] = q[1:int((nq+1) / 2)][::-1]
+            
+        # --- System with MPC ---
+        sys = ctl.mpc.System(Ad, Bd, Cd, n_pred=n, n_ctl=n, rw=rw, q=q, lp=lp)
+
+        Kx = sys.Kx[0]
+        Ky = sys.Ky[0][0]
+
+        return {'Kx0':Kx[0], 'Kx1':Kx[1], 'Ky':Ky}
 
 
 class Controller:

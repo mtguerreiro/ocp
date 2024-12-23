@@ -252,7 +252,7 @@ void boostControlEnergyMpcOpt(void){
     dmpcDelayComp(xm, xm, u);
 
     /* Optimization */
-    dmpcOpt(xm, xm_1, ref, u, &n_iters, du);
+    dmpcOpt(xm, xm_1, ref, u, &n_iters, du, 0);
     n_iters_float = (float) n_iters;
 
     /* Computes u = du + u_1 */

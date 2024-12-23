@@ -1,7 +1,7 @@
 /*
- * cukControlEnergy.c
+ * cukControlEnergyInt.c
  *
- *  Created on: 11.09.2023
+ *  Created on: 22.11.2023
  *      Author: marco
  */
 
@@ -9,139 +9,138 @@
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
-#include "cukControlEnergyMpc.h"
+#include "cukControlEnergyInt.h"
 
 #include "ocpConfig.h"
 #include "ocpTrace.h"
 
 #include "cukConfig.h"
 //#include "config/stypesCuk.h"
-
-#include "mvops.h"
-#include "dmpc.h"
-#include "dmpc_defs.h"
-#include "dmpc_matrices.h"
-
 //=============================================================================
 
 //=============================================================================
 /*-------------------------------- Prototypes -------------------------------*/
 //=============================================================================
+static void cukControlEnergyIntFilterReset(void);
+static float cukControlEnergyIntFilterRun(float x);
 //=============================================================================
 
 //=============================================================================
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
-#define V_GAIN          ((float) 1e6 )
+typedef struct{
 
+    float a0;
+    float a1;
+    float a2;
+
+    float b1;
+    float b2;
+
+    float x_1;
+    float x_2;
+
+    float y;
+    float y_1;
+    float y_2;
+
+}filter_t;
 //=============================================================================
 
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
+static float u = 0.0f;
+static float k1 = 22864929.498738717, k2 = 9333.3333286044, k3 = -33914344673.813805, dt = 1e-05;
+static float vc = 0.0f;
 static float p_in = 0.0f, p_out = 0.0f, y_dot = 0.0f, y = 0.0f, y_r = 0.0f;
 
-static float xm[DMPC_CONFIG_NXM] = {0};
-static float xm_1[DMPC_CONFIG_NXM] = {0};
+static float y_e = 0.0f, y_e_1 = 0.0f;
 
-static float ref[DMPC_CONFIG_NY];
+static filter_t notch = {.a0 = 1.0f, .a1 = -1.8954516649246216f, .a2 = 0.9887202978134155f,
+        .b1 = -1.3892015218734741, .b2 = 0.48247018456459045f,
+        .x_1 = 0.0f, .x_2 = 0.0f, .y = 0.0f, .y_1 = 0.0f, .y_2 = 0.0f
+};
 
-static float u[DMPC_CONFIG_NU + DMPC_CONFIG_ND] = {0};
-static float du[DMPC_CONFIG_NU + DMPC_CONFIG_ND] = {0};
+static float notchEnable = 0.0f;
 
 static uint32_t first_enter = 0;
 
-static float u_init, u_min, u_max;
-static float x_init, x_min, x_max;
-
-static float il_max = 7.0f;
-static float il_min = 0.0f;
-
-static float duty = 0.0f;
-
-static float du_min_1, du_min_2;
-static float du_max_1, du_max_2;
-
-static float Kx[2] = {9.40077310e+01, 1.36080265e-02};
-static float Ky = 3.79121039;
-
-static float Co = CUK_CONFIG_C_O;
-
-static float du_1[DMPC_CONFIG_NC];
-static float aux[DMPC_CONFIG_NC_x_NU];
-
-static float freq_en = 0.0f;
+static float C_out = CUK_CONFIG_C_O;
 //=============================================================================
 
 //=============================================================================
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void cukControlEnergyMpcInitialize(void){
+void cukControlEnergyIntInitialize(void){
 
 }
 //-----------------------------------------------------------------------------
-int32_t cukControlEnergyMpcSetParams(void *params, uint32_t n){
+int32_t cukControlEnergyIntSetParams(void *params, uint32_t n){
 
     float *p = (float *)params;
 
-    Kx[0] = *p++;
-    Kx[1] = *p++;
+    k1 = *p++;
+    k2 = *p++;
+    k3 = *p++;
+    dt = *p++;
 
-    Ky = *p++;
+    notch.a0 = *p++;
+    notch.a1 = *p++;
+    notch.a2 = *p++;
 
-    il_max = *p++;
-    il_min = *p++;
+    notch.b1 = *p++;
+    notch.b2 = *p++;
 
-    Co = *p++;
+    notchEnable = *p++;
 
-    freq_en = *p++;
+    C_out = *p++;
 
-    return 0;
+	return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t cukControlEnergyMpcGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
+int32_t cukControlEnergyIntGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
 
     float *p = (float *)out;
 
-    *p++ = Kx[0];
-    *p++ = Kx[1];
+    *p++ = k1;
+    *p++ = k2;
+    *p++ = k3;
+    *p++ = dt;
 
-    *p++ = Ky;
+    *p++ = notch.a0;
+    *p++ = notch.a1;
+    *p++ = notch.a2;
 
-    *p++ = il_max;
-    *p++ = il_min;
+    *p++ = notch.b1;
+    *p++ = notch.b2;
 
-    *p++ = Co;
+    *p++ = notchEnable;
 
-    *p++ = freq_en;
+    *p++ = C_out;
 
-    return 28;
+    return 44;
 }
 //-----------------------------------------------------------------------------
-int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs){
+int32_t cukControlEnergyIntRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs){
 
     cukConfigMeasurements_t *m = (cukConfigMeasurements_t *)meas;
     cukConfigReferences_t *r = (cukConfigReferences_t *)refs;
     cukConfigControl_t *o = (cukConfigControl_t *)outputs;
 
-    static float x1, x2, x3, x4;
     static float e_x1, e_x2, e_x3, e_x4;
     static float x1_r, x2_r, x3_r, x4_r;
     static float e_x1_r, e_x2_r, e_x3_r, e_x4_r;
     static float v;
-    uint32_t i;
 
-    x1 = m->i_1;
-    x2 = m->i_2;
-    x3 = m->v_1 + (1.0f / CUK_CONFIG_TF_N2N1) * m->v_2;
-    x4 = m->v_dc_out;
+    vc = m->v_1 + (1.0f / CUK_CONFIG_TF_N2N1) * m->v_2;
 
     /* Energies */
-    e_x1 = (0.5f) * CUK_CONFIG_L_IN * x1 * x1;
-    e_x2 = (0.5f) * CUK_CONFIG_L_OUT * x2 * x2;
-    e_x3 = (0.5f) * CUK_CONFIG_C_C * x3 * x3 * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
-    e_x4 = (0.5f) * Co * x4 * x4;
+    e_x1 = (0.5f) * CUK_CONFIG_L_IN * m->i_1 * m->i_1;
+    e_x2 = (0.5f) * CUK_CONFIG_L_OUT * m->i_2 * m->i_2;
+    e_x3 = (0.5f) * CUK_CONFIG_C_C * vc * vc * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
+    e_x4 = (0.5f) * C_out * m->v_dc_out * m->v_dc_out;
     y = e_x1 + e_x2 + e_x3 + e_x4;
 
     /* Input, output and converter power */
@@ -158,91 +157,40 @@ int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nr
     e_x1_r = (0.5f) * CUK_CONFIG_L_IN * x1_r * x1_r;
     e_x2_r = (0.5f) * CUK_CONFIG_L_OUT * x2_r * x2_r;
     e_x3_r = (0.5f) * CUK_CONFIG_C_C * x3_r * x3_r * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
-    e_x4_r = (0.5f) * Co * x4_r * x4_r;
+    e_x4_r = (0.5f) * C_out * x4_r * x4_r;
     y_r = e_x1_r + e_x2_r + e_x3_r + e_x4_r;
 
-    /* Initialization */
+    /* Integrator */
     if( first_enter == 0 ){
         first_enter = 1;
-
-        u[0] = 0;
-        xm_1[0] = y;
+        y_e = (-k1 * y - k2 * y_dot) / k3;
     }
-
-    /* Updates bounds */
-    u_min = m->v_in / CUK_CONFIG_L_IN * (m->v_in - x3) / V_GAIN;
-    u_max = m->v_in * m->v_in / CUK_CONFIG_L_IN / V_GAIN;
-    //DMPC_CONFIG_U_MIN[0] = u_min;
-    //DMPC_CONFIG_U_MAX[0] = u_max;
-
-    x_min = il_min * m->v_in - p_out;
-    x_max = il_max * m->v_in - p_out;
-    //DMPC_CONFIG_XM_MIN[0] = x_min;
-    //DMPC_CONFIG_XM_MAX[0] = x_max;
-
-    du_min_1 = (x_min - y_dot) / 10.0f - u[0];
-    du_min_2 = u_min;
-
-    du_max_1 = (x_max - y_dot) / 10.0f - u[0];
-    du_max_2 = u_max;
-
-    /* Assembles state vector */
-    xm[0] = y;
-    xm[1] = y_dot;
-
-    /* Delay compensation */
-    dmpcDelayComp(xm, xm, u);
-
-    /* Optimization */
-    //dmpcOpt(xm, xm_1, &y_r, u, 0, du, 0);
-    du[0] = -Kx[0] * (xm[0] - xm_1[0]) - Kx[1] * (xm[1] - xm_1[1]) - Ky * (xm[0] - y_r);
-
-    if( freq_en > 0.5f ){
-        mulmv(DMPC_M_Fj_3, DMPC_CONFIG_NU, du_1, DMPC_CONFIG_NC_x_NU, aux);
-        du[0] = du[0] - aux[0];
-        for(i = 0; i < (DMPC_CONFIG_NC - 1); i++){
-            du_1[i] = du_1[i+1];
-        }
-        du_1[DMPC_CONFIG_NC - 1] = du[0];
+    else{
+        y_e = y_e_1 + dt * (y_r - y);
     }
+    y_e_1 = y_e;
 
-    if( du[0] < du_min_1 ) du[0] = du_min_1;
-    if( du[0] < du_min_2 ) du[0] = du_min_2;
+    /* Control */
+    v = - k1 * y - k2 * y_dot - k3 * y_e;
 
-    if( du[0] > du_max_1 ) du[0] = du_max_1;
-    if( du[0] > du_max_2 ) du[0] = du_max_2;
+    if( notchEnable > 0.5f ) v = cukControlEnergyIntFilterRun(v);
 
-    /* Computes u = du + u_1 */
-    sumv(u, du, DMPC_CONFIG_NU, u);
+    u =  1 - (m->v_dc * m->v_dc / CUK_CONFIG_L_IN - v) * CUK_CONFIG_L_IN / (vc * m->v_dc);
 
-    /* Saves variables */
-    for(i = 0; i < DMPC_CONFIG_NXM; i++){
-        xm_1[i] = xm[i];
-    }
+    if( u > 1.0f ) u = 1.0f;
+    if( u < 0.0f ) u = 0.0f;
 
-    v = u[0] * V_GAIN;
-
-    duty =  1 - (m->v_dc * m->v_dc / CUK_CONFIG_L_IN - v) * CUK_CONFIG_L_IN / (x3 * m->v_dc);
-
-    o->u = duty;
-
-    if( o->u > 1.0f ) o->u = 1.0f;
-    else if ( o->u < 0.0f ) o->u = 0.0f;
+    o->u = u;
 
     return sizeof(cukConfigControl_t);
 }
 //-----------------------------------------------------------------------------
-void cukControlEnergyMpcReset(void){
+void cukControlEnergyIntReset(void){
 
-    uint32_t i;
+    cukControlEnergyIntFilterReset();
 
-    first_enter = 0;
-
-    for(i = 0; i < DMPC_CONFIG_NXM; i++) xm_1[i] = 0.0f;
-    for(i = 0; i < (DMPC_CONFIG_NU + DMPC_CONFIG_ND); i++) u[i] = 0.0f;
-
-    for(i = 0; i < DMPC_CONFIG_NC; i++) du_1[i] = 0.0f;
-
+    y_e_1 = 0.0f;
+    u = 0.0f;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -251,6 +199,31 @@ void cukControlEnergyMpcReset(void){
 /*----------------------------- Static functions ----------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
+static void cukControlEnergyIntFilterReset(void){
+
+    notch.x_1 = 0.0f;
+    notch.x_2 = 0.0f;
+
+    notch.y = 0.0f;
+    notch.y_1 = 0.0f;
+    notch.y_2 = 0.0f;
+
+    first_enter = 0;
+}
+//-----------------------------------------------------------------------------
+static float cukControlEnergyIntFilterRun(float x){
+
+    notch.y = -notch.b1 * notch.y_1 - notch.b2 * notch.y_2 + \
+            notch.a0 * x + notch.a1 * notch.x_1 + notch.a2 * notch.x_2;
+
+    notch.y_2 = notch.y_1;
+    notch.y_1 = notch.y;
+
+    notch.x_2 = notch.x_1;
+    notch.x_1 = x;
+
+    return notch.y;
+}
 //-----------------------------------------------------------------------------
 //=============================================================================
 

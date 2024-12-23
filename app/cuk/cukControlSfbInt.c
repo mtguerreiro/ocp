@@ -33,6 +33,8 @@ static float dt = 0.0f;
 static float xs[4] = {0.0f};
 static float xe = 0.0f, xe_1 = 0.0f;
 static float us = 0.0f, ue = 0.0f;
+
+static uint32_t first_enter = 0;
 //=============================================================================
 
 //=============================================================================
@@ -107,10 +109,16 @@ int32_t cukControlSfbIntRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs
     x1e = m->i_1 - xs[0];
     x2e = m->i_2 - xs[1];
     x3e = vc - xs[2];
-    x4e = m->v_out - xs[3];
+    x4e = m->v_dc_out - xs[3];
 
     /* Integral */
-    xe = xe_1 + dt * (r->v_o - m->v_out);
+    if( first_enter == 0 ){
+        first_enter = 1;
+        xe = -(k[0] * x1e + k[1] * x2e + k[2] * x3e +  k[3] * x4e) / ke;
+    }
+    else{
+        xe = xe_1 + dt * (r->v_o - m->v_dc_out);
+    }
     xe_1 = xe;
 
     /* Control */
@@ -129,6 +137,8 @@ int32_t cukControlSfbIntRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs
 void cukControlSfbIntReset(void){
 
     xe_1 = 0.0f;
+
+    first_enter = 0;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

@@ -26,6 +26,10 @@
 #include "cukControlPch.h"
 #include "cukControlEnergyMpc.h"
 
+
+#include "ocpConfig.h"
+#include "ocpTrace.h"
+
 //=============================================================================
 
 //=============================================================================
@@ -95,6 +99,8 @@ void cukControllerInitialize(cukControllerConfig_t *config){
     cukControllerInitializeInterface();
     cukControllerInitializeControllers();
     cukControllerInitializeReferences();
+
+    ocpTraceAddSignal(OCP_TRACE_1, &controllers.refs.v_o, "Output voltage ref.");
 }
 //-----------------------------------------------------------------------------
 int32_t cukControllerInterface(void *in, uint32_t insize, void **out, uint32_t maxoutsize){

@@ -37,9 +37,9 @@
 #define CUK_HW_CONFIG_GPIO_CHANNEL          1
 #define CUK_HW_CONFIG_GPIO_MASK             0b11
 
-#define CUK_HW_CONFIG_GPIO_OUTPUT_OFFS      (0U)
+#define CUK_HW_CONFIG_GPIO_OUTPUT_OFFS      (1U)
 #define CUK_HW_CONFIG_GPIO_OUTPUT           (1 << CUK_HW_CONFIG_GPIO_OUTPUT_OFFS)
-#define CUK_HW_CONFIG_GPIO_LOAD_OFFS        (1U)
+#define CUK_HW_CONFIG_GPIO_LOAD_OFFS        (0U)
 #define CUK_HW_CONFIG_GPIO_LOAD             (1 << CUK_HW_CONFIG_GPIO_LOAD_OFFS)
 
 /* PWM peripheral clock, in Hz */
@@ -314,6 +314,7 @@ int32_t cukHwGetMeasurements(void *meas){
 
     dst->p_in = dst->i_1 * dst->v_dc;
     dst->p_out = i_o_filt * dst->v_dc_out;
+    dst->p_load = dst->p_out;
     //-------------------------------------------------------------------------
 
     /* Protection */
@@ -509,11 +510,11 @@ static void cukHwInitializeGpio(void){
 //-----------------------------------------------------------------------------
 static void cukHwInitializeMeasGains(void){
 
-    hwControl.gains.i_i_gain = 0.012527748670796679f;
-    hwControl.gains.i_i_ofs =  -25.09620948301267f;
+    hwControl.gains.i_i_gain = 0.012609869672308061f;
+    hwControl.gains.i_i_ofs =  -25.269847795362907f;
 
-    hwControl.gains.i_1_gain = 0.02574140041460996f;
-    hwControl.gains.i_1_ofs =  -51.723993428472845f;
+    hwControl.gains.i_1_gain = 0.026246737138454348f;
+    hwControl.gains.i_1_ofs =  -52.861529301961006f;
 
     hwControl.gains.v_in_gain = 0.014919542630730998f;
     hwControl.gains.v_in_ofs =  0.02983490778952813f;
@@ -524,11 +525,11 @@ static void cukHwInitializeMeasGains(void){
     hwControl.gains.v_1_gain = 0.014919540229885057f;
     hwControl.gains.v_1_ofs = 0.014919540229886508f;
 
-    hwControl.gains.i_o_gain = 0.012403521044364872;
-    hwControl.gains.i_o_ofs =  -24.842671890874133;
+    hwControl.gains.i_o_gain = 0.012327860955684866f;
+    hwControl.gains.i_o_ofs =  -24.943995861772958f;
 
-    hwControl.gains.i_2_gain = 0.025902038490429217;
-    hwControl.gains.i_2_ofs =  -52.28905224441168;
+    hwControl.gains.i_2_gain = 0.02595658415851647f;
+    hwControl.gains.i_2_ofs =  -53.053563135347005f;
 
     hwControl.gains.v_out_gain = 0.01490621920998692f;
     hwControl.gains.v_out_ofs =  0.021628758244869317f;

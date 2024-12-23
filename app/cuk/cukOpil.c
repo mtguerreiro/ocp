@@ -53,19 +53,33 @@ int32_t cukOpilGetMeasurements(void *meas){
     src = (float *)(&xtMeasurements);
     dst = (cukConfigMeasurements_t *)meas;
 
-    dst->i_i =  ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS712_OFFS ) * CUK_CONFIG_ISENS_ACS712_GAIN_INV;
-    dst->i_1 =  ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS730_OFFS ) * CUK_CONFIG_ISENS_ACS730_GAIN_INV;
+    dst->i_i =  xtMeasurements.i_i;
+    dst->i_1 =  xtMeasurements.i_1;
 
-    dst->v_in = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-    dst->v_dc = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-    dst->v_1  = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
+    dst->v_in = xtMeasurements.v_in;
+    dst->v_dc = xtMeasurements.v_dc;
+    dst->v_1  = xtMeasurements.v_1;
 
-    dst->i_o =  - ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS712_OFFS ) * CUK_CONFIG_ISENS_ACS712_GAIN_INV;
-    dst->i_2 =  - ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS730_OFFS ) * CUK_CONFIG_ISENS_ACS730_GAIN_INV;
+    dst->i_o =  xtMeasurements.i_o;
+    dst->i_2 =  xtMeasurements.i_2;
 
-    dst->v_out =    ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-    dst->v_dc_out = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-    dst->v_2 =      ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
+    dst->v_out =    xtMeasurements.v_out;
+    dst->v_dc_out = xtMeasurements.v_dc_out;
+    dst->v_2 =      xtMeasurements.v_2;
+
+//    dst->i_i =  ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS712_OFFS ) * CUK_CONFIG_ISENS_ACS712_GAIN_INV;
+//    dst->i_1 =  ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS730_OFFS ) * CUK_CONFIG_ISENS_ACS730_GAIN_INV;
+//
+//    dst->v_in = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
+//    dst->v_dc = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
+//    dst->v_1  = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
+//
+//    dst->i_o =  - ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS712_OFFS ) * CUK_CONFIG_ISENS_ACS712_GAIN_INV;
+//    dst->i_2 =  - ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS730_OFFS ) * CUK_CONFIG_ISENS_ACS730_GAIN_INV;
+//
+//    dst->v_out =    ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
+//    dst->v_dc_out = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
+//    dst->v_2 =      ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
 
     dst->i_i_filt = 0.0f;
     dst->i_1_filt = 0.0f;
@@ -80,6 +94,8 @@ int32_t cukOpilGetMeasurements(void *meas){
     dst->v_out_filt =    0.0f;
     dst->v_dc_out_filt = 0.0f;
     dst->v_2_filt =      0.0f;
+
+    dst->p_load = xtMeasurements.p_load;
 
 //    int32_t size;
 //
