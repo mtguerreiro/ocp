@@ -15,6 +15,9 @@
 #include "ocpTrace.h"
 
 #include "buckConfig.h"
+
+/* Controllers */
+#include "controller.h"
 //=============================================================================
 
 //=============================================================================
@@ -35,8 +38,9 @@ static float uinc = 50.0f / 100000.0f;
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void buckControlStartupInitialize(void){
+int32_t buckControlStartupInitialize(void){
 
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t buckControlStartupSetParams(void *params, uint32_t n){
@@ -49,9 +53,9 @@ int32_t buckControlStartupSetParams(void *params, uint32_t n){
 	return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t buckControlStartupGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
+int32_t buckControlStartupGetParams(void *buffer, uint32_t size){
 
-    float *p = (float *)out;
+    float *p = (float *)buffer;
 
     *p++ = uinc;
     *p++ = ufinal;
@@ -78,6 +82,19 @@ int32_t buckControlStartupRun(void *meas, int32_t nmeas, void *refs, int32_t nre
 void buckControlStartupReset(void){
 
     u = 0.0f;
+}
+//-----------------------------------------------------------------------------
+void buckControlStartupGetCallbacks(void *callbacksBuffer){
+
+    controllerCallbacks_t *cbs = (controllerCallbacks_t * )callbacksBuffer;
+
+    cbs->init = buckControlStartupInitialize;
+    cbs->run = buckControlStartupRun;
+    cbs->setParams = buckControlStartupSetParams;
+    cbs->getParams = buckControlStartupGetParams;
+    cbs->reset = buckControlStartupReset;
+    cbs->firstEntry = 0;
+    cbs->lastExit = 0;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

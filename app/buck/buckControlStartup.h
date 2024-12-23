@@ -24,15 +24,17 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void buckControlStartupInitialize(void);
-//-----------------------------------------------------------------------------
-int32_t buckControlStartupSetParams(void *params, uint32_t n);
-//-----------------------------------------------------------------------------
-int32_t buckControlStartupGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
+int32_t buckControlStartupInitialize(void);
 //-----------------------------------------------------------------------------
 int32_t buckControlStartupRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
+int32_t buckControlStartupSetParams(void *params, uint32_t n);
+//-----------------------------------------------------------------------------
+int32_t buckControlStartupGetParams(void *buffer, uint32_t size);
+//-----------------------------------------------------------------------------
 void buckControlStartupReset(void);
+//-----------------------------------------------------------------------------
+void buckControlStartupGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 

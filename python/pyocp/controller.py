@@ -48,6 +48,11 @@ class ControllerTemplate:
         return (0, params)
 
 
+    def reset(self):
+
+        return self._ctl_if.reset(self._ctl_id)
+    
+
     def _encode(self, params):
 
         return params

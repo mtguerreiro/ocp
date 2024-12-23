@@ -4,7 +4,6 @@ Module ``buck_plot``
 
 
 """
-import lrssoc
 import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt

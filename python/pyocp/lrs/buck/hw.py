@@ -4,7 +4,7 @@ Module ``buck_hw``
 
 
 """
-import lrssoc
+import pyocp
 import struct
 
 class Commands:
@@ -340,8 +340,8 @@ class Hw:
         cmd = self._cmd.set_pwm_reset
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(reset, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(reset, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -365,7 +365,7 @@ class Hw:
         cmd = self._cmd.get_pwm_reset
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, reset = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -373,7 +373,7 @@ class Hw:
             print('Error getting PWM reset. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        reset = lrssoc.conversions.u8_to_u32(reset, msb=False)
+        reset = pyocp.conversions.u8_to_u32(reset, msb=False)
         
         return (0, reset)
     
@@ -391,8 +391,8 @@ class Hw:
         cmd = self._cmd.set_pwm_output_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(enable, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(enable, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -416,7 +416,7 @@ class Hw:
         cmd = self._cmd.get_pwm_output_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, enable = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -424,7 +424,7 @@ class Hw:
             print('Error getting PWM output enable. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
+        enable = pyocp.conversions.u8_to_u32(enable, msb=False)
         
         return (0, enable)
 
@@ -442,8 +442,8 @@ class Hw:
         cmd = self._cmd.set_pwm_ovf_trigger_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(enable, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(enable, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -467,7 +467,7 @@ class Hw:
         cmd = self._cmd.get_pwm_ovf_trigger_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, enable = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -475,7 +475,7 @@ class Hw:
             print('Error getting PWM ovf trigger. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
+        enable = pyocp.conversions.u8_to_u32(enable, msb=False)
         
         return (0, enable)
     
@@ -493,8 +493,8 @@ class Hw:
         cmd = self._cmd.set_pwm_inv
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(enable, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(enable, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -518,7 +518,7 @@ class Hw:
         cmd = self._cmd.get_pwm_inv
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, enable = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -526,7 +526,7 @@ class Hw:
             print('Error getting PWM inv. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
+        enable = pyocp.conversions.u8_to_u32(enable, msb=False)
         
         return (0, enable)
 
@@ -544,8 +544,8 @@ class Hw:
         cmd = self._cmd.set_pwm_freq
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(freq, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(freq, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -569,7 +569,7 @@ class Hw:
         cmd = self._cmd.get_pwm_freq
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, freq = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -577,7 +577,7 @@ class Hw:
             print('Error getting PWM frequency. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        freq = lrssoc.conversions.u8_to_u32(freq, msb=False)
+        freq = pyocp.conversions.u8_to_u32(freq, msb=False)
         
         return (0, freq)
 
@@ -595,7 +595,7 @@ class Hw:
         cmd = self._cmd.set_pwm_duty
         
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         tx_data.extend( list(struct.pack('<f', duty)) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
@@ -620,7 +620,7 @@ class Hw:
         cmd = self._cmd.get_pwm_duty
         
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, duty_b = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -646,7 +646,7 @@ class Hw:
         cmd = self._cmd.set_pwm_dead_time
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         tx_data.extend( list(struct.pack('<f', dead_time)) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
@@ -671,7 +671,7 @@ class Hw:
         cmd = self._cmd.get_pwm_dead_time
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, dt_b = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -697,8 +697,8 @@ class Hw:
         cmd = self._cmd.set_adc_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(enable, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(enable, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -722,7 +722,7 @@ class Hw:
         cmd = self._cmd.get_adc_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, enable = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -730,7 +730,7 @@ class Hw:
             print('Error getting ADC enable. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
+        enable = pyocp.conversions.u8_to_u32(enable, msb=False)
         
         return (0, enable)
     
@@ -748,8 +748,8 @@ class Hw:
         cmd = self._cmd.set_adc_manual_trigger
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(trigger, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(trigger, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -773,7 +773,7 @@ class Hw:
         cmd = self._cmd.get_adc_manual_trigger
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, trigger = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -781,7 +781,7 @@ class Hw:
             print('Error getting ADC manual trigger. Error code {:}\r\n'.format(status))
             return (-1, status)
         
-        trigger = lrssoc.conversions.u8_to_u32(trigger, msb=False)
+        trigger = pyocp.conversions.u8_to_u32(trigger, msb=False)
         
         return (0, trigger)
 
@@ -799,8 +799,8 @@ class Hw:
         cmd = self._cmd.set_adc_int_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(enable, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(enable, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -824,7 +824,7 @@ class Hw:
         cmd = self._cmd.get_adc_int_enable
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, enable = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -832,7 +832,7 @@ class Hw:
             print('Error getting ADC int enable. Error code {:}\r\n'.format(status))
             return (-1, status)
         
-        enable = lrssoc.conversions.u8_to_u32(enable, msb=False)
+        enable = pyocp.conversions.u8_to_u32(enable, msb=False)
         
         return (0, enable)
     
@@ -850,8 +850,8 @@ class Hw:
         cmd = self._cmd.set_adc_spi_freq
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(freq, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(freq, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -875,7 +875,7 @@ class Hw:
         cmd = self._cmd.get_adc_spi_freq
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, freq = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -883,7 +883,7 @@ class Hw:
             print('Error getting ADC SPI frequency. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        freq = lrssoc.conversions.u8_to_u32(freq, msb=False)
+        freq = pyocp.conversions.u8_to_u32(freq, msb=False)
         
         return (0, freq)
 
@@ -901,8 +901,8 @@ class Hw:
         cmd = self._cmd.set_input_relay
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(state, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(state, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -926,7 +926,7 @@ class Hw:
         cmd = self._cmd.get_input_relay
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, state = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -934,7 +934,7 @@ class Hw:
             print('Error getting the load switch. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        state = lrssoc.conversions.u8_to_u32(state, msb=False)
+        state = pyocp.conversions.u8_to_u32(state, msb=False)
         
         return (0, state)
 
@@ -952,8 +952,8 @@ class Hw:
         cmd = self._cmd.set_output_relay
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
-        tx_data.extend( lrssoc.conversions.u32_to_u8(state, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(state, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -977,7 +977,7 @@ class Hw:
         cmd = self._cmd.get_output_relay
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, state = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -985,7 +985,7 @@ class Hw:
             print('Error getting the output switch. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        state = lrssoc.conversions.u8_to_u32(state, msb=False)
+        state = pyocp.conversions.u8_to_u32(state, msb=False)
         
         return (0, state)
 
@@ -1003,7 +1003,7 @@ class Hw:
         cmd = self._cmd.get_meas_gains
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, gains = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -1027,7 +1027,7 @@ class Hw:
         cmd = self._cmd.clear_status
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -1051,7 +1051,7 @@ class Hw:
         cmd = self._cmd.get_status
 
         tx_data = []
-        tx_data.extend( lrssoc.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
         
         status, hw_status = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
@@ -1059,6 +1059,6 @@ class Hw:
             print('Error getting hardware status. Error code {:}\r\n'.format(status))
             return (-1, status)
 
-        hw_status = lrssoc.conversions.u8_to_u32(hw_status, msb=False)
+        hw_status = pyocp.conversions.u8_to_u32(hw_status, msb=False)
         
         return (0, hw_status)

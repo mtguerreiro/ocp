@@ -18,15 +18,17 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void buckControlSfbIntInitialize(void);
-//-----------------------------------------------------------------------------
-int32_t buckControlSfbIntSetParams(void *params, uint32_t n);
-//-----------------------------------------------------------------------------
-int32_t buckControlSfbIntGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
+int32_t buckControlSfbIntInitialize(void);
 //-----------------------------------------------------------------------------
 int32_t buckControlSfbIntRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
+int32_t buckControlSfbIntSetParams(void *params, uint32_t n);
+//-----------------------------------------------------------------------------
+int32_t buckControlSfbIntGetParams(void *buffer, uint32_t size);
+//-----------------------------------------------------------------------------
 void buckControlSfbIntReset(void);
+//-----------------------------------------------------------------------------
+void buckControlSfbIntGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 

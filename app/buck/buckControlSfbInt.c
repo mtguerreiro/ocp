@@ -9,6 +9,9 @@
 #include "ocpTrace.h"
 
 #include "buckConfig.h"
+
+/* Controllers */
+#include "controller.h"
 //=============================================================================
 
 //=============================================================================
@@ -37,32 +40,9 @@ static float u = 0.0f;
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void buckControlSfbIntInitialize(void){
+int32_t buckControlSfbIntInitialize(void){
 
-}
-//-----------------------------------------------------------------------------
-int32_t buckControlSfbIntSetParams(void *params, uint32_t n){
-
-    float *p = (float *)params;
-
-    k1 = *p++;
-    k2 = *p++;
-    ke = *p++;
-    dt = *p++;
-
-	return 0;
-}
-//-----------------------------------------------------------------------------
-int32_t buckControlSfbIntGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
-
-    float *p = (float *)out;
-
-    *p++ = k1;
-    *p++ = k2;
-    *p++ = ke;
-    *p++ = dt;
-
-    return 16;
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t buckControlSfbIntRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs){
@@ -93,9 +73,46 @@ int32_t buckControlSfbIntRun(void *meas, int32_t nmeas, void *refs, int32_t nref
     return sizeof(buckConfigControl_t);
 }
 //-----------------------------------------------------------------------------
+int32_t buckControlSfbIntSetParams(void *params, uint32_t n){
+
+    float *p = (float *)params;
+
+    k1 = *p++;
+    k2 = *p++;
+    ke = *p++;
+    dt = *p++;
+
+	return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t buckControlSfbIntGetParams(void *buffer, uint32_t size){
+
+    float *p = (float *)buffer;
+
+    *p++ = k1;
+    *p++ = k2;
+    *p++ = ke;
+    *p++ = dt;
+
+    return 16;
+}
+//-----------------------------------------------------------------------------
 void buckControlSfbIntReset(void){
 
     xe_1 = 0.0f;
+}
+//-----------------------------------------------------------------------------
+void buckControlSfbIntGetCallbacks(void *callbacksBuffer){
+
+    controllerCallbacks_t *cbs = (controllerCallbacks_t * )callbacksBuffer;
+
+    cbs->init = buckControlSfbIntInitialize;
+    cbs->run = buckControlSfbIntRun;
+    cbs->setParams = buckControlSfbIntSetParams;
+    cbs->getParams = buckControlSfbIntGetParams;
+    cbs->reset = buckControlSfbIntReset;
+    cbs->firstEntry = 0;
+    cbs->lastExit = 0;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

@@ -11,7 +11,7 @@
 //=============================================================================
 #include "cukController.h"
 
-#include "../utils/rp.h"
+#include "rp.h"
 
 #include "cukConfig.h"
 
