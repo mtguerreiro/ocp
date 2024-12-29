@@ -24,18 +24,21 @@ class Commands:
         self.trace_set_mode = 9
         self.trace_get_mode = 10
         self.trace_set_num_pre_trig_samples = 11
-        self.trace_set_signal_to_track = 12
-        self.trace_set_trig_level = 13
-        self.trace_get_tail = 14
-        self.cs_status = 15
-        self.cs_enable = 16
-        self.cs_disable = 17
-        self.cs_controller_if = 18
-        self.cs_hardware_if = 19
-        self.cs_get_number_controllers = 20
-        self.cs_get_controllers_names = 21
-        self.platform_id = 22
-        self.platform_if = 23
+        self.trace_get_num_pre_trig_samples = 12
+        self.trace_set_trigger = 13
+        self.trace_get_trigger = 14
+        self.trace_set_trig_level = 15
+        self.trace_get_trig_level = 16
+        self.trace_get_tail = 17
+        self.cs_status = 18
+        self.cs_enable = 19
+        self.cs_disable = 20
+        self.cs_controller_if = 21
+        self.cs_hardware_if = 22
+        self.cs_get_number_controllers = 23
+        self.cs_get_controllers_names = 24
+        self.platform_id = 25
+        self.platform_if = 26
 
         
 class Interface:
@@ -521,6 +524,48 @@ class Interface:
         return (0,)
     
 
+    def trace_get_num_pre_trig_samples(self, tr_id):
+        """Gets the number of pre trigger samples.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+           
+        Raises
+        ------
+        TypeError
+            If `tr_id` or `num` are not of `int` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element is the number of samples, or and error code. If the
+            command was executed successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+        
+        cmd = self.cmd.trace_get_num_pre_trig_samples
+
+        tx_data = []
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+       
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_get_num_pre_trig_samples.__name__
+            print('{:}: Error getting Number of Pre Trigger Samples. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+
+        n = pyocp.conversions.u8_to_u32(data, msb=False)
+        
+        return (0, n)
+
+    
     def trace_set_trig_signal(self, tr_id, signal):
         """Sets the trace (particular measurement value, e.g. output voltage) for which the trigger is defined in Trig Mode.
 
@@ -550,9 +595,9 @@ class Interface:
             raise TypeError('`tr_id` must be of int type.')
 
         if type(signal) is not int:
-            raise TypeError('`trace` must be of int type.')
+            raise TypeError('`signal` must be of int type.')
         
-        cmd = self.cmd.trace_set_signal_to_track
+        cmd = self.cmd.trace_set_trigger
 
         tx_data = []
         tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
@@ -566,6 +611,48 @@ class Interface:
             return (-1, status)
 
         return (0,)
+
+
+    def trace_get_trig_signal(self, tr_id):
+        """Gets the signal used as trigger.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+           
+        Raises
+        ------
+        TypeError
+            If `tr_id` or `signal` are not of `int` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element is the index of the trigger, on an error code (if
+            any). If the command was executed successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+        
+        cmd = self.cmd.trace_get_trigger
+
+        tx_data = []
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+       
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_get_trig_signal.__name__
+            print('{:}: Error setting trigger. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+
+        trigger = pyocp.conversions.u8_to_u32(data, msb=False)
+        
+        return (0, trigger)
     
 
     def trace_set_trig_level(self, tr_id, level):
@@ -597,7 +684,7 @@ class Interface:
             raise TypeError('`tr_id` must be of int type.')
 
         if (type(level) is not float) and (type(level) is not int):
-            raise TypeError('`bound` must be of float type.')
+            raise TypeError('`level` must be of float type.')
 
         cmd = self.cmd.trace_set_trig_level
 
@@ -615,6 +702,48 @@ class Interface:
             return (-1, status)
 
         return (0,)
+
+
+    def trace_get_trig_level(self, tr_id):
+        """Gets the trigger level.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+           
+        Raises
+        ------
+        TypeError
+            If `tr_id` is not of `int` or `level` is neither of `int` nor `float` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element is the trigger, or an error code, if any. If the
+            command was executed successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+
+        cmd = self.cmd.trace_get_trig_level
+
+        tx_data = []
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+       
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_set_trig_level.__name__
+            print('{:}: Error setting trigger level. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+
+        level = struct.unpack('<f', data)
+        
+        return (0, level)
     
 
     def trace_get_tail(self, tr_id):

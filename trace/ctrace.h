@@ -68,9 +68,15 @@ void ctraceTrigModeReset(ctrace_t *trace);
 //---------------------------------------------------------------------------
 int32_t ctraceTrigModeSetNumPreTrigSamples(ctrace_t *trace, uint32_t numPreTrigSamples);
 //---------------------------------------------------------------------------
+uint32_t ctraceTrigModeGetNumPreTrigSamples(ctrace_t *trace);
+//---------------------------------------------------------------------------
 int32_t ctraceTrigModeSetTrigSignal(ctrace_t *trace, uint32_t signal);
 //---------------------------------------------------------------------------
-int32_t ctraceTrigModeSetTrigLevel(ctrace_t *trace, uint32_t signal);
+uint32_t ctraceTrigModeGetTrigSignal(ctrace_t *trace);
+//---------------------------------------------------------------------------
+void ctraceTrigModeSetTrigLevel(ctrace_t *trace, float signal);
+//---------------------------------------------------------------------------
+float ctraceTrigModeGetTrigLevel(ctrace_t *trace);
 //---------------------------------------------------------------------------
 int32_t ctraceTrigModeGetTail(ctrace_t *trace);
 //---------------------------------------------------------------------------

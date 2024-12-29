@@ -95,15 +95,30 @@ class TraceTemplate:
         return self._ocp_if.trace_set_num_pre_trig_samples(self._tr_id, n)
 
 
+    def get_n_pre_trig_samples(self):
+
+        return self._ocp_if.trace_get_num_pre_trig_samples(self._tr_id)
+    
+
     def set_trig_signal(self, signal):
 
         return self._ocp_if.trace_set_trig_signal(self._tr_id, signal)
+
+
+    def get_trig_signal(self):
+
+        return self._ocp_if.trace_get_trig_signal(self._tr_id)
 
 
     def set_trig_level(self, level):
 
         return self._ocp_if.trace_set_trig_level(self._tr_id, level)
 
+
+    def get_trig_level(self):
+
+        return self._ocp_if.trace_get_trig_level(self._tr_id)
+    
 
     def _reorder_data(self, data):
 

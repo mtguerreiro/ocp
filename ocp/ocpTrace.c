@@ -170,6 +170,13 @@ int32_t ocpTraceSetNumPreTrigSamples(uint32_t id, uint32_t samples){
 	return ctraceTrigModeSetNumPreTrigSamples( &xifcontrol.traces[id], samples );
 }
 //-----------------------------------------------------------------------------
+int32_t ocpTraceGetNumPreTrigSamples(uint32_t id){
+
+	if( id >= OCP_TRACE_END ) return -1;
+
+	return (int32_t) ctraceTrigModeGetNumPreTrigSamples( &xifcontrol.traces[id] );
+}
+//-----------------------------------------------------------------------------
 int32_t ocpTraceSetTrigSignal(uint32_t id, uint32_t signal){
 
 	if( id >= OCP_TRACE_END ) return -1;
@@ -177,11 +184,29 @@ int32_t ocpTraceSetTrigSignal(uint32_t id, uint32_t signal){
 	return ctraceTrigModeSetTrigSignal( &xifcontrol.traces[id], signal );
 }
 //-----------------------------------------------------------------------------
-int32_t ocpTraceSetTrigLevel(uint32_t id, uint32_t level){
+int32_t ocpTraceGetTrigSignal(uint32_t id){
 
 	if( id >= OCP_TRACE_END ) return -1;
 
-	return ctraceTrigModeSetTrigLevel( &xifcontrol.traces[id], level );
+	return (int32_t) ctraceTrigModeGetTrigSignal( &xifcontrol.traces[id] );
+}
+//-----------------------------------------------------------------------------
+int32_t ocpTraceSetTrigLevel(uint32_t id, float level){
+
+	if( id >= OCP_TRACE_END ) return -1;
+
+	ctraceTrigModeSetTrigLevel( &xifcontrol.traces[id], level );
+
+	return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t ocpTraceGetTrigLevel(uint32_t id, float *level){
+
+	if( id >= OCP_TRACE_END ) return -1;
+
+	*level = ctraceTrigModeGetTrigLevel( &xifcontrol.traces[id] );
+
+	return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t ocpTraceGetTail(uint32_t id){

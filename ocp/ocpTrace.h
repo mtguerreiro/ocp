@@ -56,9 +56,15 @@ int32_t ocpTraceGetMode(uint32_t id);
 //-----------------------------------------------------------------------------
 int32_t ocpTraceSetNumPreTrigSamples(uint32_t id, uint32_t samples);
 //-----------------------------------------------------------------------------
+int32_t ocpTraceGetNumPreTrigSamples(uint32_t id);
+//-----------------------------------------------------------------------------
 int32_t ocpTraceSetTrigSignal(uint32_t id, uint32_t signal);
 //-----------------------------------------------------------------------------
-int32_t ocpTraceSetTrigLevel(uint32_t id, uint32_t level);
+int32_t ocpTraceGetTrigSignal(uint32_t id);
+//-----------------------------------------------------------------------------
+int32_t ocpTraceSetTrigLevel(uint32_t id, float level);
+//-----------------------------------------------------------------------------
+int32_t ocpTraceGetTrigLevel(uint32_t id, float *level);
 //---------------------------------------------------------------------------
 int32_t ocpTraceGetTail(uint32_t id);
 //---------------------------------------------------------------------------

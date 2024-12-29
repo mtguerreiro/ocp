@@ -194,6 +194,19 @@ typedef enum{
 
 	/**
 	 * Command
+	 *  ----------------------------------------------------------
+	 *  | GET NUM PRE TRIG SAMPLES (uint32) |  TRACE ID (uint32) |
+	 *  ----------------------------------------------------------
+	 *
+	 * Response
+     *  ------------------------
+     *  | NUM SAMPLES (uint32) |
+     *  ------------------------
+	 */
+	OCP_IF_CMD_TRACE_GET_NUM_PRE_TRIG_SAMPLES,
+
+	/**
+	 * Command
 	 *  -------------------------------------------------------------------
 	 *  | SET TRIG SIGNAL (uint32) |  TRACE ID (uint32) | SIGNAL (uint32) |
 	 *  -------------------------------------------------------------------
@@ -205,18 +218,46 @@ typedef enum{
 
 	/**
 	 * Command
-	 *  -----------------------------------------------------------------
-	 *  | SET TRIG LEVEL (uint32) |  TRACE ID (uint32) | LEVEL (uint32) |
-	 *  -----------------------------------------------------------------
+	 *  -------------------------------------------------
+	 *  | GET TRIG SIGNAL (uint32) |  TRACE ID (uint32) |
+	 *  -------------------------------------------------
+	 *
+	 * Response
+     *  --------------------
+     *  | TRIGGER (uint32) |
+     *  --------------------
+	 */
+	OCP_IF_CMD_TRACE_GET_TRIG_SIGNAL,
+
+	/**
+	 * Command
+	 *  ----------------------------------------------------------------
+	 *  | SET TRIG LEVEL (uint32) |  TRACE ID (uint32) | LEVEL (float) |
+	 *  ----------------------------------------------------------------
 	 *
 	 * Response
 	 * No Response
      * 
      * Notes
-     *  - The size of LEVEL is 4 bytes (uint32), but the type could be 
-     *    integer or float.
+     *  - The size of LEVEL is 4 bytes.
 	 */
 	OCP_IF_CMD_TRACE_SET_TRIG_LEVEL,
+
+	/**
+	 * Command
+	 *  ----------------------------------------------------------------
+	 *  | SET TRIG LEVEL (uint32) |  TRACE ID (uint32) | LEVEL (float) |
+	 *  ----------------------------------------------------------------
+	 *
+	 * Response
+     *  -----------------
+     *  | LEVEL (float) |
+     *  -----------------
+     * 
+     * Notes
+     *  - The size of LEVEL is 4 bytes.
+	 */
+	OCP_IF_CMD_TRACE_GET_TRIG_LEVEL,
 
 	/**
 	 * Command

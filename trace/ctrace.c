@@ -107,14 +107,29 @@ int32_t ctraceTrigModeSetNumPreTrigSamples(ctrace_t *trace, uint32_t numPreTrigS
 	return ctracememTrigModeSetNumPreTrigSamples( &trace->mem, numPreTrigSamples, trace->n );
 }
 //---------------------------------------------------------------------------
+uint32_t ctraceTrigModeGetNumPreTrigSamples(ctrace_t *trace){
+
+	return ctracememTrigModeGetNumPreTrigSamples( &trace->mem );
+}
+//---------------------------------------------------------------------------
 int32_t ctraceTrigModeSetTrigSignal(ctrace_t *trace, uint32_t signal){
 
 	return ctracememTrigModeSetTrigSignal( &trace->mem, signal, trace->n );
 }
 //---------------------------------------------------------------------------
-int32_t ctraceTrigModeSetTrigLevel(ctrace_t *trace, uint32_t level){
+uint32_t ctraceTrigModeGetTrigSignal(ctrace_t *trace){
 
-	return ctracememTrigModeSetTrigLevel( &trace->mem, level );
+	return ctracememTrigModeGetTrigSignal( &trace->mem );
+}
+//---------------------------------------------------------------------------
+void ctraceTrigModeSetTrigLevel(ctrace_t *trace, float level){
+
+	ctracememTrigModeSetTrigLevel( &trace->mem, level );
+}
+//---------------------------------------------------------------------------
+float ctraceTrigModeGetTrigLevel(ctrace_t *trace){
+
+	return ctracememTrigModeGetTrigLevel( &trace->mem );
 }
 //---------------------------------------------------------------------------
 int32_t ctraceTrigModeGetTail(ctrace_t *trace){

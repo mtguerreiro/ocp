@@ -133,6 +133,16 @@ void ctracememTrigModeReset(ctracemem_t *trace);
 int32_t ctracememTrigModeSetNumPreTrigSamples(ctracemem_t *trace, uint32_t numPreTrigSamples, uint32_t numTraces);
 //---------------------------------------------------------------------------
 /**
+ * @brief Gets number of samples to be stored prior to the trigger sample.
+ * 
+ * During initializtion, this is set to zero.
+ *
+ * @param trace Pointer to trace memory region.
+ * @return Number of samples
+ */
+uint32_t ctracememTrigModeGetNumPreTrigSamples(ctracemem_t *trace);
+//---------------------------------------------------------------------------
+/**
  * @brief Sets signal of particular trace for which the trigger is defined.
  *
  * The number to be set corresponds to the ID for the particular measurement.
@@ -145,15 +155,32 @@ int32_t ctracememTrigModeSetNumPreTrigSamples(ctracemem_t *trace, uint32_t numPr
 int32_t ctracememTrigModeSetTrigSignal(ctracemem_t *trace, uint32_t signal, uint32_t numTraces);
 //---------------------------------------------------------------------------
 /**
+ * @brief Gets trigger.
+ *
+ * During initialization, the trigger is set to 0.
+ * 
+ * @param trace Pointer to trace memory region.
+ * @return Trigger.
+ */
+uint32_t ctracememTrigModeGetTrigSignal(ctracemem_t *trace);
+//---------------------------------------------------------------------------
+/**
  * @brief Sets the trigger level.
  *
  * After a trace reset, the trigger is set each time this value is crossed from above or from below.
  *
  * @param trace Pointer to trace memory region.
- * @param level level; reinterpret cast is used to convert back to the float value set in the Python command.
- * @return Always return 0.
+ * @param level Level.
  */
-int32_t ctracememTrigModeSetTrigLevel(ctracemem_t *trace, uint32_t level);
+void ctracememTrigModeSetTrigLevel(ctracemem_t *trace, float level);
+//---------------------------------------------------------------------------
+/**
+ * @brief Gets the trigger level.
+ *
+ * @param trace Pointer to trace memory region.
+ * @return Level.
+ */
+float ctracememTrigModeGetTrigLevel(ctracemem_t *trace);
 //---------------------------------------------------------------------------
 /**
  * @brief Saves measurement values for each trace in Trig Mode.
