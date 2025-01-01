@@ -171,9 +171,14 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
 	}
 }
 //---------------------------------------------------------------------------
-int32_t ctracememTrigModeGetTail(ctracemem_t *trace) {
+int32_t ctracememTrigModeGetTail(ctracemem_t *trace){
 	
 	return trace->trigModeBuffer.tail;
+}
+//---------------------------------------------------------------------------
+int32_t ctracememTrigModeGetState(ctracemem_t *trace){
+	
+	return trace->trigModeParams.fsmState;
 }
 //---------------------------------------------------------------------------
 //===========================================================================

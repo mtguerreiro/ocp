@@ -203,6 +203,16 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size);
  */
 int32_t ctracememTrigModeGetTail(ctracemem_t *trace);
 //---------------------------------------------------------------------------
+/**
+ * @brief Gets the state of the trigger.
+ *
+ * Can be used to check when the trace has finished recording data.
+ *
+ * @param trace Pointer to trace memory region.
+ * @return State of the trigger.
+ */
+int32_t ctracememTrigModeGetState(ctracemem_t *trace);
+//---------------------------------------------------------------------------
 //===========================================================================
 
 #endif /* CTRACE_MEM_H_ */

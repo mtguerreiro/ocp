@@ -129,6 +129,11 @@ class TraceTemplate:
     def get_trig_level(self):
 
         return self._ocp_if.trace_get_trig_level(self._tr_id)
+
+
+    def get_trig_state(self):
+
+        return self._ocp_if.trace_get_trig_state(self._tr_id)
     
 
     def _reorder_data(self, data):

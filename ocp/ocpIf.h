@@ -276,6 +276,22 @@ typedef enum{
 	 */
 	OCP_IF_CMD_TRACE_GET_TAIL,
 
+	/**
+	 * Command
+	 *  ------------------------------------------------
+	 *  | GET TRIG STATE (uint32) |  TRACE ID (uint32) |
+	 *  ------------------------------------------------
+	 *
+	 * Response
+     *  -----------------
+     *  | STATE (uint32) |
+     *  -----------------
+	 * 
+     * Notes
+     *  - STATE is the state of the trigger when the trace is in trigger mode.
+	 */
+	OCP_IF_CMD_TRACE_GET_TRIG_STATE,
+
     /**
      * Command
      *  ----------------------------------------------

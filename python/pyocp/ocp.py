@@ -30,15 +30,16 @@ class Commands:
         self.trace_set_trig_level = 15
         self.trace_get_trig_level = 16
         self.trace_get_tail = 17
-        self.cs_status = 18
-        self.cs_enable = 19
-        self.cs_disable = 20
-        self.cs_controller_if = 21
-        self.cs_hardware_if = 22
-        self.cs_get_number_controllers = 23
-        self.cs_get_controllers_names = 24
-        self.platform_id = 25
-        self.platform_if = 26
+        self.trace_get_trig_state = 18
+        self.cs_status = 19
+        self.cs_enable = 20
+        self.cs_disable = 21
+        self.cs_controller_if = 22
+        self.cs_hardware_if = 23
+        self.cs_get_number_controllers = 24
+        self.cs_get_controllers_names = 25
+        self.platform_id = 26
+        self.platform_if = 27
 
         
 class Interface:
@@ -789,6 +790,48 @@ class Interface:
         tail = pyocp.conversions.u8_to_u32(data, msb=False)
 
         return (0, tail)
+
+
+    def trace_get_trig_state(self, tr_id):
+        """Gets state of the trigger when the trace is in trigger mode.
+
+        Parameters
+        ----------
+        tr_id : int
+            Trace ID. This ID must exist in the controller, otherwise an
+            error will be returned.
+
+        Raises
+        ------
+        TypeError
+            If `id` is not of `int` type.
+
+        Returns
+        -------
+        tuple
+            A tuple, where the first element is the command's status and the
+            second element is the trigger state, or an error code. If the
+            command was executed successfully, status is zero.
+            
+        """
+        if type(tr_id) is not int:
+            raise TypeError('`tr_id` must be of int type.')
+        
+        cmd = self.cmd.trace_get_trig_state
+
+        tx_data = []
+        tx_data.extend( pyocp.conversions.u32_to_u8(tr_id, msb=False) )
+
+        status, data = self.hwp.request(cmd, tx_data)
+
+        if status < 0:
+            funcname = Interface.trace_get_trig_state.__name__
+            print('{:}: Error getting the state of the trigger. Error code {:}\r\n'.format(funcname, status))
+            return (-1, status)
+        
+        state = pyocp.conversions.u8_to_u32(data, msb=False)
+
+        return (0, state)
     
 
     def cs_status(self, cs_id):

@@ -216,6 +216,13 @@ int32_t ocpTraceGetTail(uint32_t id){
 	return ctraceTrigModeGetTail( &xifcontrol.traces[id] );
 }
 //-----------------------------------------------------------------------------
+int32_t ocpTraceGetTriggerState(uint32_t id){
+
+	if( id >= OCP_TRACE_END ) return -1;
+
+	return ctraceTrigModeGetState( &xifcontrol.traces[id] );
+}
+//-----------------------------------------------------------------------------
 int32_t ocpTraceSave(uint32_t id){
 
 	if( id >= OCP_TRACE_END ) return -1;

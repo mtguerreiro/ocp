@@ -137,4 +137,9 @@ int32_t ctraceTrigModeGetTail(ctrace_t *trace){
 	return ctracememTrigModeGetTail(&trace->mem);
 }
 //---------------------------------------------------------------------------
+int32_t ctraceTrigModeGetState(ctrace_t *trace){
+
+	return ctracememTrigModeGetState( &trace->mem );
+}
+//---------------------------------------------------------------------------
 //===========================================================================

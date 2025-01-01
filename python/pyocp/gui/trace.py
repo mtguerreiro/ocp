@@ -158,10 +158,13 @@ class Bar(tk.Frame):
 
         if self.timer:
             self.timer.cancel()
-            
-        rrate = float( self.refresh_rate_entry.get() )
 
-        print('running again with {:} s'.format(rrate))
+        # If trace is in trigger mode, sets timer with a small rate
+        if bool(self.trace_mode.get()):
+            rrate = 0.1
+        else:
+            rrate = float( self.refresh_rate_entry.get() )
+        
         self.trace.reset()
         self.timer = RepeatTimer(rrate, self.update_plot_windows)
         self.timer.start()
@@ -272,16 +275,28 @@ class Bar(tk.Frame):
 
 
     def update_plot_windows(self):
-    
-        status, data = self.trace.read()
-        for pw in self.plot_windows:
-            pw.update_waveforms( data )
 
-        if bool( self.acq_mode.get() ):
-            self.trace.reset()
-        else:
+        if bool(self.trace_mode.get()):
+            status, trig_state = self.trace.get_trig_state()
+            if trig_state != 4:
+                return
+            
+            status, data = self.trace.read()
+            for pw in self.plot_windows:
+                pw.update_waveforms( data )
+
             self.start.set(0)
             self.acq_start()
+        else:        
+            status, data = self.trace.read()
+            for pw in self.plot_windows:
+                pw.update_waveforms( data )
+
+            if bool( self.acq_mode.get() ):
+                self.trace.reset()
+            else:
+                self.start.set(0)
+                self.acq_start()
 
 @dataclass
 class _PlotWindowData:

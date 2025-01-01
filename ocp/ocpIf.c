@@ -84,6 +84,9 @@ static int32_t ocpIfTraceGetTrigLevel(void *in, uint32_t insize,
 static int32_t ocpIfTraceGetTail(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
+static int32_t ocpIfTraceGetTriggerState(void *in, uint32_t insize,
+		void **out, uint32_t maxoutsize);
+//-----------------------------------------------------------------------------
 static int32_t ocpIfCSStatus(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
@@ -291,6 +294,7 @@ int32_t ocpIfInitialize(void){
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_LEVEL, ocpIfTraceSetTrigLevel );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_LEVEL, ocpIfTraceGetTrigLevel );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TAIL, ocpIfTraceGetTail );
+	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_STATE, ocpIfTraceGetTriggerState );
 
 	//rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_STATUS, ocpIfCSGetStatus );
 	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_STATUS, ocpIfCSStatus );
@@ -644,6 +648,24 @@ static int32_t ocpIfTraceGetTail(void *in, uint32_t insize,
 	if( tail < 0 ) return tail;
 
 	*o = tail;
+
+	return 4;
+}
+//-----------------------------------------------------------------------------
+static int32_t ocpIfTraceGetTriggerState(void *in, uint32_t insize,
+		void **out, uint32_t maxoutsize){
+
+	uint32_t id;
+	int32_t state;
+	uint32_t *o = (uint32_t *)*out;
+	uint32_t *p = (uint32_t *)in;
+
+	id = *p++;
+
+	state = ocpTraceGetTriggerState(id);
+	if( state < 0 ) return state;
+
+	*o = state;
 
 	return 4;
 }
