@@ -16,6 +16,8 @@ from . import trace
 
 from . import lrs
 
+from . import gui
+
 #from . import boost
 #from . import buck
 #from . import cuk
