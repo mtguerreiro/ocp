@@ -54,6 +54,17 @@ class TraceTemplate:
         return self._ocp_if.trace_get_signals_names(self._tr_id)
 
 
+    def get_signals_dict(self):
+
+        status, signals = self._ocp_if.trace_get_signals_names(self._tr_id)
+        if status < 0:
+            return (-1, status)
+
+        signals = dict(enumerate(signals))
+
+        return (0, signals)
+
+    
     def get_size(self):
 
         status, tr_size = self._ocp_if.trace_get_size(self._tr_id)
