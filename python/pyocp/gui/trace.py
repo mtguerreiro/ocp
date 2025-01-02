@@ -8,13 +8,14 @@ from tkinter import messagebox
 from dataclasses import dataclass
 
 import numpy as np
+import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
 import pyocp
 
 
-class RepeatTimer(threading.Timer):
+class _RepeatTimer(threading.Timer):
     def run(self):
         while not self.finished.wait(self.interval):
             self.function(*self.args, **self.kwargs)
@@ -27,6 +28,89 @@ class _OcpTrace(pyocp.trace.TraceTemplate):
         super().__init__(tr_id=tr_id, ocp_if=ocp_if)
 
 
+_ACQ_STATE_IDLE = 0
+_ACQ_STATE_RUNNING = 1
+_ACQ_STATE_STOP = 2
+class _Acq:
+
+    def __init__(self, trace, callback):
+
+        self.trace = trace
+        self.timer = _RepeatTimer(0, self.on_timer)
+        self.callback = callback
+
+        self.trace_mode = 0
+        self.acq_mode = 0
+        self.rrate = 0
+
+        self._TRIG_SET = 4
+
+        self.state = _ACQ_STATE_IDLE
+        
+
+    def set_acq_mode(self, mode):
+
+        self.acq_mode = mode
+
+
+    def set_trace_mode(self, mode):
+
+        self.trace_mode = mode
+
+
+    def set_refresh_rate(self, rate):
+
+        self.rrate = rate
+        
+
+    def start(self, acq_mode=None, trace_mode=None, rrate=None):
+
+        if acq_mode:
+            self.acq_mode = acq_mode
+        if trace_mode:
+            self.trace_mode = trace_mode
+        if rrate:
+            self.rrate = rrate
+
+        self.timer.cancel()
+        #del self.timer
+        self.timer = _RepeatTimer(self.rrate, self.on_timer)
+        self.state = _ACQ_STATE_RUNNING
+        self.trace.reset()
+        self.timer.start()
+
+
+    def stop(self):
+
+        self.timer.cancel()
+        self.state = _ACQ_STATE_IDLE
+        
+
+    def on_timer(self):
+        #print('on timer')
+
+        self.timer.cancel()
+        #del self.timer
+
+        if self.trace_mode:
+            # trace mode is trigger
+            status, trig_state = self.trace.get_trig_state()
+            if trig_state != self._TRIG_SET:
+                self.timer = _RepeatTimer(1, self.on_timer)
+                self.timer.start()
+                return
+
+        if self.acq_mode == 0:
+            self.state = _ACQ_STATE_STOP
+
+        self.callback(self.state)
+
+        if self.state == _ACQ_STATE_RUNNING:
+            self.trace.reset()
+            self.timer = _RepeatTimer(self.rrate, self.on_timer)
+            self.timer.start()
+                
+
 class Bar(tk.Frame):
 
     def __init__(self, parent, ocp, tr_id=0, tr_name='', ctrl_name='', *args, **options):
@@ -38,7 +122,7 @@ class Bar(tk.Frame):
 
         self.plot_windows = []
 
-        self.timer = None
+        self.acq = _Acq(self.trace, self.update_plot_windows)
 
         self.title_frame = ttk.Frame(self)
         self.title_frame.pack(fill='x', expand=1)
@@ -72,25 +156,16 @@ class Bar(tk.Frame):
         row = 0
         
         # Size
-        status, size = self.trace.get_size()
-        if status < 0:
-            raise RuntimeError("Failed to read the size of the trace.")
-        size = int(size)
         ttk.Label(self.sub_frame, text='Size (samples)', width=15).grid(row=row, column=0, padx=10, pady=2, sticky='w')
         self.size_entry = ttk.Entry(self.sub_frame, width=10)
-        self.size_entry.insert(0, size)
         self.size_entry.bind('<Return>', self.update_size)
         self.size_entry.bind('<FocusOut>', self.update_size)
+        self.size_entry.bind('<Leave>', self.update_size)
         self.size_entry.grid(row=row, column=1, columnspan=2, padx=10, sticky='w')
         
         # Trace mode
-        status, mode = self.trace.get_mode()
-        if status < 0:
-            raise RuntimeError("Failed to read the mode of the trace.")
-        mode = int(mode)
         row = row + 1
         self.trace_mode = tk.IntVar(master=self.sub_frame, value=0)
-        self.trace_mode.set(mode)
         ttk.Label(self.sub_frame, text='Trace mode', width=15).grid(row=row, column=0, padx=10, pady=2)
         ttk.Radiobutton(self.sub_frame, text='Manual', variable=self.trace_mode, value=0, command=self.update_trace_mode).grid(row=row, column=1, padx=10, sticky='w')
         ttk.Radiobutton(self.sub_frame, text='Trigger', variable=self.trace_mode, value=1, command=self.update_trace_mode).grid(row=row, column=2, padx=10, sticky='w')
@@ -99,8 +174,8 @@ class Bar(tk.Frame):
         row = row + 1
         self.acq_mode = tk.IntVar(master=self.sub_frame, value=0)
         ttk.Label(self.sub_frame, text='Acquisition mode', width=15).grid(row=row, column=0, padx=10, pady=2)
-        ttk.Radiobutton(self.sub_frame, text='One-time', variable=self.acq_mode, value=0).grid(row=row, column=1, padx=10, sticky='w')
-        ttk.Radiobutton(self.sub_frame, text='Continuous', variable=self.acq_mode, value=1).grid(row=row, column=2, padx=10, sticky='w')
+        ttk.Radiobutton(self.sub_frame, text='One-time', variable=self.acq_mode, value=0, command=self.update_acq_mode).grid(row=row, column=1, padx=10, sticky='w')
+        ttk.Radiobutton(self.sub_frame, text='Continuous', variable=self.acq_mode, value=1, command=self.update_acq_mode).grid(row=row, column=2, padx=10, sticky='w')
         
         # Refresh rate
         row = row + 1
@@ -110,6 +185,7 @@ class Bar(tk.Frame):
         self.refresh_rate_entry.grid(row=row, column=1, columnspan=2, padx=10, sticky='w')
         self.refresh_rate_entry.bind('<Return>', self.update_refresh_rate)
         self.refresh_rate_entry.bind('<FocusOut>', self.update_refresh_rate)
+        self.refresh_rate_entry.bind('<Leave>', self.update_refresh_rate)
         
         # Trigger
         row = row + 1
@@ -118,21 +194,82 @@ class Bar(tk.Frame):
         self.trigger_option_menu = ttk.OptionMenu(self.sub_frame, self.trigger, '')
         self.trigger_option_menu.grid(row=row, column=1, columnspan=2, padx=10, pady=2, sticky='ew') 
         self.trigger_option_menu.bind('<Button>', self.update_trigger_list)
-        self.update_trigger_list(0)
         
+        # Trigger level
+        row = row + 1
+        ttk.Label(self.sub_frame, text='Trigger level', width=15).grid(row=row, column=0, padx=10, pady=2, sticky='w')
+        self.trigger_level_entry = ttk.Entry(self.sub_frame, width=10)
+        self.trigger_level_entry.grid(row=row, column=1, columnspan=2, padx=10, sticky='w')
+        self.trigger_level_entry.bind('<Return>', self.update_trigger_level)
+        self.trigger_level_entry.bind('<FocusOut>', self.update_trigger_level)
+        self.trigger_level_entry.bind('<Leave>', self.update_trigger_level)
+
         # Pretrig samples
-        status, n = self.trace.get_n_pre_trig_samples()
-        if status < 0:
-            raise RuntimeError("Failed to get the number of pre trig samples.")        
         row = row + 1
         ttk.Label(self.sub_frame, text='Pre trig. samples', width=15).grid(row=row, column=0, padx=10, pady=2, sticky='w')
         self.pre_trig_samples_entry = ttk.Entry(self.sub_frame, width=10)
-        self.pre_trig_samples_entry.insert(0, n)
         self.pre_trig_samples_entry.grid(row=row, column=1, columnspan=2, padx=10, sticky='w')
         self.pre_trig_samples_entry.bind('<Return>', self.update_pre_trig_samples)
         self.pre_trig_samples_entry.bind('<FocusOut>', self.update_pre_trig_samples)
-
+        self.pre_trig_samples_entry.bind('<Leave>', self.update_pre_trig_samples)
         
+        self.update_widgets(0)
+        self.title_frame.bind('<Enter>', self.update_widgets)
+        self.sub_frame.bind('<Enter>', self.update_widgets)
+
+
+    def update_widgets(self, event):
+
+        # Size
+        status, size = self.trace.get_size()
+        if status < 0:
+            raise RuntimeError("Failed to read the size of the trace.")
+        size = int(size)
+        self.size_entry.delete(0, tk.END)
+        self.size_entry.insert(0, size)
+
+        # Trace mode
+        status, mode = self.trace.get_mode()
+        if status < 0:
+            raise RuntimeError("Failed to read the mode of the trace.")
+        mode = int(mode)
+        self.trace_mode.set(mode)
+
+        # Trigger list
+        self.update_trigger_list(0)
+
+        # Trigger level
+        status, level = self.trace.get_trig_level()
+        if status < 0:
+            raise RuntimeError("Failed to get the trigger level.")
+        self.trigger_level_entry.delete(0, tk.END)
+        self.trigger_level_entry.insert(0, level)
+
+        status, n = self.trace.get_n_pre_trig_samples()
+        if status < 0:
+            raise RuntimeError("Failed to get the number of pre trig samples.")
+        self.pre_trig_samples_entry.delete(0, tk.END)
+        self.pre_trig_samples_entry.insert(0, n)
+
+        self.update_widgets_visibility()
+
+
+    def update_widgets_visibility(self):
+
+        if bool( self.trace_mode.get() ):
+            # Trace mode is trigger
+            self.refresh_rate_entry.config(state='disabled')
+            self.trigger_option_menu.config(state='enabled')
+            self.trigger_level_entry.config(state='enabled')
+            self.pre_trig_samples_entry.config(state='enabled')
+        else:
+            # Trace mode is manual
+            self.refresh_rate_entry.config(state='enabled')
+            self.trigger_option_menu.config(state='disabled')
+            self.trigger_level_entry.config(state='disabled')
+            self.pre_trig_samples_entry.config(state='disabled')
+
+    
     def settings_toggle(self):
         if bool( self.settings_toggle_state.get() ):
             self.sub_frame.pack(fill='x', expand=1)
@@ -146,34 +283,17 @@ class Bar(tk.Frame):
 
         if bool( self.start.get() ):
             self.start_button.configure(text='Stop')
-            self.acq_run()
+            acq_mode = self.acq_mode.get()
+            trace_mode = self.trace_mode.get()
+            try:
+                rrate = float( self.refresh_rate_entry.get() )
+            except:
+                messagebox.showerror('Input Error', 'Refresh rate must be a number (int or float).')
+                return
+            self.acq.start(acq_mode=acq_mode, trace_mode=trace_mode, rrate=rrate)
         else:
             self.start_button.configure(text='Start')
-            self.acq_stop()
-
-
-    def acq_run(self):
-
-        if not bool(self.start.get()): return
-
-        if self.timer:
-            self.timer.cancel()
-
-        # If trace is in trigger mode, sets timer with a small rate
-        if bool(self.trace_mode.get()):
-            rrate = 0.1
-        else:
-            rrate = float( self.refresh_rate_entry.get() )
-        
-        self.trace.reset()
-        self.timer = RepeatTimer(rrate, self.update_plot_windows)
-        self.timer.start()
-
-
-    def acq_stop(self):
-        
-        if self.timer:
-            self.timer.cancel()
+            self.acq.stop()
 
 
     def update_size(self, event):
@@ -181,7 +301,7 @@ class Bar(tk.Frame):
         size = self.size_entry.get()
         
         if not size.isdigit():
-            messagebox.showerror('Input Error', 'Size must be a number.')
+            messagebox.showerror('Input Error', 'Size must be an integer.')
             return
 
         status, = self.trace.set_size( int(size) )    
@@ -198,12 +318,15 @@ class Bar(tk.Frame):
         if status < 0:
             messagebox.showerror('Error', 'Failed to update mode.')
 
-        self.acq_start()
+        self.update_widgets_visibility()
+        
+        self.acq.set_trace_mode(mode)
 
     
     def update_acq_mode(self):
 
-        self.acq_run()
+        mode = self.acq_mode.get()
+        self.acq.set_acq_mode(mode)
 
 
     def update_refresh_rate(self, event):
@@ -214,7 +337,7 @@ class Bar(tk.Frame):
             messagebox.showerror('Input Error', 'Refresh rate must be a number (int or float).')
             return
 
-        self.acq_run()
+        self.acq.set_refresh_rate(rrate)
 
 
     def update_trigger(self):
@@ -260,7 +383,7 @@ class Bar(tk.Frame):
         n = self.pre_trig_samples_entry.get()
         
         if not n.isdigit():
-            messagebox.showerror('Input Error', 'Number of samples must be a number.')
+            messagebox.showerror('Input Error', 'Number of samples must be an integer.')
             return
 
         status, = self.trace.set_n_pre_trig_samples( int(n) )    
@@ -269,34 +392,38 @@ class Bar(tk.Frame):
             messagebox.showerror('Error', 'Failed to update number of pre trig samples.')
 
 
+    def update_trigger_level(self, event):
+
+        level = self.trigger_level_entry.get()
+
+        try:
+            level = float(level)
+        except:
+            messagebox.showerror('Input Error', 'Level must be a number.')
+            return
+
+        status, = self.trace.set_trig_level( level )    
+
+        if status < 0:
+            messagebox.showerror('Error', 'Failed to update trigger level.')
+
+            
     def new_plot(self):
         
         self.plot_windows.append( PlotWindow(self.trace_signals) )
 
 
-    def update_plot_windows(self):
+    def update_plot_windows(self, acq_state):
 
-        if bool(self.trace_mode.get()):
-            status, trig_state = self.trace.get_trig_state()
-            if trig_state != 4:
-                return
-            
-            status, data = self.trace.read()
-            for pw in self.plot_windows:
-                pw.update_waveforms( data )
+        status, data = self.trace.read()
+        for pw in self.plot_windows:
+            pw.update_waveforms( data )
 
-            self.start.set(0)
+        if acq_state == _ACQ_STATE_STOP:
+            # If acq ended, updates "Start" button
+            mode = self.start.set(0)
             self.acq_start()
-        else:        
-            status, data = self.trace.read()
-            for pw in self.plot_windows:
-                pw.update_waveforms( data )
 
-            if bool( self.acq_mode.get() ):
-                self.trace.reset()
-            else:
-                self.start.set(0)
-                self.acq_start()
 
 @dataclass
 class _PlotWindowData:
@@ -376,6 +503,7 @@ class PlotWindow:
         self.control_frame.pack(side=tk.TOP, fill=tk.X)
 
         # Initialize the plot
+        set_matplotlib_theme()
         self.fig, self.ax = plt.subplots()
         self.ax.set_title('Waveform Plot')
         self.ax.set_xlabel('Time')
@@ -468,3 +596,55 @@ class PlotWindow:
         if any(sig.visible for sig in self.signals.values()):
             self.ax.legend()
         self.canvas.draw()
+
+
+def set_matplotlib_theme():
+
+    title_fontsize = 12
+    legend_fontsize = 10
+    label_fontsize = 12
+    tick_fontsize = 12
+
+    line_width = 1.25
+
+    # Theme
+    try:
+        plt.style.use('seaborn-v0_8-bright')
+    except:
+        plt.style.use('seaborn-bright')
+
+    # Fonts
+    matplotlib.rcParams['mathtext.fontset'] = 'cm'
+    matplotlib.rcParams['font.family'] = 'serif'
+    #matplotlib.rcParams['font.serif'] = 'CMU Serif'
+
+    # Misc
+    plt.rcParams['axes.unicode_minus'] = False
+
+    # Grid
+    plt.rcParams['axes.grid'] = True
+    plt.rcParams['axes.grid.which'] = 'major'
+    plt.rcParams['grid.linestyle'] = ':'
+    plt.rcParams['grid.alpha'] = 0.7
+
+    # Ticks
+    plt.rcParams['xtick.labelsize'] = tick_fontsize
+    plt.rcParams['ytick.labelsize'] = tick_fontsize
+
+    # Lines
+    plt.rcParams['lines.linewidth'] = line_width
+
+    # Labels
+    plt.rcParams['axes.labelsize'] = label_fontsize
+
+    # Legend
+    plt.rcParams['legend.fontsize'] = legend_fontsize
+
+    # Title
+    plt.rcParams['axes.titlesize'] = title_fontsize
+    #plt.rcParams['figure.titlesize'] = title_fontsize
+    #plt.rcParams['figure.titleweight'] = title_fontsize
+
+    # Tight layout
+    plt.rcParams['figure.autolayout'] = True
+    plt.rcParams['savefig.bbox'] = 'tight'
