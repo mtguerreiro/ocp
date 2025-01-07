@@ -214,8 +214,8 @@ class Bar(tk.Frame):
         self.pre_trig_samples_entry.bind('<Leave>', self.update_pre_trig_samples)
         
         self.update_widgets(0)
-        self.title_frame.bind('<Enter>', self.update_widgets)
-        self.sub_frame.bind('<Enter>', self.update_widgets)
+        #self.title_frame.bind('<Enter>', self.update_widgets)
+        #self.sub_frame.bind('<Enter>', self.update_widgets)
 
 
     def update_widgets(self, event):
@@ -595,8 +595,9 @@ class PlotWindow:
                 self.ax.plot(sig.data, label=sig.label)
         if any(sig.visible for sig in self.signals.values()):
             self.ax.legend()
-        self.canvas.draw()
-
+        #self.canvas.draw()
+        self.canvas.draw_idle()
+        self.canvas.flush_events()
 
 def set_matplotlib_theme():
 
