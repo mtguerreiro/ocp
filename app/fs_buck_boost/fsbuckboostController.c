@@ -1,0 +1,104 @@
+
+//=============================================================================
+/*-------------------------------- Includes ---------------------------------*/
+//=============================================================================
+#include "fsbuckboostController.h"
+
+#include "fsbuckboostConfig.h"
+
+/* OCP */
+#include "ocpConfig.h"
+#include "ocpTrace.h"
+#include "rp.h"
+
+/* Controller lib */
+#include "controller.h"
+#include "controllerIf.h"
+
+/* Controllers */
+#include "fsbuckboostControlDisabled.h"
+#include "fsbuckboostControlStartup.h"
+//#include "fsbuckboostControlSfbInt.h"
+//#include "appControllerCascaded.h"
+//============================================================================
+
+//=============================================================================
+/*------------------------------- Definitions -------------------------------*/
+//=============================================================================
+typedef enum{
+    FS_BUCK_BOOST_CONTROLLER_DISABLED,
+    FS_BUCK_BOOST_CONTROLLER_STARTUP,
+    //FS_BUCK_BOOST_CONTROLLER_SFB_INT,
+    //FS_BUCK_BOOST_CONTROLLER_CASCADED,
+    FS_BUCK_BOOST_CONTROLLER_END
+}appControllersEnum_t;
+
+typedef struct{
+    fsbuckboostConfigReferences_t refs;
+    controller_t controller;
+    controllerCallbacks_t cbs[FS_BUCK_BOOST_CONTROLLER_END];
+}fsbuckboostController_t;
+
+//=============================================================================
+
+//=============================================================================
+/*--------------------------------- Globals ---------------------------------*/
+//=============================================================================
+fsbuckboostController_t xfsbuckboostControler;
+//============================================================================
+
+//=============================================================================
+/*-------------------------------- Functions --------------------------------*/
+//=============================================================================
+//-----------------------------------------------------------------------------
+int32_t fsbuckboostControllerInit(void){
+
+    controllerConfig_t config;
+
+    controllerGetCbs_t ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_END] = {0};
+    ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_DISABLED] = fsbuckboostControlDisabledGetCallbacks;
+    ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_STARTUP] = fsbuckboostControlStartupGetCallbacks;
+    //ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_SFB_INT] = fsbuckboostControlSfbIntGetCallbacks;
+    //ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_CASCADED] = appControlCascadedGetCallbacks;
+
+    config.refBuffer = (void *)&xfsbuckboostControler.refs;
+    config.refSize = sizeof(xfsbuckboostControler.refs);
+    
+    config.getCbs = ctlGetCbs;
+    config.cbsBuffer = xfsbuckboostControler.cbs;
+    config.nControllers = FS_BUCK_BOOST_CONTROLLER_END;
+
+    controllerInit(&xfsbuckboostControler.controller, &config);
+
+    controllerIfInit();
+    controllerIfRegister(&xfsbuckboostControler.controller, OCP_CS_2); //OCP_CS_2 should be FS_BUCK_BOOST_CS
+
+    //OCP_TRACE_2 should be FS_BUCK_BOOST_TRACE
+    ocpTraceAddSignal(OCP_TRACE_2, (void *)&xfsbuckboostControler.refs.v_out, "Voltage reference");
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t fsbuckboostControllerRun(void *inputs, int32_t ninputs, void *outputs, int32_t nmaxoutputs){
+    
+    int32_t status;
+
+    status = controllerRun(
+        &xfsbuckboostControler.controller,
+        inputs, ninputs,
+        outputs, nmaxoutputs);
+
+    return status;
+}
+//-----------------------------------------------------------------------------
+int32_t fsbuckboostControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    return controllerIf(in, insize, out, maxoutsize);
+}
+//-----------------------------------------------------------------------------
+int32_t fsbuckboostControllerStatus(void){
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+//=============================================================================
