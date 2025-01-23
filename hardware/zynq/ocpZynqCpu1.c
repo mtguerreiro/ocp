@@ -1012,7 +1012,7 @@ static int32_t ocpZynqCpu1InitializeTrace(void){
     config.data = (void **)traceData;
     config.names = traceNames;
 
-    ocpTraceInitialize(OCP_TRACE_2, &config, "Buck Boost Trace");
+    ocpTraceInitialize(OCP_TRACE_1, &config, "FS buck boost trace");
 
     ocpZynqCpu1InitializeTraceSignals();
 
@@ -1027,20 +1027,20 @@ static int32_t ocpZynqCpu1InitializeTraceSignals(void){
     /* Adds measurements to trace */
     meas = (fsbuckboostConfigMeasurements_t *)bInputs;
 
-    ocpTraceAddSignal(OCP_TRACE_2, &meas->ii, "Inductor current");
-    ocpTraceAddSignal(OCP_TRACE_2, &meas->il, "Inductor current");
-    ocpTraceAddSignal(OCP_TRACE_2, &meas->io, "Output current current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->ii, "Input current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->il, "Inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->io, "Output current");
 
-    ocpTraceAddSignal(OCP_TRACE_2, &meas->v_in, "Input voltage");
-    ocpTraceAddSignal(OCP_TRACE_2, &meas->v_dc_out, "Output DC link");
-    ocpTraceAddSignal(OCP_TRACE_2, &meas->v_out, "Output voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_in, "Input voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc_out, "Output DC link");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_out, "Output voltage");
 
     /* Adds control signals to trace */
     outputs = (fsbuckboostConfigControl_t *)bOutputs;
-    ocpTraceAddSignal(OCP_TRACE_2, &outputs->u, "Duty-cycle");
+    ocpTraceAddSignal(OCP_TRACE_1, &outputs->u, "Duty-cycle");
 
     /* Other signals to add */
-    ocpTraceAddSignal(OCP_TRACE_2, &texec_buck_boost, "Exec. time");
+    ocpTraceAddSignal(OCP_TRACE_1, &texec_buck_boost, "Exec. time");
 
     return 0;
 }
@@ -1078,7 +1078,7 @@ static int32_t ocpZynqCpu1InitializeControlSystem(void){
     config.fonEntry = 0;
     config.fonExit = 0;
 
-    ocpCSInitialize(OCP_CS_2, &config, "Buck control");
+    ocpCSInitialize(OCP_CS_1, &config, "FS buck boost control");
 
     return 0;
 }

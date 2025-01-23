@@ -71,10 +71,10 @@ int32_t fsbuckboostControllerInit(void){
     controllerInit(&xfsbuckboostControler.controller, &config);
 
     controllerIfInit();
-    controllerIfRegister(&xfsbuckboostControler.controller, OCP_CS_2); //OCP_CS_2 should be FS_BUCK_BOOST_CS
+    controllerIfRegister(&xfsbuckboostControler.controller, OCP_CS_1); //OCP_CS_2 should be FS_BUCK_BOOST_CS
 
     //OCP_TRACE_2 should be FS_BUCK_BOOST_TRACE
-    ocpTraceAddSignal(OCP_TRACE_2, (void *)&xfsbuckboostControler.refs.v_out, "Voltage reference");
+    ocpTraceAddSignal(OCP_TRACE_1, (void *)&xfsbuckboostControler.refs.v_out, "Voltage reference");
 
     return 0;
 }
