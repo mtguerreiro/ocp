@@ -1,6 +1,6 @@
 
-#ifndef FS_BUCK_BOOST_CONTROL_STARTUP_H_
-#define FS_BUCK_BOOST_CONTROL_STARTUP_H_
+#ifndef FS_BUCK_BOOST_CONTROL_RAMP_H_
+#define FS_BUCK_BOOST_CONTROL_RAMP_H_
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -18,18 +18,18 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlStartupInitialize(void);
+int32_t fsbuckboostControlRampInitialize(void);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlStartupRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+int32_t fsbuckboostControlRampRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlStartupSetParams(void *params, uint32_t n);
+int32_t fsbuckboostControlRampSetParams(void *params, uint32_t n);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlStartupGetParams(void *buffer, uint32_t size);
+int32_t fsbuckboostControlRampGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
-void fsbuckboostControlStartupReset(void);
+void fsbuckboostControlRampReset(void);
 //-----------------------------------------------------------------------------
-void fsbuckboostControlStartupGetCallbacks(void *callbacksBuffer);
+void fsbuckboostControlRampGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-#endif /* FS_BUCK_BOOST_CONTROL_STARTUP_H_ */
+#endif /* FS_BUCK_BOOST_CONTROL_RAMP_H_ */

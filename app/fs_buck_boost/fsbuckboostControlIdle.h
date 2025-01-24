@@ -1,6 +1,6 @@
 
-#ifndef FS_BUCK_BOOST_CONTROL_DISABLED_H_
-#define FS_BUCK_BOOST_CONTROL_DISABLED_H_
+#ifndef FS_BUCK_BOOST_CONTROL_IDLE_H_
+#define FS_BUCK_BOOST_CONTROL_IDLE_H_
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -18,22 +18,22 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlDisabledInitialize(void);
+int32_t fsbuckboostControlIdleInitialize(void);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlDisabledSetParams(void *params, uint32_t n);
+int32_t fsbuckboostControlIdleSetParams(void *params, uint32_t n);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlDisabledGetParams(void *buffer, uint32_t size);
+int32_t fsbuckboostControlIdleGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlDisabledRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+int32_t fsbuckboostControlIdleRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-void fsbuckboostControlDisabledReset(void);
+void fsbuckboostControlIdleReset(void);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlDisabledFirstEntry(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+int32_t fsbuckboostControlIdleFirstEntry(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControlDisabledLastExit(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+int32_t fsbuckboostControlIdleLastExit(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-void fsbuckboostControlDisabledGetCallbacks(void *callbacksBuffer);
+void fsbuckboostControlIdleGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-#endif /* FS_BUCK_BOOST_CONTROL_DISABLED_H_ */
+#endif /* FS_BUCK_BOOST_CONTROL_IDLE_H_ */

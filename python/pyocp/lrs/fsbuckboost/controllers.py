@@ -47,19 +47,19 @@ class Controllers:
 
     def __init__(self, ctl_if):
 
-        self.disabled = _Disabled(0, ctl_if)
-        self.startup = _Startup(1, ctl_if)
+        self.idle = _Idle(0, ctl_if)
+        self.ramp = _Ramp(1, ctl_if)
         #self.sfb = _SFB(2, ctl_if)
         #self.cascaded = _Cascaded(3, ctl_if)
 
 
-class _Disabled(pyocp.controller.ControllerTemplate):
+class _Idle(pyocp.controller.ControllerTemplate):
     
     def __init__(self, ctl_id, ctl_if):
         super().__init__(ctl_id, ctl_if)
 
 
-class _Startup(pyocp.controller.ControllerTemplate):
+class _Ramp(pyocp.controller.ControllerTemplate):
     
     def __init__(self, ctl_id, ctl_if):
         super().__init__(ctl_id, ctl_if)
@@ -72,7 +72,7 @@ class _Startup(pyocp.controller.ControllerTemplate):
 
         params = {}
         params['uinc'] = data[0]
-        params['ufinal'] = data[1]
+        params['u_upper'] = data[1]
 
         return params
 
@@ -82,8 +82,8 @@ class _Startup(pyocp.controller.ControllerTemplate):
         fmt = '<' + 'f' * len(params)
         
         uinc = params['uinc']
-        ufinal = params['ufinal']
+        u_upper = params['u_upper']
 
-        params_bin = struct.pack(fmt, uinc, ufinal)
+        params_bin = struct.pack(fmt, uinc, u_upper)
 
         return params_bin

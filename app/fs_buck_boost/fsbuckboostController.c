@@ -2,6 +2,8 @@
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
+#include <fsbuckboostControlIdle.h>
+#include <fsbuckboostControlRamp.h>
 #include "fsbuckboostController.h"
 
 #include "fsbuckboostConfig.h"
@@ -16,8 +18,6 @@
 #include "controllerIf.h"
 
 /* Controllers */
-#include "fsbuckboostControlDisabled.h"
-#include "fsbuckboostControlStartup.h"
 //#include "fsbuckboostControlSfbInt.h"
 //#include "appControllerCascaded.h"
 //============================================================================
@@ -26,8 +26,8 @@
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
 typedef enum{
-    FS_BUCK_BOOST_CONTROLLER_DISABLED,
-    FS_BUCK_BOOST_CONTROLLER_STARTUP,
+    FS_BUCK_BOOST_CONTROLLER_IDLE,
+    FS_BUCK_BOOST_CONTROLLER_RAMP,
     //FS_BUCK_BOOST_CONTROLLER_SFB_INT,
     //FS_BUCK_BOOST_CONTROLLER_CASCADED,
     FS_BUCK_BOOST_CONTROLLER_END
@@ -56,8 +56,8 @@ int32_t fsbuckboostControllerInit(void){
     controllerConfig_t config;
 
     controllerGetCbs_t ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_END] = {0};
-    ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_DISABLED] = fsbuckboostControlDisabledGetCallbacks;
-    ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_STARTUP] = fsbuckboostControlStartupGetCallbacks;
+    ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_IDLE] = fsbuckboostControlIdleGetCallbacks;
+    ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_RAMP] = fsbuckboostControlRampGetCallbacks;
     //ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_SFB_INT] = fsbuckboostControlSfbIntGetCallbacks;
     //ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_CASCADED] = appControlCascadedGetCallbacks;
 
