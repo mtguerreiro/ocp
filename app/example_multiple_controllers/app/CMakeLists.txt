@@ -1,11 +1,23 @@
-cmake_minimum_required(VERSION 3.15)
 
-add_library(app app.c appController.c appHw.c appOpil.c appControllerSfb.c appControllerCascaded.c)
+add_library(app)
 
-target_link_libraries(app ocp opil controller)
+target_sources(app
+    PRIVATE
+    app.c 
+    appController.c
+    appControllerCascaded.c
+    appControllerSfb.c
+    appHw.c
+    appOpil.c
+)
 
-target_include_directories(app PRIVATE
-                           "${PROJECT_SOURCE_DIR}"
-                           "../${OCP_PATH}"
-                           "${OPIL_PATH}"
+target_link_libraries(app
+    PRIVATE
+    ocp
+    opil
+)
+
+target_include_directories(app
+    PRIVATE
+    "${PROJECT_SOURCE_DIR}"
 )

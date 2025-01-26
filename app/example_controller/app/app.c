@@ -55,8 +55,6 @@ static uint8_t traceBuffer[APP_CONFIG_OCP_TRACE_0_SIZE_BYTES];
 
 static float bInputs[APP_OCP_CONFIG_INPUT_BUF_SIZE];
 static float bOutputs[APP_OCP_CONFIG_OUTPUT_BUF_SIZE];
-
-static float texec = 0.0f;
 //=============================================================================
 
 //=============================================================================
@@ -149,6 +147,8 @@ static int32_t appOpilInit(void){
 //=============================================================================
 //-----------------------------------------------------------------------------
 void appAdcIrq(void *callbackRef){
+    
+    (void)callbackRef;
 
     ocpCSRun(APP_CONFIG_OCP_CS_ID);
     ocpTraceSave(APP_CONFIG_OCP_TRACE_ID);

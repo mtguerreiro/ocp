@@ -20,7 +20,6 @@ static float kv = -0.04430925432587546;
 static float k_ev = -98.62715371027674;
 
 static float e = 0.0f;
-static float ts = 1.0f / 100000.0f;
 
 static float v_ref = 6.0f;
 static float dt = 1.0f / 100000.0f;

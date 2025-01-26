@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.18)
 
 project(ocp_example)
 
@@ -18,9 +18,9 @@ else ()
     message("-- THREADS: platform ${CMAKE_SYSTEM_NAME} not supported for this example.")
 endif ()
 
-target_link_libraries(ocp_example PUBLIC ocp)
-
-target_include_directories(ocp_example PUBLIC
-                           "${PROJECT_BINARY_DIR}"
-                           "${OCP_PATH}"
+target_link_libraries(
+    ocp_example
+    PRIVATE
+    ocp
 )
+

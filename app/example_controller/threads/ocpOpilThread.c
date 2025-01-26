@@ -119,7 +119,7 @@ static int32_t opilOcpUpdateMeasurements(void *meas, int32_t size){
 
     int32_t status;
     int32_t *p;
-    uint32_t k;
+    int32_t k;
 
     uint8_t *dst, *src;
 
@@ -141,7 +141,7 @@ static int32_t opilOcpUpdateSimData(void *simData, int32_t size){
 
     int32_t status;
     int32_t *p;
-    uint32_t k;
+    int32_t k;
 
     uint8_t *dst, *src;
 

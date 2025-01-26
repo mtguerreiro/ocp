@@ -4,7 +4,7 @@
 //=============================================================================
 #include "controllerIf.h"
 
-#include "../rp/rp.h"
+#include "rp/rp.h"
 
 #include "ocpConfig.h"
 //=============================================================================
@@ -74,9 +74,12 @@ int32_t controllerIfRegister(controller_t *controller, uint32_t csid){
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSetReferences(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status;
+    int32_t status = -1;
     uint32_t *p = (uint32_t *)in;
     uint32_t csid;
+
+    (void)out;
+    (void)maxoutsize;
 
     csid = *p++;
 
@@ -90,7 +93,7 @@ static int32_t controllerIfSetReferences(void *in, uint32_t insize, void **out, 
 //-----------------------------------------------------------------------------
 static int32_t controllerIfGetReferences(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status;
+    int32_t status = -1;
     uint32_t *p = (uint32_t *)in;
     uint32_t csid;
     void *o = (void *)*out;
@@ -107,10 +110,13 @@ static int32_t controllerIfGetReferences(void *in, uint32_t insize, void **out, 
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSet(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status;
+    int32_t status = -1;
     uint32_t *p = (uint32_t *)in;
     uint32_t csid;    
     uint32_t ctl;
+
+    (void)out;
+    (void)maxoutsize;
 
     csid = *p++;
     ctl = *p++;
@@ -130,9 +136,10 @@ static int32_t controllerIfGet(void *in, uint32_t insize, void **out, uint32_t m
     uint32_t csid = *((uint32_t *)in);
 
     if( csid >= OCP_CS_END ) return -1;
+
+    if( controllers[csid] == 0 ) return -1;
     
-    if( controllers[csid] != 0 )
-        ctl = controllerGet(controllers[csid]);
+    ctl = controllerGet(controllers[csid]);
 
     *p = ctl;
 
@@ -141,10 +148,13 @@ static int32_t controllerIfGet(void *in, uint32_t insize, void **out, uint32_t m
 //-----------------------------------------------------------------------------
 static int32_t controllerIfReset(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status;
+    int32_t status = -1;
     uint32_t *p = (uint32_t *)in;
     uint32_t csid;    
     uint32_t ctl;
+
+    (void)out;
+    (void)maxoutsize;
 
     csid = *p++;
     ctl = *p++;
@@ -157,7 +167,7 @@ static int32_t controllerIfReset(void *in, uint32_t insize, void **out, uint32_t
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSetParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status;
+    int32_t status = -1;
     uint32_t *p = (uint32_t *)in;
     uint32_t csid;    
     uint32_t ctl;
@@ -173,7 +183,7 @@ static int32_t controllerIfSetParams(void *in, uint32_t insize, void **out, uint
 //-----------------------------------------------------------------------------
 static int32_t controllerIfGetParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status;
+    int32_t status = -1;
     uint32_t *p = (uint32_t *)in;
     uint32_t csid;    
     uint32_t ctl;

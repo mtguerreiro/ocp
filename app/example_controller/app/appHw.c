@@ -21,7 +21,8 @@ int32_t appHwGetMeasurements(void *inputs){
 }
 //-----------------------------------------------------------------------------
 int32_t appHwUpdateControl(void *outputs, int32_t n){
-
+    
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t appHwIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){

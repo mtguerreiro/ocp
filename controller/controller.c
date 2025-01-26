@@ -11,7 +11,6 @@
 //=============================================================================
 static int32_t controllerSwitch(controller_t *controller,
     void *meas, int32_t nmeas,
-    void *refs, int32_t nrefs,
     void *outputs, int32_t nmaxoutputs);
 //=============================================================================
 
@@ -59,7 +58,6 @@ int32_t controllerRun(controller_t *controller,
     if( active != previous ){
         status = controllerSwitch(
             controller, meas, nmeas,
-            controller->refs.buffer, controller->refs.size,
             outputs, nmaxoutputs);
         if( status < 0 ) return status;
     }
@@ -167,7 +165,6 @@ int32_t controllerGetParams(controller_t *controller, uint32_t id,
 //-----------------------------------------------------------------------------
 static int32_t controllerSwitch(controller_t *controller,
     void *meas, int32_t nmeas,
-    void *refs, int32_t nrefs,
     void *outputs, int32_t nmaxoutputs){
 
     int32_t status;

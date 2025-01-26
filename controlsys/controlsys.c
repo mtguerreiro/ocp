@@ -59,8 +59,8 @@ int32_t controlsysHardwareInterface(controlsys_t *sys,
 //-----------------------------------------------------------------------------
 int32_t controlsysRun(controlsys_t *sys){
 
-    int32_t ninputs;
-    int32_t noutputs;
+    int32_t ninputs = -1;
+    int32_t noutputs = -1;
     int32_t status;
 
     if( sys->status == CONTROLSYS_STATUS_DISABLED ) return CONTROLSYS_STATUS_DISABLED;

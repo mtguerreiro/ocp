@@ -18,7 +18,7 @@
 
 #include "stddef.h"
 
-#include "../rp/rp.h"
+#include "rp/rp.h"
 
 #ifdef OCP_CONFIG_MASTER_CORE
 #include "ipcClient.h"
@@ -385,7 +385,7 @@ static int32_t ocpIfTraceRead(void *in, uint32_t insize,
 
 	uint32_t id;
 	size_t address;
-	uint32_t size;
+	int32_t size;
 	int32_t status;
 
 	id = *( (uint32_t *)in );
@@ -452,7 +452,7 @@ static int32_t ocpIfTraceGetNumberSignals(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize){
 
 	uint32_t id;
-	uint32_t n;
+	int32_t n;
 
 	uint32_t *o = (uint32_t *)( *out );
 
@@ -484,7 +484,7 @@ static int32_t ocpIfTraceGetSignalsNames(void *in, uint32_t insize,
 static int32_t ocpIfTraceGetNumberTraces(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize){
 
-	uint32_t n;
+	int32_t n;
 
 	uint32_t *o = (uint32_t *)( *out );
 
@@ -769,7 +769,7 @@ static int32_t ocpIfCSHardwareIf(void *in, uint32_t insize,
 static int32_t ocpIfCSGetNumberControllers(void *in, uint32_t insize,
 		void **out, uint32_t maxoutsize){
 
-	uint32_t n;
+	int32_t n;
 
 	uint32_t *o = (uint32_t *)( *out );
 
