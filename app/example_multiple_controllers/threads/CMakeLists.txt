@@ -9,7 +9,7 @@ target_sources(threads
 target_link_libraries(threads
     PRIVATE
     ocp
-    opil opil_comm opil_ctlrif
+    opil
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Linux")
@@ -24,5 +24,4 @@ endif ()
 target_include_directories(threads
     PRIVATE
     "${PROJECT_SOURCE_DIR}"
-    "../${OPIL_PATH}"
 )
