@@ -2,7 +2,7 @@
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
-#include "fsbuckboostHw.h"
+#include "fsbuckboostHwOpil.h"
 
 //#include "xparameters.h"
 //#include "zynqAxiFsPwm.h"
@@ -37,6 +37,9 @@ typedef struct{
     uint32_t pwmOutputEnable;
     uint32_t pwmMode;
     uint32_t pwmFrequency;
+
+    float pwmHsSw;
+    float pwmLsSw;
 
 }fsbuckboostHwControl_t;
 //=============================================================================
@@ -127,20 +130,22 @@ uint32_t fsbuckboostHwGetPwmMode(void){
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetPwmLsSw(uint32_t state){
 
+    hwControl.pwmLsSw = state;
 }
 //-----------------------------------------------------------------------------
 uint32_t fsbuckboostHwGetPwmLsSw(void){
 
-    return 0;
+    return hwControl.pwmLsSw;
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetPwmHsSw(uint32_t state){
 
+    hwControl.pwmHsSw = state;
 }
 //-----------------------------------------------------------------------------
 uint32_t fsbuckboostHwGetPwmHsSw(void){
 
-    return 0;
+    return hwControl.pwmHsSw;
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetPwmFrequency(uint32_t freq){
@@ -242,13 +247,7 @@ int32_t fsbuckboostHwGetMeasurements(void *meas){
 //-----------------------------------------------------------------------------
 int32_t fsbuckboostHwApplyOutputs(void *outputs, int32_t size){
 
-    fsbuckboostConfigControl_t *control;
-
-    control = (fsbuckboostConfigControl_t *)outputs;
-
-    fsbuckboostHwSetPwmDuty(control->u);
-
-    return 0;
+    return fsbuckboostHwOpilUpdateControl(outputs, size);
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostHwDisable(void){
