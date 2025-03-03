@@ -1,5 +1,5 @@
 
-#ifdef SOC_CPU1
+//#ifdef SOC_CPU1
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
@@ -7,10 +7,9 @@
 #include "fsbuckboostConfig.h"
 
 #include "ocpConfig.h"
-#include "ocpTrace.h"
 
 /* Controllers */
-#include "controller.h"
+#include "controller/controller.h"
 
 #include "fsbuckboostHw.h"
 //=============================================================================
@@ -33,7 +32,6 @@
 //-----------------------------------------------------------------------------
 int32_t fsbuckboostControlIdleInitialize(void){
 
-	//ocpTraceAddSignal(OCP_TRACE_1, (void *)&i_ac, "Grid current");
     return 0;
 }
 //-----------------------------------------------------------------------------
@@ -89,4 +87,4 @@ void fsbuckboostControlIdleGetCallbacks(void *callbacksBuffer){
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
-#endif /* SOC_CPU1 */
+//#endif /* SOC_CPU1 */

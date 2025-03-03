@@ -8,12 +8,12 @@
 
 /* OCP */
 #include "ocpConfig.h"
-#include "ocpTrace.h"
-#include "rp.h"
+#include "ocp/ocpTrace.h"
+#include "rp/rp.h"
 
 /* Controller lib */
-#include "controller.h"
-#include "controllerIf.h"
+#include "controller/controller.h"
+#include "controller/controllerIf.h"
 
 /* Controllers */
 #include "fsbuckboostControlIdle.h"
