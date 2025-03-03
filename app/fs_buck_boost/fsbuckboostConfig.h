@@ -70,7 +70,9 @@ typedef struct{
 #define FS_BUCK_BOOST_CFG_V_OUT_GAIN    (0.014724696702574171f)
 #define FS_BUCK_BOOST_CFG_V_OUT_OFFS    (-0.007491753705390119f)
 
-#define FS_BUCK_BOOST_CONFIG_SHUTDOWN_U_DEC 0.025
+#define FS_BUCK_BOOST_CONFIG_I_LIM      22.5f
+#define FS_BUCK_BOOST_CONFIG_V_LIM      50.0f
+
 //=============================================================================
 
 #endif /* FS_BUCK_BOOST_CONFIG_H_ */

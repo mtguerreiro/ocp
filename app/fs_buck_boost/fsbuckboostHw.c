@@ -21,7 +21,7 @@
 //=============================================================================
 #define FS_BUCK_BOOST_HW_CONFIG_ADC_SPI_FREQ_HZ      ((uint32_t)16666666)
 #define FS_BUCK_BOOST_HW_CONFIG_PWM_FREQ_HZ          ((uint32_t) 100000 )
-#define FS_BUCK_BOOST_HW_CONFIG_PWM_DEAD_TIME_NS     ((float) 300e-9 )
+#define FS_BUCK_BOOST_HW_CONFIG_PWM_DEAD_TIME_NS     ((float) 100e-9 )
 #define FS_BUCK_BOOST_HW_CONFIG_PWM_BASE             XPAR_AXI_PWM_BUCKBOOST_0_S00_AXI_BASEADDR//XPAR_AXI_PWM_1_S00_AXI_BASEADDR
 #define FS_BUCK_BOOST_HW_CONFIG_ADC_BASE             XPAR_ADC_PSCTL_0_S00_AXI_BASEADDR//XPAR_ADC_PSCTL_1_S00_AXI_BASEADDR
 
@@ -299,12 +299,16 @@ int32_t fsbuckboostHwGetMeasurements(void *meas){
     dst->v_dc_out = hwControl.gains.v_dc_out_gain * ((float)(*src++)) + hwControl.gains.v_dc_out_ofs;
 
     /* Protection */
-//    if( (dst->i_l > FS_BUCK_BOOST_CONFIG_I_LIM) ) hwControl.status = 1;
-//    if( (dst->i_l < -FS_BUCK_BOOST_CONFIG_I_LIM) ) hwControl.status = 1;
-//    if( (dst->v_dc_in > FS_BUCK_BOOST_CONFIG_V_LIM) || (dst->v_dc_out > FS_BUCK_BOOST_CONFIG_V_LIM) || (dst->v_out > FS_BUCK_BOOST_CONFIG_V_LIM) ) hwControl.status = 1;
+    if( (dst->ii > FS_BUCK_BOOST_CONFIG_I_LIM) || (dst->il > FS_BUCK_BOOST_CONFIG_I_LIM) )
+        hwControl.status = 1;
+
+    if( (dst->ii < -FS_BUCK_BOOST_CONFIG_I_LIM) || (dst->il < -FS_BUCK_BOOST_CONFIG_I_LIM) )
+        hwControl.status = 1;
+
+    if( (dst->v_in > FS_BUCK_BOOST_CONFIG_V_LIM) || (dst->v_dc_out > FS_BUCK_BOOST_CONFIG_V_LIM) || (dst->v_out > FS_BUCK_BOOST_CONFIG_V_LIM) )
+        hwControl.status = 1;
 
     if( hwControl.status != 0 ){
-        //fsbuckboostHwSetPwmOutputEnable(0);
         fsbuckboostHwShutDown();
         return -1;
     }
@@ -319,8 +323,6 @@ int32_t fsbuckboostHwApplyOutputs(void *outputs, int32_t size){
     control = (fsbuckboostConfigControl_t *)outputs;
 
     fsbuckboostHwSetPwmDuty(control->u);
-
-    //control->u = 0.5f;
 
     return 0;
 }
@@ -411,19 +413,9 @@ uint32_t fsbuckboostHwGetMeasGains(fsbuckboostConfigMeasGains_t *gains){
 //-----------------------------------------------------------------------------
 void fsbuckboostHwShutDown(void){
 
-    float u;
-
-    u = fsbuckboostHwGetPwmDuty();
+    fsbuckboostHwSetPwmOutputEnable(0);
     fsbuckboostHwSetLoadSwitch(0);
     fsbuckboostHwSetOutputRelay(0);
-
-    u = u - FS_BUCK_BOOST_CONFIG_SHUTDOWN_U_DEC;
-    if( u < 0.0f ){
-        //fsbuckboostHwSetPwmOutputEnable(0);
-        u = 0.0f;
-    }
-
-    fsbuckboostHwSetPwmDuty(u);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -455,14 +447,16 @@ static void fsbuckboostHwInitializePwm(void){
 
     fsbuckboostHwSetPwmReset(1);
 
-    //fsbuckboostHwSetPwmInv(1);
-
     fsbuckboostHwSetPwmFrequency(FS_BUCK_BOOST_HW_CONFIG_PWM_FREQ_HZ);
     fsbuckboostHwSetPwmDuty(0.0f);
     fsbuckboostHwSetPwmDeadTime(FS_BUCK_BOOST_HW_CONFIG_PWM_DEAD_TIME_NS);
 
     fsbuckboostHwSetPwmOvfTriggerEnable(0);
     fsbuckboostHwSetPwmOutputEnable(0);
+
+    fsbuckboostHwSetPwmMode(0);
+    fsbuckboostHwSetPwmHsSw(0);
+    fsbuckboostHwSetPwmLsSw(0);
 
     fsbuckboostHwSetPwmReset(0);
 }
@@ -475,6 +469,9 @@ static void fsbuckboostHwInitializeGpio(void){
     cfg_ptr = XGpio_LookupConfig(FS_BUCK_BOOST_HW_CONFIG_GPIO_ID);
     XGpio_CfgInitialize(&hwControl.gpio, cfg_ptr, cfg_ptr->BaseAddress);
     XGpio_SetDataDirection(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL, 0);
+
+    fsbuckboostHwSetOutputRelay(0);
+    fsbuckboostHwSetLoadSwitch(0);
 }
 //-----------------------------------------------------------------------------
 static void fsbuckboostHwInitializeMeasGains(void){

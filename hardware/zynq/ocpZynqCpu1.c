@@ -869,36 +869,21 @@
 //=============================================================================
 #include "ocpZynqCpu1.h"
 
-/* Open controller project */
-#include "ocpConfig.h"
-#include "ocpTrace.h"
-#include "ocpCS.h"
-#include "ocpIf.h"
-#include "ocpOpil.h"
+/* Benchmarking */
+#include "benchmarking_zynq.h"
 
 /* Inter-processor communication */
 #include "../ipc/ipcServer.h"
 
-/* Controller lib */
-#include "../controller/controller.h"
-
 /* Zynq-specific stuff */
+#include "zynqConfig.h"
 #include "ipcServerZynq.h"
 
+/* Open controller project */
+#include "ocpIf.h"
+
 /* Application */
-
-//#include "fsBuckBoostOpil.h"
-#include "fsbuckboostController.h"
-
-#include "fsbuckboostHwIf.h"
-#include "fsbuckboostHw.h"
-#include "fsbuckboostConfig.h"
-
-#include "zynqConfig.h"
-#include "zynqAxiAdc.h"
-
-#include "benchmarking_zynq.h"
-#include "sleep.h"
+#include "fsbuckboost.h"
 //=============================================================================
 
 //=============================================================================
@@ -908,14 +893,6 @@
 static int32_t ocpZynqCpu1InitializeHw(void *intcInst);
 //-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeIpc(void *intcInst);
-//-----------------------------------------------------------------------------
-static int32_t ocpZynqCpu1InitializeTrace(void);
-//-----------------------------------------------------------------------------
-static int32_t ocpZynqCpu1InitializeTraceSignals(void);
-//-----------------------------------------------------------------------------
-static int32_t ocpZynqCpu1InitializeControlSystem(void);
-//-----------------------------------------------------------------------------
-void ocpZynqCpu1AdcIrq(void *callbackRef);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
@@ -928,30 +905,6 @@ void ocpZynqCpu1AdcIrq(void *callbackRef);
 #define OCP_ZYNQ_C1_CONFIG_CPU1_TO_CPU0_ADDR        ZYNQ_CONFIG_MEM_CPU1_TO_CPU0_ADR
 #define OCP_ZYNQ_C1_CONFIG_CPU1_TO_CPU0_SIZE        ZYNQ_CONFIG_MEM_CPU1_TO_CPU0_SIZE
 
-#define OCP_ZYNQ_C1_CONFIG_TRACE_0_ADDR             ZYNQ_CONFIG_MEM_TRACE_ADR
-#define OCP_ZYNQ_C1_CONFIG_TRACE_0_SIZE             ZYNQ_CONFIG_MEM_TRACE_SIZE_MAX
-
-#define OCP_ZYNQ_C1_CONFIG_TRACE_0_NAME_LEN         500
-#define OCP_ZYNQ_C1_CONFIG_TRACE_0_MAX_SIGNALS      40
-
-#define OCP_ZYNQ_C1_CONFIG_INPUT_BUF_SIZE           50
-#define OCP_ZYNQ_C1_CONFIG_OUTPUT_BUG_SIZE          20
-#define OCP_ZYNQ_C1_CONFIG_REFERENCE_BUF_SIZE       20
-//=============================================================================
-
-//=============================================================================
-/*--------------------------------- Globals ---------------------------------*/
-//=============================================================================
-static char traceNames[OCP_ZYNQ_C1_CONFIG_TRACE_0_NAME_LEN];
-static size_t traceData[OCP_ZYNQ_C1_CONFIG_TRACE_0_MAX_SIGNALS];
-
-static float bInputs[OCP_ZYNQ_C1_CONFIG_INPUT_BUF_SIZE];
-static float bOutputs[OCP_ZYNQ_C1_CONFIG_OUTPUT_BUG_SIZE];
-
-static float texec_boost = 0.0f, texec_buck = 0.0f;
-static float texec_buck_boost = 0.0f;
-
-static float taux = 0.0f;
 //=============================================================================
 
 //=============================================================================
@@ -960,36 +913,20 @@ static float taux = 0.0f;
 //-----------------------------------------------------------------------------
 void ocpZynqCpu1Initialize(void *intcInst){
 
-    ocpZynqCpu1InitializeTrace();
+    /* Initialize timer for benchmarking */
+    InitBenchmarking();
+
     ocpZynqCpu1InitializeIpc(intcInst);
     ocpZynqCpu1InitializeHw(intcInst);
-    ocpZynqCpu1InitializeControlSystem();
 
     ocpIfInitialize();
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-
 //=============================================================================
 /*---------------------------- Static functions -----------------------------*/
 //=============================================================================
-//-----------------------------------------------------------------------------
-static int32_t ocpZynqCpu1InitializeHw(void *intcInst){
-
-    /* Initialize the hardware */
-    fsbuckboostHwInitConfig_t hwConfig;
-
-    hwConfig.intc = intcInst;
-    hwConfig.irqhandle = ocpZynqCpu1AdcIrq;
-    //hwConfig.auxirqhandle = ocpZynqCpu1AdcIrqAux;
-
-    fsbuckboostHwInitialize(&hwConfig);
-    /* Initialize timer for benchmarking */
-    InitBenchmarking();
-
-    return 0;
-}
 //-----------------------------------------------------------------------------
 static int32_t ocpZynqCpu1InitializeIpc(void *intcInst){
 
@@ -997,109 +934,17 @@ static int32_t ocpZynqCpu1InitializeIpc(void *intcInst){
     ipcServerZynqInitialize(intcInst);
 
     ipcServerInitialize(ocpIf, ipcServerZynqIrqSend,
-            ZYNQ_CONFIG_MEM_CPU0_TO_CPU1_ADR, ZYNQ_CONFIG_MEM_CPU0_TO_CPU1_SIZE,
-            ZYNQ_CONFIG_MEM_CPU1_TO_CPU0_ADR, ZYNQ_CONFIG_MEM_CPU1_TO_CPU0_SIZE);
+            OCP_ZYNQ_C1_CONFIG_CPU0_TO_CPU1_ADDR, OCP_ZYNQ_C1_CONFIG_CPU0_TO_CPU1_SIZE,
+            OCP_ZYNQ_C1_CONFIG_CPU1_TO_CPU0_ADDR, OCP_ZYNQ_C1_CONFIG_CPU1_TO_CPU0_SIZE);
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpZynqCpu1InitializeTrace(void){
+static int32_t ocpZynqCpu1InitializeHw(void *intcInst){
 
-    ocpTraceConfig_t config;
-
-    config.mem = (void *)OCP_ZYNQ_C1_CONFIG_TRACE_0_ADDR;
-    config.size = OCP_ZYNQ_C1_CONFIG_TRACE_0_SIZE;
-    config.data = (void **)traceData;
-    config.names = traceNames;
-
-    ocpTraceInitialize(OCP_TRACE_1, &config, "FS buck boost trace");
-
-    ocpZynqCpu1InitializeTraceSignals();
+    fsbuckboostInit(intcInst);
 
     return 0;
-}
-//-----------------------------------------------------------------------------
-static int32_t ocpZynqCpu1InitializeTraceSignals(void){
-
-    fsbuckboostConfigMeasurements_t *meas;
-    fsbuckboostConfigControl_t *outputs;
-
-    /* Adds measurements to trace */
-    meas = (fsbuckboostConfigMeasurements_t *)bInputs;
-
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->ii, "Input current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->il, "Inductor current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->io, "Output current");
-
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_in, "Input voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc_out, "Output DC link");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_out, "Output voltage");
-
-    /* Adds control signals to trace */
-    outputs = (fsbuckboostConfigControl_t *)bOutputs;
-    ocpTraceAddSignal(OCP_TRACE_1, &outputs->u, "Duty-cycle");
-
-    /* Other signals to add */
-    ocpTraceAddSignal(OCP_TRACE_1, &texec_buck_boost, "Exec. time");
-
-    return 0;
-}
-//-----------------------------------------------------------------------------
-static int32_t ocpZynqCpu1InitializeControlSystem(void){
-
-    ocpCSConfig_t config;
-
-    /* Initializes controller and hardware interface libs */
-    fsbuckboostControllerInit();
-    fsbuckboostHwIfInitialize();
-
-    /* Initializes control sys lib */
-    config.binputs = (void *)bInputs;
-    config.boutputs = (void *)bOutputs;
-
-    config.fhwInterface = fsbuckboostHwIf;
-    config.fhwStatus = fsbuckboostHwStatus;
-
-    //config.fgetInputs = buckOpilGetMeasurements;
-    config.fgetInputs = fsbuckboostHwGetMeasurements;
-
-    //config.fapplyOutputs = buckOpilUpdateControl;
-    config.fapplyOutputs = fsbuckboostHwApplyOutputs;
-
-    config.frun = fsbuckboostControllerRun;
-    config.fcontrollerInterface = fsbuckboostControllerIf;
-    config.fcontrollerStatus = fsbuckboostControllerStatus;
-
-    config.fenable = fsbuckboostHwEnable;
-    //config.fenable = 0;
-    config.fdisable = fsbuckboostHwDisable;
-    //config.fdisable = buckOpilDisable;
-
-    config.fonEntry = 0;
-    config.fonExit = 0;
-
-    ocpCSInitialize(OCP_CS_1, &config, "FS buck boost control");
-
-    return 0;
-}
-//-----------------------------------------------------------------------------
-//=============================================================================
-
-//=============================================================================
-/*----------------------------------- IRQ -----------------------------------*/
-//=============================================================================
-//-----------------------------------------------------------------------------
-void ocpZynqCpu1AdcIrq(void *callbackRef){
-
-    uint32_t ticks;
-
-    ticks = GetTicks();
-
-    ocpCSRun(OCP_CS_1);
-    ocpTraceSave(OCP_TRACE_1);
-
-    ticks = ticks - GetTicks();
-    texec_buck_boost = TicksToS(ticks) / 1e-6;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

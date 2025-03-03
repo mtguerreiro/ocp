@@ -31,3 +31,41 @@ class Interface(Controllers, Reference):
 
         return self._ocp.cs_disable(self._cs_id)
 
+
+    def set_mode(self, mode):
+
+        modes = ('buck', 'boost')
+        if mode not in modes:
+            raise ValueError(f'Mode must be one of: {modes}')
+
+        status, en = self.hw.get_pwm_output_enable()
+        if status != 0:
+            return (-1, status)
+
+        if en != 0:
+            print('Cannot set mode if pwm is enabled.')
+            return (-1,)
+
+        status = self.hw.set_pwm_ls_sw(0)
+        if status[0] != 0:
+            print ('Failed to set the low-side switch.')
+            return (-1, status[0])
+
+        status = self.hw.set_pwm_hs_sw(1)
+        if status[0] != 0:
+            print ('Failed to set the high-side switch.')
+            return (-1, status[0])
+
+        if mode == 'buck':
+            status = self.hw.set_pwm_mode(0)
+        elif mode == 'boost':
+            status = self.hw.set_pwm_mode(1)
+        else:
+            print('Unknown mode')
+            return (-1,)
+
+        if status[0] != 0:
+            print('Failed to set the pwm mode')
+            return (-1, status[0])
+
+        return (0,)
