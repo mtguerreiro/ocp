@@ -1,6 +1,6 @@
 """
-Module ``buck_hw``
-===================
+Module ``fsbuckboost_hw``
+=========================
 
 
 """
@@ -67,48 +67,34 @@ class Commands:
 
 
 
-"""
 class MeasGains:
 
     def __init__(self):
-        pass
 
-    def decode(self, data):
-        fmt = '<' + 'f' * 20
-        data = struct.unpack(fmt, data)
+        self.keys = (
+            'ii_gain', 'ii_ofs', 'il_gain', 'il_ofs', 'io_gain', 'io_ofs',
+            'vi_gain', 'vi_ofs', 'vo_dc_gain', 'vo_dc_ofs', 'vo_gain', 'vo_ofs'
+        )
 
-        gains = {
-            'i_i_gain':      data[0],  'i_i_ofs':      data[1],
-            'i_1_gain':      data[2],  'i_1_ofs':      data[3],
-            'v_in_gain':     data[4],  'v_in_ofs':     data[5],
-            'v_dc_gain':     data[6],  'v_dc_ofs':     data[7],
-            'v_1_gain':      data[8],  'v_1_ofs':      data[9],
-            'i_o_gain':      data[10], 'i_o_ofs':      data[11],
-            'i_2_gain':      data[12], 'i_2_ofs':      data[13],
-            'v_out_gain':    data[14], 'v_out_ofs':    data[15],
-            'v_dc_out_gain': data[16], 'v_dc_out_ofs': data[17],
-            'v_2_gain':      data[18], 'v_2_ofs':      data[19],
-            }
+    def encode(self, gains):
+
+        keys = self.keys
+        
+        _gains = [gains[key] for key in keys]
+        gains_bin = struct.pack(f'<{len(keys)}f', *_gains)
+
+        return gains_bin
+
+    
+    def decode(self, data_bin):
+
+        keys = self.keys
+        
+        data = struct.unpack(f'<{len(keys)}f', data_bin)
+        gains = dict(zip(keys, data))
 
         return gains
 
-    def encode(self, gains):
-        data = [gains['i_i_gain'],      gains['i_i_ofs'],
-                gains['i_1_gain'],      gains['i_1_ofs'],
-                gains['v_in_gain'],     gains['v_in_ofs'],
-                gains['v_dc_gain'],     gains['v_dc_ofs'],
-                gains['v_1_gain'],      gains['v_1_ofs'],
-                gains['i_o_gain'],      gains['i_o_ofs'],
-                gains['i_2_gain'],      gains['i_2_ofs'],
-                gains['v_out_gain'],    gains['v_out_ofs'],
-                gains['v_dc_out_gain'], gains['v_dc_out_ofs'],
-                gains['v_2_gain'],      gains['v_2_ofs']
-                ]
-        fmt = '<' + 'f' * 20
-        data = struct.pack(fmt, *data)
-
-        return data
-"""
         
 class Hw:
     """
@@ -128,6 +114,7 @@ class Hw:
         self._cmd = Commands()
         self._ocp_if = ocp_if
         self._cs_id = cs_id
+        self._meas_gains = MeasGains()
 
 
     def set_pwm_reset(self, reset):
@@ -345,12 +332,26 @@ class Hw:
     def get_meas_gains(self):
         """Gets conversion gains.
         """
-        status, gains = self._get_meas_gains()
+        status, gains_bin = self._get_meas_gains()
         if status != 0:
             return (-1, status)
-        
-        return (status, gains)
 
+        gains = self._meas_gains.decode(gains_bin)
+        
+        return (0, gains)
+
+
+    def set_meas_gains(self, gains):
+        """Sets conversion gains.
+        """
+        gains_bin = self._meas_gains.encode(gains)
+        status = self._set_meas_gains(gains_bin)
+
+        if status[0] != 0:
+            return (-1, status[1])
+        
+        return (0,)
+    
 
     def clear_status(self):
         """Clears the hardware status.
@@ -1208,6 +1209,31 @@ class Hw:
         return (0, gains)
 
 
+    def _set_meas_gains(self, gains_bin):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """
+        cmd = self._cmd.set_meas_gains
+
+        tx_data = []
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( gains_bin )
+        
+        status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error setting the meas gains. Error code {:}\r\n'.format(status))
+            return (-1, status)
+        
+        return (0,)
+
+    
     def _clear_status(self):
         """
 

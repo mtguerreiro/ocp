@@ -24,8 +24,8 @@
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
 static float u = 0.0f;
-static float u_upper = 0.5f;
-static float uinc = 50.0f / 100000.0f;
+static float u_ref  = 0.5f;
+static float u_step = 0.001;
 //=============================================================================
 
 //=============================================================================
@@ -41,8 +41,13 @@ int32_t fsbuckboostControlRampSetParams(void *params, uint32_t n){
 
     float *p = (float *)params;
 
-    uinc = *p++;
-    u_upper = *p++;
+    u_step = *p++;
+    u_ref  = *p++;
+
+    if( u_step < 0 ) u_step = 0.0f;
+
+    if( u_ref  > 1.0f ) u_ref  = 1.0f;
+    else if( u_ref  < 0.0f) u_ref  = 0.0f;
 
 	return 0;
 }
@@ -51,8 +56,8 @@ int32_t fsbuckboostControlRampGetParams(void *buffer, uint32_t size){
 
     float *p = (float *)buffer;
 
-    *p++ = uinc;
-    *p++ = u_upper;
+    *p++ = u_step;
+    *p++ = u_ref ;
 
     return 8;
 }
@@ -63,10 +68,15 @@ int32_t fsbuckboostControlRampRun(void *meas, int32_t nmeas, void *refs, int32_t
     fsbuckboostConfigReferences_t *r = (fsbuckboostConfigReferences_t *)refs;
     fsbuckboostConfigControl_t *o = (fsbuckboostConfigControl_t *)outputs;
 
-    u += uinc;
+    if( u < u_ref  ){
+        u = u + u_step;
+        if(u > u_ref ) u = u_ref ;
+    }
 
-    if( u >= u_upper ) u = u_upper;
-    if( u <= 0.0f ) u = 0.0f;
+    else{
+        u = u - u_step;
+        if(u < u_ref ) u = u_ref ;
+    }
 
     o->u = u;
 

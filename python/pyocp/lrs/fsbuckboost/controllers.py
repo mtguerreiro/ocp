@@ -63,27 +63,25 @@ class _Ramp(pyocp.controller.ControllerTemplate):
     
     def __init__(self, ctl_id, ctl_if):
         super().__init__(ctl_id, ctl_if)
+
+        self.keys = ('u_step', 'u_ref')
         
 
     def _decode(self, params_bin):
         
-        fmt = '<' + 'f' * round( len(params_bin) / 4 )
-        data = struct.unpack(fmt, params_bin)
-
-        params = {}
-        params['uinc'] = data[0]
-        params['u_upper'] = data[1]
+        keys = self.keys
+        
+        _params = struct.unpack(f'<{len(keys)}f', params_bin)
+        params = dict(zip(keys, _params))
 
         return params
 
 
     def _encode(self, params):
 
-        fmt = '<' + 'f' * len(params)
+        keys = self.keys
         
-        uinc = params['uinc']
-        u_upper = params['u_upper']
-
-        params_bin = struct.pack(fmt, uinc, u_upper)
+        _params = [params[key] for key in keys]
+        params_bin = struct.pack(f'<{len(keys)}f', *_params)
 
         return params_bin
