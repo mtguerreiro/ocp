@@ -10,6 +10,7 @@ import numpy as np
 from dataclasses import dataclass, field
 import pickle
 import zipfile
+import json
 
 
 @dataclass
@@ -129,3 +130,22 @@ def save_data(
     with zipfile.ZipFile(file + '.zip', 'w', compression=zipfile.ZIP_LZMA) as zipf:
         zipf.writestr('DataSet', pickle.dumps(data))
 
+
+def load_json(file: str):
+    
+    with open(file + r'.json', 'r') as f:
+        data = json.load(f)
+	
+    return data
+
+
+def save_json(
+    file: str,
+    data : dict):
+    
+    with open(file + r'.json', 'w') as f:
+        json.dump(
+            data, f,
+            sort_keys = True, indent = 4,
+            ensure_ascii = False
+        )

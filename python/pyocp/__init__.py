@@ -3,6 +3,7 @@ Package ``pyocp``
 ==================
 
 """
+from . import data_mng_util
 from . import conversions
 
 from . import hwp
