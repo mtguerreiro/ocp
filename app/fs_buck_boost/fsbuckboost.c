@@ -14,7 +14,7 @@
 #include "ocpOpil.h"
 
 /* Controller lib */
-#include "../controller/controller.h"
+#include "controller/controller.h"
 
 /* Application */
 
@@ -25,9 +25,11 @@
 #include "fsbuckboostHw.h"
 #include "fsbuckboostConfig.h"
 
+/* Zynq */
 #include "zynqConfig.h"
-#include "zynqAxiAdc.h"
 
+/* Benchmarking */
+#include "benchmarking_zynq.h"
 //=============================================================================
 
 //=============================================================================
@@ -35,8 +37,6 @@
 //=============================================================================
 //-----------------------------------------------------------------------------
 static int32_t fsbuckboostInitializeHw(void *intcInst);
-//-----------------------------------------------------------------------------
-static int32_t fsbuckboostInitializeIpc(void *intcInst);
 //-----------------------------------------------------------------------------
 static int32_t fsbuckboostInitializeTrace(void);
 //-----------------------------------------------------------------------------
@@ -74,10 +74,7 @@ static size_t traceData[FS_BUCK_BOOST_CONFIG_TRACE_0_MAX_SIGNALS];
 static float bInputs[FS_BUCK_BOOST_CONFIG_INPUT_BUF_SIZE];
 static float bOutputs[FS_BUCK_BOOST_CONFIG_OUTPUT_BUG_SIZE];
 
-static float texec_boost = 0.0f, texec_buck = 0.0f;
 static float texec_buck_boost = 0.0f;
-
-static float taux = 0.0f;
 //=============================================================================
 
 //=============================================================================
