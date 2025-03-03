@@ -17,6 +17,7 @@
 #include "controller/controller.h"
 
 /* Application */
+#include "fsbuckboostConfig.h"
 
 //#include "fsBuckBoostOpil.h"
 #include "fsbuckboostController.h"
@@ -51,18 +52,7 @@ void fsbuckboostAdcIrq(void *callbackRef);
 //=============================================================================
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
-#define FS_BUCK_BOOST_CONFIG_TRACE_0_ADDR             ZYNQ_CONFIG_MEM_TRACE_ADR
-#define FS_BUCK_BOOST_CONFIG_TRACE_0_SIZE             ZYNQ_CONFIG_MEM_TRACE_SIZE_MAX
 
-#define FS_BUCK_BOOST_CONFIG_TRACE_0_NAME_LEN         500
-#define FS_BUCK_BOOST_CONFIG_TRACE_0_MAX_SIGNALS      40
-
-#define FS_BUCK_BOOST_CONFIG_INPUT_BUF_SIZE           50
-#define FS_BUCK_BOOST_CONFIG_OUTPUT_BUG_SIZE          20
-#define FS_BUCK_BOOST_CONFIG_REFERENCE_BUF_SIZE       20
-
-#define FS_BUCK_BOOST_CONFIG_CS_ID                    OCP_CS_1
-#define FS_BUCK_BOOST_CONFIG_TRACE_ID                 OCP_TRACE_1
 //=============================================================================
 
 //=============================================================================
@@ -100,8 +90,8 @@ static int32_t fsbuckboostInitializeTrace(void){
 
     ocpTraceConfig_t config;
 
-    config.mem = (void *)FS_BUCK_BOOST_CONFIG_TRACE_0_ADDR;
-    config.size = FS_BUCK_BOOST_CONFIG_TRACE_0_SIZE;
+    config.mem = (void *)FS_BUCK_BOOST_CONFIG_TRACE_ADDR;
+    config.size = FS_BUCK_BOOST_CONFIG_TRACE_SIZE;
     config.data = (void **)traceData;
     config.names = traceNames;
 

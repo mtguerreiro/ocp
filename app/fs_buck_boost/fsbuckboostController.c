@@ -2,8 +2,6 @@
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
-#include <fsbuckboostControlIdle.h>
-#include <fsbuckboostControlRamp.h>
 #include "fsbuckboostController.h"
 
 #include "fsbuckboostConfig.h"
@@ -18,7 +16,9 @@
 #include "controllerIf.h"
 
 /* Controllers */
-//#include "fsbuckboostControlSfbInt.h"
+#include "fsbuckboostControlIdle.h"
+#include "fsbuckboostControlRamp.h"
+#include "fsbuckboostControlSfb.h"
 //#include "appControllerCascaded.h"
 //============================================================================
 
@@ -28,7 +28,7 @@
 typedef enum{
     FS_BUCK_BOOST_CONTROLLER_IDLE,
     FS_BUCK_BOOST_CONTROLLER_RAMP,
-    //FS_BUCK_BOOST_CONTROLLER_SFB_INT,
+    FS_BUCK_BOOST_CONTROLLER_SFB,
     //FS_BUCK_BOOST_CONTROLLER_CASCADED,
     FS_BUCK_BOOST_CONTROLLER_END
 }appControllersEnum_t;
@@ -58,7 +58,7 @@ int32_t fsbuckboostControllerInit(void){
     controllerGetCbs_t ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_END] = {0};
     ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_IDLE] = fsbuckboostControlIdleGetCallbacks;
     ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_RAMP] = fsbuckboostControlRampGetCallbacks;
-    //ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_SFB_INT] = fsbuckboostControlSfbIntGetCallbacks;
+    ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_SFB] = fsbuckboostControlSfbGetCallbacks;
     //ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_CASCADED] = appControlCascadedGetCallbacks;
 
     config.refBuffer = (void *)&xfsbuckboostControler.refs;
@@ -71,10 +71,16 @@ int32_t fsbuckboostControllerInit(void){
     controllerInit(&xfsbuckboostControler.controller, &config);
 
     controllerIfInit();
-    controllerIfRegister(&xfsbuckboostControler.controller, OCP_CS_1); //OCP_CS_2 should be FS_BUCK_BOOST_CS
+    controllerIfRegister(
+            &xfsbuckboostControler.controller,
+            FS_BUCK_BOOST_CONFIG_CS_ID
+    );
 
-    //OCP_TRACE_2 should be FS_BUCK_BOOST_TRACE
-    ocpTraceAddSignal(OCP_TRACE_1, (void *)&xfsbuckboostControler.refs.v_out, "Voltage reference");
+    ocpTraceAddSignal(
+            FS_BUCK_BOOST_CONFIG_TRACE_ID,
+            (void *)&xfsbuckboostControler.refs.v_out,
+            "Voltage reference"
+    );
 
     return 0;
 }
