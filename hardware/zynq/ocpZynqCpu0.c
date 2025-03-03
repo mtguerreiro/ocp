@@ -11,15 +11,15 @@
 
 
 /* Open controller project */
-#include "ocpTrace.h"
-#include "ocpCS.h"
-#include "ocpIf.h"
+#include "ocp/ocpTrace.h"
+#include "ocp/ocpCS.h"
+#include "ocp/ocpIf.h"
 
 /* Inter-processor communication */
-#include "../ipc/ipcClient.h"
+#include "ipc/ipcClient.h"
 
 /* Controller lib */
-#include "../controller/controller.h"
+#include "controller/controller.h"
 
 /* Zynq-specific stuff */
 #include "ipcClientZynq.h"
