@@ -13,12 +13,11 @@ import control
 from dataclasses import dataclass
 
 @dataclass
-class _ModelParams:
-    V_in : float = 10
+class ModelParams:
+    v_in : float = 10
     R : float = 22
     L : float = 15e-6
     Co : float = 100e-6
-
 
 class Reference(pyocp.controller.ReferenceTemplate):
 
@@ -93,7 +92,7 @@ class _SFB(pyocp.controller.ControllerTemplate):
         super().__init__(ctl_id, ctl_if)
 
         self.keys = ('ki', 'kv', 'k_ev', 'dt')
-        self._model_params = _ModelParams
+        self._model_params = ModelParams
 
 
     def get_model_params(self):
@@ -116,7 +115,7 @@ class _SFB(pyocp.controller.ControllerTemplate):
     def _get_gains(self, ts=1e-3, os=5, dt=1/100e3):
 
         # Model
-        V_in = self._model_params.V_in
+        V_in = self._model_params.v_in
         R = self._model_params.R
         L = self._model_params.L
         Co = self._model_params.Co
