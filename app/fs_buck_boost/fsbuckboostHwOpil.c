@@ -38,9 +38,6 @@ typedef struct{
     uint32_t pwmMode;
     uint32_t pwmFrequency;
 
-    float pwmHsSw;
-    float pwmLsSw;
-
 }fsbuckboostHwControl_t;
 //=============================================================================
 
@@ -120,32 +117,32 @@ uint32_t fsbuckboostHwGetPwmInv(void){
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetPwmMode(uint32_t mode){
 
-    hwControl.pwmMode = mode;
+    xtControl.pwm_mode = mode;
 }
 //-----------------------------------------------------------------------------
 uint32_t fsbuckboostHwGetPwmMode(void){
 
-    return hwControl.pwmMode;
+    return xtControl.pwm_mode;
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetPwmLsSw(uint32_t state){
-
-    hwControl.pwmLsSw = state;
+    
+    xtControl.ls_sw = state;
 }
 //-----------------------------------------------------------------------------
 uint32_t fsbuckboostHwGetPwmLsSw(void){
 
-    return hwControl.pwmLsSw;
+    return xtControl.ls_sw;
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetPwmHsSw(uint32_t state){
 
-    hwControl.pwmHsSw = state;
+    xtControl.hs_sw = state;
 }
 //-----------------------------------------------------------------------------
 uint32_t fsbuckboostHwGetPwmHsSw(void){
 
-    return hwControl.pwmHsSw;
+    return xtControl.hs_sw;
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetPwmFrequency(uint32_t freq){
@@ -272,6 +269,16 @@ void fsbuckboostHwControllerDisable(void){
 void fsbuckboostHwControllerEnable(void){
 
     fsbuckboostHwSetPwmOutputEnable(1);
+}
+//-----------------------------------------------------------------------------
+void fsbuckboostHwSetInputRelay(uint32_t state){
+
+    xtControl.input_relay = state;
+}
+//-----------------------------------------------------------------------------
+uint32_t fsbuckboostHwGetInputRelay(void){
+
+    return xtControl.input_relay;
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetOutputRelay(uint32_t state){

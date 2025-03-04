@@ -33,10 +33,12 @@
 #define FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL         1
 #define FS_BUCK_BOOST_HW_CONFIG_GPIO_MASK            0b11
 
+#define FS_BUCK_BOOST_HW_CONFIG_GPIO_IN_RLY_OFFS     (1U)
+#define FS_BUCK_BOOST_HW_CONFIG_GPIO_IN_RLY          (1 << FS_BUCK_BOOST_HW_CONFIG_GPIO_IN_RLY_OFFS)
 #define FS_BUCK_BOOST_HW_CONFIG_GPIO_OUT_RLY_OFFS    (0U)
 #define FS_BUCK_BOOST_HW_CONFIG_GPIO_OUT_RLY         (1 << FS_BUCK_BOOST_HW_CONFIG_GPIO_OUT_RLY_OFFS)
-#define FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW_OFFS    (1U)
-#define FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW         (1 << FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW_OFFS)
+//#define FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW_OFFS    (1U)
+//#define FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW         (1 << FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW_OFFS)
 
 /* PWM peripheral clock, in Hz */
 #define FS_BUCK_BOOST_HW_PWM_CLK                      100000000
@@ -351,6 +353,30 @@ void fsbuckboostHwControllerEnable(void){
     fsbuckboostHwSetPwmOutputEnable(1);
 }
 //-----------------------------------------------------------------------------
+void fsbuckboostHwSetInputRelay(uint32_t state){
+
+    uint32_t gpio;
+
+    state = (state & 0x01) << FS_BUCK_BOOST_HW_CONFIG_GPIO_IN_RLY_OFFS;
+
+    gpio = XGpio_DiscreteRead(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL) & (~FS_BUCK_BOOST_HW_CONFIG_GPIO_IN_RLY);
+
+    gpio = gpio | state;
+
+    XGpio_DiscreteWrite(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL, gpio);
+}
+//-----------------------------------------------------------------------------
+uint32_t fsbuckboostHwGetInputRelay(void){
+
+    uint32_t gpio;
+
+    gpio = XGpio_DiscreteRead(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL) & (FS_BUCK_BOOST_HW_CONFIG_GPIO_IN_RLY);
+
+    gpio = gpio >> FS_BUCK_BOOST_HW_CONFIG_GPIO_IN_RLY_OFFS;
+
+    return gpio;
+}
+//-----------------------------------------------------------------------------
 void fsbuckboostHwSetOutputRelay(uint32_t state){
 
     uint32_t gpio;
@@ -377,26 +403,27 @@ uint32_t fsbuckboostHwGetOutputRelay(void){
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetLoadSwitch(uint32_t state){
 
-    uint32_t gpio;
-
-    state = (state & 0x01) << FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW_OFFS;
-
-    gpio = XGpio_DiscreteRead(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL) & (~FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW);
-
-    gpio = gpio | state;
-
-    XGpio_DiscreteWrite(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL, gpio);
+//    uint32_t gpio;
+//
+//    state = (state & 0x01) << FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW_OFFS;
+//
+//    gpio = XGpio_DiscreteRead(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL) & (~FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW);
+//
+//    gpio = gpio | state;
+//
+//    XGpio_DiscreteWrite(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL, gpio);
 }
 //-----------------------------------------------------------------------------
 uint32_t fsbuckboostHwGetLoadSwitch(void){
 
-    uint32_t gpio;
-
-    gpio = XGpio_DiscreteRead(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL) & (FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW);
-
-    gpio = gpio >> FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW_OFFS;
-
-    return gpio;
+//    uint32_t gpio;
+//
+//    gpio = XGpio_DiscreteRead(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL) & (FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW);
+//
+//    gpio = gpio >> FS_BUCK_BOOST_HW_CONFIG_GPIO_LOAD_SW_OFFS;
+//
+//    return gpio;
+    return 0;
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostHwSetMeasGains(fsbuckboostConfigMeasGains_t *gains){
@@ -414,8 +441,9 @@ uint32_t fsbuckboostHwGetMeasGains(fsbuckboostConfigMeasGains_t *gains){
 void fsbuckboostHwShutDown(void){
 
     fsbuckboostHwSetPwmOutputEnable(0);
-    fsbuckboostHwSetLoadSwitch(0);
+    fsbuckboostHwSetInputRelay(0);
     fsbuckboostHwSetOutputRelay(0);
+    fsbuckboostHwSetLoadSwitch(0);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -470,6 +498,7 @@ static void fsbuckboostHwInitializeGpio(void){
     XGpio_CfgInitialize(&hwControl.gpio, cfg_ptr, cfg_ptr->BaseAddress);
     XGpio_SetDataDirection(&hwControl.gpio, FS_BUCK_BOOST_HW_CONFIG_GPIO_CHANNEL, 0);
 
+    fsbuckboostHwSetInputRelay(0);
     fsbuckboostHwSetOutputRelay(0);
     fsbuckboostHwSetLoadSwitch(0);
 }

@@ -18,9 +18,8 @@ typedef struct{
     float io;
     
     float v_in;
-    float v_out;
     float v_dc_out;
-    
+    float v_out;    
 }fsbuckboostConfigMeasurements_t;
 
 typedef struct{
@@ -73,9 +72,10 @@ typedef struct{
 #define FS_BUCK_BOOST_CONFIG_I_LIM      22.5f
 #define FS_BUCK_BOOST_CONFIG_V_LIM      50.0f
 
-
-//#define FS_BUCK_BOOST_CONFIG_TRACE_ADDR             ZYNQ_CONFIG_MEM_TRACE_ADR
-//#define FS_BUCK_BOOST_CONFIG_TRACE_SIZE             ZYNQ_CONFIG_MEM_TRACE_SIZE_MAX
+#ifdef SOC_CPU1
+#define FS_BUCK_BOOST_CONFIG_TRACE_ADDR             ZYNQ_CONFIG_MEM_TRACE_ADR
+#define FS_BUCK_BOOST_CONFIG_TRACE_SIZE             ZYNQ_CONFIG_MEM_TRACE_SIZE_MAX
+#endif
 
 #define FS_BUCK_BOOST_CONFIG_TRACE_0_NAME_LEN       500
 #define FS_BUCK_BOOST_CONFIG_TRACE_0_MAX_SIGNALS    40

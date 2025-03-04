@@ -53,18 +53,20 @@ class Commands:
         self.set_adc_spi_freq = 26
         self.get_adc_spi_freq = 27
 
-        self.set_output_relay = 28
-        self.get_output_relay = 29
+        self.set_input_relay = 28
+        self.get_input_relay = 29
+        
+        self.set_output_relay = 30
+        self.get_output_relay = 31
 
-        self.set_load_switch = 30
-        self.get_load_switch = 31
+        self.set_load_switch = 32
+        self.get_load_switch = 33
 
-        self.set_meas_gains = 32
-        self.get_meas_gains = 33
+        self.set_meas_gains = 34
+        self.get_meas_gains = 35
 
-        self.clear_status = 34
-        self.get_status = 35
-
+        self.clear_status = 36
+        self.get_status = 37
 
 
 class MeasGains:
@@ -296,6 +298,21 @@ class Hw:
         
         return (status, int(freq))
 
+
+    def set_input_relay(self, state):
+        """Sets the input relay.
+        """
+        return self._set_input_relay(int(state))
+
+
+    def get_input_relay(self):
+        """Gets the input relay.
+        """
+        status, state = self._get_input_relay()
+        if status != 0:
+            return (-1, status)
+        
+        return (status, int(state))
 
     def set_output_relay(self, state):
         """Sets the output relay.
@@ -1083,6 +1100,57 @@ class Hw:
         return (0, freq)
 
 
+    def _set_input_relay(self, state):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """
+        cmd = self._cmd.set_input_relay
+
+        tx_data = []
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        tx_data.extend( pyocp.conversions.u32_to_u8(state, msb=False) )
+        
+        status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error setting the input relay. Error code {:}\r\n'.format(status))
+            return (-1, status)
+        
+        return (0,)
+
+
+    def _get_input_relay(self):
+        """
+
+        Parameters
+        ----------
+
+        Raises
+        ------
+
+        """
+        cmd = self._cmd.get_input_relay
+
+        tx_data = []
+        tx_data.extend( pyocp.conversions.u32_to_u8(cmd, msb=False) )
+        
+        status, state = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
+
+        if status < 0:
+            print('Error getting the input relay. Error code {:}\r\n'.format(status))
+            return (-1, status)
+
+        state = pyocp.conversions.u8_to_u32(state, msb=False)
+        
+        return (0, state)
+
+
     def _set_output_relay(self, state):
         """
 
@@ -1102,7 +1170,7 @@ class Hw:
         status, _ = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
         if status < 0:
-            print('Error setting the output switch. Error code {:}\r\n'.format(status))
+            print('Error setting the output relay. Error code {:}\r\n'.format(status))
             return (-1, status)
         
         return (0,)
@@ -1126,7 +1194,7 @@ class Hw:
         status, state = self._ocp_if.cs_hardware_if(self._cs_id, tx_data)
 
         if status < 0:
-            print('Error getting the output switch. Error code {:}\r\n'.format(status))
+            print('Error getting the output relay. Error code {:}\r\n'.format(status))
             return (-1, status)
 
         state = pyocp.conversions.u8_to_u32(state, msb=False)

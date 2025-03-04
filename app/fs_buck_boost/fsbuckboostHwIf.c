@@ -8,11 +8,7 @@
 //=============================================================================
 #include "fsbuckboostHwIf.h"
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-#include "fsbuckboostHwOpil.h"
-#else
 #include "fsbuckboostHw.h"
-#endif
 
 #include "fsbuckboostConfig.h"
 
@@ -80,6 +76,9 @@ static int32_t fsbuckboostHwIfGetAdcInterruptEnable(void *in, uint32_t insize, v
 static int32_t fsbuckboostHwIfSetAdcSpiFreq(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 static int32_t fsbuckboostHwIfGetAdcSpiFreq(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 
+static int32_t fsbuckboostHwIfSetInputRelay(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+static int32_t fsbuckboostHwIfGetInputRelay(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
+
 static int32_t fsbuckboostHwIfSetOutputRelay(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 static int32_t fsbuckboostHwIfGetOutputRelay(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 
@@ -143,6 +142,9 @@ int32_t fsbuckboostHwIfInitialize(void){
     rpRegisterHandle(&hwControl.interface.rp, FS_BUCK_BOOST_HW_IF_SET_ADC_SPI_FREQ, fsbuckboostHwIfSetAdcSpiFreq);
     rpRegisterHandle(&hwControl.interface.rp, FS_BUCK_BOOST_HW_IF_GET_ADC_SPI_FREQ, fsbuckboostHwIfGetAdcSpiFreq);
 
+    rpRegisterHandle(&hwControl.interface.rp, FS_BUCK_BOOST_HW_IF_SET_INPUT_RELAY, fsbuckboostHwIfSetInputRelay);
+    rpRegisterHandle(&hwControl.interface.rp, FS_BUCK_BOOST_HW_IF_GET_INPUT_RELAY, fsbuckboostHwIfGetInputRelay);
+
     rpRegisterHandle(&hwControl.interface.rp, FS_BUCK_BOOST_HW_IF_SET_OUTPUT_RELAY, fsbuckboostHwIfSetOutputRelay);
     rpRegisterHandle(&hwControl.interface.rp, FS_BUCK_BOOST_HW_IF_GET_OUTPUT_RELAY, fsbuckboostHwIfGetOutputRelay);
 
@@ -179,11 +181,7 @@ static int32_t fsbuckboostHwIfSetPwmReset(void *in, uint32_t insize, void **out,
 
     reset = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmReset(reset);
-#else
     fsbuckboostHwSetPwmReset(reset);
-#endif
 
     return 0;
 }
@@ -193,11 +191,7 @@ static int32_t fsbuckboostHwIfGetPwmReset(void *in, uint32_t insize, void **out,
     uint32_t *o = (uint32_t *)*out;
     uint32_t reset;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    reset = fsbuckboostHwOpilGetPwmReset();
-#else
     reset = fsbuckboostHwGetPwmReset();
-#endif
 
     *o = reset;
 
@@ -210,11 +204,7 @@ static int32_t fsbuckboostHwIfSetPwmOutputEnable(void *in, uint32_t insize, void
 
     enable = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmOutputEnable(enable);
-#else
     fsbuckboostHwSetPwmOutputEnable(enable);
-#endif
 
     return 0;
 }
@@ -224,11 +214,7 @@ static int32_t fsbuckboostHwIfGetPwmOutputEnable(void *in, uint32_t insize, void
     uint32_t *o = (uint32_t *)*out;
     uint32_t enable;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    enable = fsbuckboostHwOpilGetPwmOutputEnable();
-#else
     enable = fsbuckboostHwGetPwmOutputEnable();
-#endif
 
     *o = enable;
 
@@ -241,11 +227,7 @@ static int32_t fsbuckboostHwIfSetPwmOvfTriggerEnable(void *in, uint32_t insize, 
 
     enable = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmOvfTriggerEnable(enable);
-#else
     fsbuckboostHwSetPwmOvfTriggerEnable(enable);
-#endif
 
     return 0;
 }
@@ -255,11 +237,7 @@ static int32_t fsbuckboostHwIfGetPwmOvfTriggerEnable(void *in, uint32_t insize, 
     uint32_t *o = (uint32_t *)*out;
     uint32_t enable;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    enable = fsbuckboostHwOpilGetPwmOvfTriggerEnable();
-#else
     enable = fsbuckboostHwGetPwmOvfTriggerEnable();
-#endif
 
     *o = enable;
 
@@ -272,11 +250,7 @@ static int32_t fsbuckboostHwIfSetPwmInv(void *in, uint32_t insize, void **out, u
 
     enable = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmInv(enable);
-#else
     fsbuckboostHwSetPwmInv(enable);
-#endif
 
     return 0;
 }
@@ -286,11 +260,7 @@ static int32_t fsbuckboostHwIfGetPwmInv(void *in, uint32_t insize, void **out, u
     uint32_t *o = (uint32_t *)*out;
     uint32_t enable;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    enable = fsbuckboostHwOpilGetPwmInv();
-#else
     enable = fsbuckboostHwGetPwmInv();
-#endif
 
     *o = enable;
 
@@ -303,11 +273,7 @@ static int32_t fsbuckboostHwIfSetPwmMode(void *in, uint32_t insize, void **out, 
 
     mode = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmMode(mode);
-#else
     fsbuckboostHwSetPwmMode(mode);
-#endif
 
     return 0;
 }
@@ -317,11 +283,7 @@ static int32_t fsbuckboostHwIfGetPwmMode(void *in, uint32_t insize, void **out, 
     uint32_t *o = (uint32_t *)*out;
     uint32_t mode;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    mode = fsbuckboostHwOpilGetPwmMode();
-#else
     mode = fsbuckboostHwGetPwmMode();
-#endif
 
     *o = mode;
 
@@ -334,11 +296,7 @@ static int32_t fsbuckboostHwIfSetPwmLsSw(void *in, uint32_t insize, void **out, 
 
     state = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmLsSw(state);
-#else
     fsbuckboostHwSetPwmLsSw(state);
-#endif
 
     return 0;
 }
@@ -348,11 +306,7 @@ static int32_t fsbuckboostHwIfGetPwmLsSw(void *in, uint32_t insize, void **out, 
     uint32_t *o = (uint32_t *)*out;
     uint32_t state;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    state = fsbuckboostHwOpilGetPwmLsSw();
-#else
     state = fsbuckboostHwGetPwmLsSw();
-#endif
 
     *o = state;
 
@@ -365,11 +319,7 @@ static int32_t fsbuckboostHwIfSetPwmHsSw(void *in, uint32_t insize, void **out, 
 
     state = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmHsSw(state);
-#else
     fsbuckboostHwSetPwmHsSw(state);
-#endif
 
     return 0;
 }
@@ -379,11 +329,7 @@ static int32_t fsbuckboostHwIfGetPwmHsSw(void *in, uint32_t insize, void **out, 
     uint32_t *o = (uint32_t *)*out;
     uint32_t state;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    state = fsbuckboostHwOpilGetPwmHsSw();
-#else
     state = fsbuckboostHwGetPwmHsSw();
-#endif
 
     *o = state;
 
@@ -396,11 +342,7 @@ static int32_t fsbuckboostHwIfSetPwmFrequency(void *in, uint32_t insize, void **
 
     freq = *( (uint32_t *)in );
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmFrequency(freq);
-#else
     fsbuckboostHwSetPwmFrequency(freq);
-#endif
 
     return 0;
 }
@@ -410,11 +352,7 @@ static int32_t fsbuckboostHwIfGetPwmFrequency(void *in, uint32_t insize, void **
     uint32_t *o = (uint32_t *)*out;
     uint32_t freq;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    freq = fsbuckboostHwOpilGetPwmFrequency();
-#else
     freq = fsbuckboostHwGetPwmFrequency();
-#endif
 
     *o = freq;
 
@@ -427,11 +365,7 @@ static int32_t fsbuckboostHwIfSetPwmDutyCycle(void *in, uint32_t insize, void **
 
     duty = *( (float *)in );
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmDuty(duty);
-#else
     fsbuckboostHwSetPwmDuty(duty);
-#endif
 
     return 0;
 }
@@ -441,11 +375,7 @@ static int32_t fsbuckboostHwIfGetPwmDutyCycle(void *in, uint32_t insize, void **
     float *o = (float *)*out;
     float duty;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    duty = fsbuckboostHwOpilGetPwmDuty();
-#else
     duty = fsbuckboostHwGetPwmDuty();
-#endif
 
     *o = duty;
 
@@ -458,11 +388,7 @@ static int32_t fsbuckboostHwIfSetPwmDeadTime(void *in, uint32_t insize, void **o
 
     deadtime = *( (float *)in );
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetPwmDeadTime(deadtime);
-#else
     fsbuckboostHwSetPwmDeadTime(deadtime);
-#endif
 
     return 0;
 }
@@ -472,11 +398,7 @@ static int32_t fsbuckboostHwIfGetPwmDeadTime(void *in, uint32_t insize, void **o
     float *o = (float *)*out;
     float deadtime;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    deadtime = fsbuckboostHwOpilGetPwmDeadTime();
-#else
     deadtime = fsbuckboostHwGetPwmDeadTime();
-#endif
 
     *o = deadtime;
 
@@ -489,11 +411,7 @@ static int32_t fsbuckboostHwIfSetAdcEnable(void *in, uint32_t insize, void **out
 
     enable = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetAdcEnable(enable);
-#else
     fsbuckboostHwSetAdcEnable(enable);
-#endif
 
     return 0;
 }
@@ -503,11 +421,7 @@ static int32_t fsbuckboostHwIfGetAdcEnable(void *in, uint32_t insize, void **out
     uint32_t *o = (uint32_t *)*out;
     uint32_t enable;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    enable = fsbuckboostHwOpilGetAdcEnable();
-#else
     enable = fsbuckboostHwGetAdcEnable();
-#endif
 
     *o = enable;
 
@@ -520,11 +434,7 @@ static int32_t fsbuckboostHwIfSetAdcManualTrig(void *in, uint32_t insize, void *
 
     trigger = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetAdcManualTrigger(trigger);
-#else
     fsbuckboostHwSetAdcManualTrigger(trigger);
-#endif
 
     return 0;
 }
@@ -534,11 +444,7 @@ static int32_t fsbuckboostHwIfGetAdcManualTrig(void *in, uint32_t insize, void *
     uint32_t *o = (uint32_t *)*out;
     uint32_t trigger;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    trigger = fsbuckboostHwOpilGetAdcManualTrigger();
-#else
     trigger = fsbuckboostHwGetAdcManualTrigger();
-#endif
 
     *o = trigger;
 
@@ -551,11 +457,7 @@ static int32_t fsbuckboostHwIfSetAdcInterruptEnable(void *in, uint32_t insize, v
 
     enable = *( (uint32_t *)in ) & 0x01;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetAdcInterruptEnable(enable);
-#else
     fsbuckboostHwSetAdcInterruptEnable(enable);
-#endif
 
     return 0;
 }
@@ -565,11 +467,7 @@ static int32_t fsbuckboostHwIfGetAdcInterruptEnable(void *in, uint32_t insize, v
     uint32_t *o = (uint32_t *)*out;
     uint32_t enable;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    enable = fsbuckboostHwOpilGetAdcInterruptEnable();
-#else
     enable = fsbuckboostHwGetAdcInterruptEnable();
-#endif
 
     *o = enable;
 
@@ -582,11 +480,7 @@ static int32_t fsbuckboostHwIfSetAdcSpiFreq(void *in, uint32_t insize, void **ou
 
     freq = *( (uint32_t *)in );
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetAdcSpiFreq(freq);
-#else
     fsbuckboostHwSetAdcSpiFreq(freq);
-#endif
 
     return 0;
 }
@@ -596,13 +490,31 @@ static int32_t fsbuckboostHwIfGetAdcSpiFreq(void *in, uint32_t insize, void **ou
     uint32_t *o = (uint32_t *)*out;
     uint32_t freq;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    freq = fsbuckboostHwOpilGetAdcSpiFreq();
-#else
     freq = fsbuckboostHwGetAdcSpiFreq();
-#endif
 
     *o = freq;
+
+    return 4;
+}
+//-----------------------------------------------------------------------------
+static int32_t fsbuckboostHwIfSetInputRelay(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t state;
+
+    state = *( (uint32_t *)in );
+
+    fsbuckboostHwSetInputRelay(state);
+    return 0;
+}
+//-----------------------------------------------------------------------------
+static int32_t fsbuckboostHwIfGetInputRelay(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t *o = (uint32_t *)*out;
+    uint32_t state;
+
+    state = fsbuckboostHwGetInputRelay();
+
+    *o = state;
 
     return 4;
 }
@@ -613,11 +525,7 @@ static int32_t fsbuckboostHwIfSetOutputRelay(void *in, uint32_t insize, void **o
 
     state = *( (uint32_t *)in );
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetOutputRelay(state);
-#else
     fsbuckboostHwSetOutputRelay(state);
-#endif
 
     return 0;
 }
@@ -627,11 +535,7 @@ static int32_t fsbuckboostHwIfGetOutputRelay(void *in, uint32_t insize, void **o
     uint32_t *o = (uint32_t *)*out;
     uint32_t state;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    state = fsbuckboostHwOpilGetOutputRelay();
-#else
     state = fsbuckboostHwGetOutputRelay();
-#endif
 
     *o = state;
 
@@ -644,11 +548,7 @@ static int32_t fsbuckboostHwIfSetLoadSwitch(void *in, uint32_t insize, void **ou
 
     state = *( (uint32_t *)in );
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetLoadSwitch(state);
-#else
     fsbuckboostHwSetLoadSwitch(state);
-#endif
 
     return 0;
 }
@@ -658,11 +558,7 @@ static int32_t fsbuckboostHwIfGetLoadSwitch(void *in, uint32_t insize, void **ou
     uint32_t *o = (uint32_t *)*out;
     uint32_t state;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    state = fsbuckboostHwOpilGetLoadSwitch();
-#else
     state = fsbuckboostHwGetLoadSwitch();
-#endif
 
     *o = state;
 
@@ -675,11 +571,7 @@ static int32_t fsbuckboostHwIfSetMeasGains(void *in, uint32_t insize, void **out
 
     gains = ( (fsbuckboostConfigMeasGains_t *)in );
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilSetMeasGains(gains);
-#else
     fsbuckboostHwSetMeasGains(gains);
-#endif
 
     return 0;
 }
@@ -690,11 +582,7 @@ static int32_t fsbuckboostHwIfGetMeasGains(void *in, uint32_t insize, void **out
     fsbuckboostConfigMeasGains_t gains;
     uint32_t size;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    size = fsbuckboostHwOpilGetMeasGains(&gains);
-#else
     size = fsbuckboostHwGetMeasGains(&gains);
-#endif
 
     *o = gains;
 
@@ -703,11 +591,7 @@ static int32_t fsbuckboostHwIfGetMeasGains(void *in, uint32_t insize, void **out
 //-----------------------------------------------------------------------------
 static int32_t fsbuckboostHwIfClearStatus(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    fsbuckboostHwOpilStatusClear();
-#else
     fsbuckboostHwStatusClear();
-#endif
 
     return 0;
 }
@@ -717,11 +601,7 @@ static int32_t fsbuckboostHwIfGetStatus(void *in, uint32_t insize, void **out, u
     uint32_t status;
     uint32_t *o = (uint32_t *)*out;
 
-#ifdef FS_BUCK_BOOST_HW_IF_CONFIG_OPIL
-    status = fsbuckboostHwOpilStatus();
-#else
     status = fsbuckboostHwStatus();
-#endif
 
     *o = status;
 

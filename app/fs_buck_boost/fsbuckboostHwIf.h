@@ -455,6 +455,32 @@ typedef enum{
 
     /**
      * Command
+     *  ---------------------------------------------
+     *  | SET INPUT RELAY (uint32) | STATE (uint32) |
+     *  ---------------------------------------------
+     *
+     * Response
+     * No response
+     *
+     */
+    FS_BUCK_BOOST_HW_IF_SET_INPUT_RELAY,
+
+    /**
+     * Command
+     *  ----------------------------
+     *  | GET INPUT RELAY (uint32) |
+     *  ----------------------------
+     *
+     * Response
+     *  ------------------------
+     *  | INPUT RELAY (uint32) |
+     *  ------------------------
+     *
+     */
+    FS_BUCK_BOOST_HW_IF_GET_INPUT_RELAY,
+
+    /**
+     * Command
      *  ----------------------------------------------
      *  | SET OUTPUT RELAY (uint32) | STATE (uint32) |
      *  ----------------------------------------------

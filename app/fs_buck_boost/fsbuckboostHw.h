@@ -107,6 +107,10 @@ void fsbuckboostHwControllerDisable(void);
 //-----------------------------------------------------------------------------
 void fsbuckboostHwControllerEnable(void);
 //-----------------------------------------------------------------------------
+void fsbuckboostHwSetInputRelay(uint32_t state);
+//-----------------------------------------------------------------------------
+uint32_t fsbuckboostHwGetInputRelay(void);
+//-----------------------------------------------------------------------------
 void fsbuckboostHwSetOutputRelay(uint32_t state);
 //-----------------------------------------------------------------------------
 uint32_t fsbuckboostHwGetOutputRelay(void);

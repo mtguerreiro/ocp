@@ -32,7 +32,7 @@ class Interface(Controllers, Reference):
         return self._ocp.cs_disable(self._cs_id)
 
 
-    def set_mode(self, mode):
+    def set_converter_mode(self, mode):
 
         modes = ('buck', 'boost')
         if mode not in modes:
