@@ -15,13 +15,13 @@
 #include "ocpTrace.h"
 
 #include "cukConfig.h"
-//#include "config/stypesCuk.h"
 
 #include "mvops.h"
 #include "dmpc.h"
 #include "dmpc_defs.h"
 #include "dmpc_matrices.h"
 
+#include "controller/controller.h"
 //=============================================================================
 
 //=============================================================================
@@ -79,44 +79,6 @@ static float freq_en = 0.0f;
 //-----------------------------------------------------------------------------
 void cukControlEnergyMpcInitialize(void){
 
-}
-//-----------------------------------------------------------------------------
-int32_t cukControlEnergyMpcSetParams(void *params, uint32_t n){
-
-    float *p = (float *)params;
-
-    Kx[0] = *p++;
-    Kx[1] = *p++;
-
-    Ky = *p++;
-
-    il_max = *p++;
-    il_min = *p++;
-
-    Co = *p++;
-
-    freq_en = *p++;
-
-    return 0;
-}
-//-----------------------------------------------------------------------------
-int32_t cukControlEnergyMpcGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
-
-    float *p = (float *)out;
-
-    *p++ = Kx[0];
-    *p++ = Kx[1];
-
-    *p++ = Ky;
-
-    *p++ = il_max;
-    *p++ = il_min;
-
-    *p++ = Co;
-
-    *p++ = freq_en;
-
-    return 28;
 }
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs){
@@ -232,6 +194,44 @@ int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nr
     return sizeof(cukConfigControl_t);
 }
 //-----------------------------------------------------------------------------
+int32_t cukControlEnergyMpcSetParams(void *params, uint32_t n){
+
+    float *p = (float *)params;
+
+    Kx[0] = *p++;
+    Kx[1] = *p++;
+
+    Ky = *p++;
+
+    il_max = *p++;
+    il_min = *p++;
+
+    Co = *p++;
+
+    freq_en = *p++;
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t cukControlEnergyMpcGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
+
+    float *p = (float *)out;
+
+    *p++ = Kx[0];
+    *p++ = Kx[1];
+
+    *p++ = Ky;
+
+    *p++ = il_max;
+    *p++ = il_min;
+
+    *p++ = Co;
+
+    *p++ = freq_en;
+
+    return 28;
+}
+//-----------------------------------------------------------------------------
 void cukControlEnergyMpcReset(void){
 
     uint32_t i;
@@ -243,6 +243,19 @@ void cukControlEnergyMpcReset(void){
 
     for(i = 0; i < DMPC_CONFIG_NC; i++) du_1[i] = 0.0f;
 
+}
+//-----------------------------------------------------------------------------
+void cukControlEnergyMpcGetCallbacks(void *callbacksBuffer){
+
+    controllerCallbacks_t *cbs = (controllerCallbacks_t * )callbacksBuffer;
+
+    cbs->init = cukControlEnergyMpcInitialize;
+    cbs->run = cukControlEnergyMpcRun;
+    cbs->setParams = cukControlEnergyMpcSetParams;
+    cbs->getParams = cukControlEnergyMpcGetParams;
+    cbs->reset = cukControlEnergyMpcReset;
+    cbs->firstEntry = 0;
+    cbs->lastExit = 0;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

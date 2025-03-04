@@ -1,12 +1,6 @@
-/*
- * cukControlStartup.h
- *
- *  Created on: 26.10.2023
- *      Author: marco
- */
 
-#ifndef CUK_CONTROL_STARTUP_H_
-#define CUK_CONTROL_STARTUP_H_
+#ifndef CUK_CONTROL_RAMP_H_
+#define CUK_CONTROL_RAMP_H_
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -24,16 +18,18 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void cukControlStartupInitialize(void);
+int32_t cukControlRampInitialize(void);
 //-----------------------------------------------------------------------------
-int32_t cukControlStartupSetParams(void *params, uint32_t n);
+int32_t cukControlRampRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-int32_t cukControlStartupGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
+int32_t cukControlRampSetParams(void *params, uint32_t n);
 //-----------------------------------------------------------------------------
-int32_t cukControlStartupRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+int32_t cukControlRampGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
-void cukControlStartupReset(void);
+void cukControlRampReset(void);
+//-----------------------------------------------------------------------------
+void cukControlRampGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-#endif /* CUK_CONTROL_STARTUP_H_ */
+#endif /* CUK_CONTROL_RAMP_H_ */

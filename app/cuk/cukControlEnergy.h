@@ -1,7 +1,7 @@
 /*
  * cukControlEnergy.h
  *
- *  Created on: 11.09.2023
+ *  Created on: 22.11.2023
  *      Author: marco
  */
 
@@ -26,13 +26,15 @@
 //-----------------------------------------------------------------------------
 void cukControlEnergyInitialize(void);
 //-----------------------------------------------------------------------------
+int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+//-----------------------------------------------------------------------------
 int32_t cukControlEnergySetParams(void *params, uint32_t n);
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergyGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
-//-----------------------------------------------------------------------------
 void cukControlEnergyReset(void);
+//-----------------------------------------------------------------------------
+void cukControlEnergyGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 

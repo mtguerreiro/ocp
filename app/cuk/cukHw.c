@@ -25,7 +25,7 @@
 //=============================================================================
 #define CUK_HW_CONFIG_ADC_SPI_FREQ_HZ      ((uint32_t)16666666)
 #define CUK_HW_CONFIG_PWM_FREQ_HZ          ((uint32_t) 100000 )
-#define CUK_HW_CONFIG_PWM_DEAD_TIME_NS     ((float) 200e-9 )
+#define CUK_HW_CONFIG_PWM_DEAD_TIME_NS     ((float) 75e-9 )
 #define CUK_HW_CONFIG_PWM_BASE              XPAR_AXI_PWM_0_S00_AXI_BASEADDR
 #define CUK_HW_CONFIG_ADC_BASE              XPAR_ADC_PSCTL_0_S00_AXI_BASEADDR
 

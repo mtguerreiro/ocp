@@ -1,12 +1,6 @@
-/*
- * cukControlSfbInt.h
- *
- *  Created on: 24.11.2023
- *      Author: marco
- */
 
-#ifndef CUK_CONTROL_SFB_INT_H_
-#define CUK_CONTROL_SFB_INT_H_
+#ifndef CUK_CONTROL_IDLE_H_
+#define CUK_CONTROL_IDLE_H_
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -24,16 +18,22 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void cukControlSfbIntInitialize(void);
+int32_t cukControlIdleInitialize(void);
 //-----------------------------------------------------------------------------
-int32_t cukControlSfbIntSetParams(void *params, uint32_t n);
+int32_t cukControlIdleSetParams(void *params, uint32_t n);
 //-----------------------------------------------------------------------------
-int32_t cukControlSfbIntGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
+int32_t cukControlIdleGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
-int32_t cukControlSfbIntRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+int32_t cukControlIdleRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-void cukControlSfbIntReset(void);
+void cukControlIdleReset(void);
+//-----------------------------------------------------------------------------
+int32_t cukControlIdleFirstEntry(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+//-----------------------------------------------------------------------------
+int32_t cukControlIdleLastExit(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+//-----------------------------------------------------------------------------
+void cukControlIdleGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-#endif /* CUK_CONTROL_SFB_INT_H_ */
+#endif /* CUK_CONTROL_IDLE_H_ */

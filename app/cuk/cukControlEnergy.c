@@ -1,11 +1,10 @@
 /*
  * cukControlEnergy.c
  *
- *  Created on: 11.09.2023
+ *  Created on: 22.11.2023
  *      Author: marco
  */
 
-#ifdef SOC_CPU1
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
@@ -15,7 +14,8 @@
 #include "ocpTrace.h"
 
 #include "cukConfig.h"
-//#include "config/stypesCuk.h"
+
+#include "controller/controller.h"
 //=============================================================================
 
 //=============================================================================
@@ -51,9 +51,11 @@ typedef struct{
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
 static float u = 0.0f;
-static float k1 = 22864929.498738717, k2 = 9333.3333286044;
+static float k1 = 22864929.498738717, k2 = 9333.3333286044, k3 = -33914344673.813805, dt = 1e-05;
 static float vc = 0.0f;
 static float p_in = 0.0f, p_out = 0.0f, y_dot = 0.0f, y = 0.0f, y_r = 0.0f;
+
+static float y_e = 0.0f, y_e_1 = 0.0f;
 
 static filter_t notch = {.a0 = 1.0f, .a1 = -1.8954516649246216f, .a2 = 0.9887202978134155f,
         .b1 = -1.3892015218734741, .b2 = 0.48247018456459045f,
@@ -61,6 +63,10 @@ static filter_t notch = {.a0 = 1.0f, .a1 = -1.8954516649246216f, .a2 = 0.9887202
 };
 
 static float notchEnable = 0.0f;
+
+static uint32_t first_enter = 0;
+
+static float C_out = CUK_CONFIG_C_O;
 //=============================================================================
 
 //=============================================================================
@@ -69,44 +75,6 @@ static float notchEnable = 0.0f;
 //-----------------------------------------------------------------------------
 void cukControlEnergyInitialize(void){
 
-}
-//-----------------------------------------------------------------------------
-int32_t cukControlEnergySetParams(void *params, uint32_t n){
-
-    float *p = (float *)params;
-
-    k1 = *p++;
-    k2 = *p++;
-
-    notch.a0 = *p++;
-    notch.a1 = *p++;
-    notch.a2 = *p++;
-
-    notch.b1 = *p++;
-    notch.b2 = *p++;
-
-    notchEnable = *p++;
-
-	return 0;
-}
-//-----------------------------------------------------------------------------
-int32_t cukControlEnergyGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
-
-    float *p = (float *)out;
-
-    *p++ = k1;
-    *p++ = k2;
-
-    *p++ = notch.a0;
-    *p++ = notch.a1;
-    *p++ = notch.a2;
-
-    *p++ = notch.b1;
-    *p++ = notch.b2;
-
-    *p++ = notchEnable;
-
-    return 32;
 }
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs){
@@ -125,8 +93,8 @@ int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs
     /* Energies */
     e_x1 = (0.5f) * CUK_CONFIG_L_IN * m->i_1 * m->i_1;
     e_x2 = (0.5f) * CUK_CONFIG_L_OUT * m->i_2 * m->i_2;
-    e_x3 = (0.5f) * CUK_CONFIG_C_C * vc * vc;
-    e_x4 = (0.5f) * CUK_CONFIG_C_O * m->v_dc_out * m->v_dc_out;
+    e_x3 = (0.5f) * CUK_CONFIG_C_C * vc * vc * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
+    e_x4 = (0.5f) * C_out * m->v_dc_out * m->v_dc_out;
     y = e_x1 + e_x2 + e_x3 + e_x4;
 
     /* Input, output and converter power */
@@ -142,12 +110,22 @@ int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs
 
     e_x1_r = (0.5f) * CUK_CONFIG_L_IN * x1_r * x1_r;
     e_x2_r = (0.5f) * CUK_CONFIG_L_OUT * x2_r * x2_r;
-    e_x3_r = (0.5f) * CUK_CONFIG_C_C * x3_r * x3_r;
-    e_x4_r = (0.5f) * CUK_CONFIG_C_O * x4_r * x4_r;
+    e_x3_r = (0.5f) * CUK_CONFIG_C_C * x3_r * x3_r * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
+    e_x4_r = (0.5f) * C_out * x4_r * x4_r;
     y_r = e_x1_r + e_x2_r + e_x3_r + e_x4_r;
 
+    /* Integrator */
+    if( first_enter == 0 ){
+        first_enter = 1;
+        y_e = (-k1 * y - k2 * y_dot) / k3;
+    }
+    else{
+        y_e = y_e_1 + dt * (y_r - y);
+    }
+    y_e_1 = y_e;
+
     /* Control */
-    v = k1 * y_r - k1 * y - k2 * y_dot;
+    v = - k1 * y - k2 * y_dot - k3 * y_e;
 
     if( notchEnable > 0.5f ) v = cukControlEnergyFilterRun(v);
 
@@ -161,11 +139,71 @@ int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs
     return sizeof(cukConfigControl_t);
 }
 //-----------------------------------------------------------------------------
+int32_t cukControlEnergySetParams(void *params, uint32_t n){
+
+    float *p = (float *)params;
+
+    k1 = *p++;
+    k2 = *p++;
+    k3 = *p++;
+    dt = *p++;
+
+    notch.a0 = *p++;
+    notch.a1 = *p++;
+    notch.a2 = *p++;
+
+    notch.b1 = *p++;
+    notch.b2 = *p++;
+
+    notchEnable = *p++;
+
+    C_out = *p++;
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t cukControlEnergyGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
+
+    float *p = (float *)out;
+
+    *p++ = k1;
+    *p++ = k2;
+    *p++ = k3;
+    *p++ = dt;
+
+    *p++ = notch.a0;
+    *p++ = notch.a1;
+    *p++ = notch.a2;
+
+    *p++ = notch.b1;
+    *p++ = notch.b2;
+
+    *p++ = notchEnable;
+
+    *p++ = C_out;
+
+    return 44;
+}
+//-----------------------------------------------------------------------------
 void cukControlEnergyReset(void){
 
     cukControlEnergyFilterReset();
 
+    y_e_1 = 0.0f;
     u = 0.0f;
+}
+//-----------------------------------------------------------------------------
+void cukControlEnergyGetCallbacks(void *callbacksBuffer){
+
+    controllerCallbacks_t *cbs = (controllerCallbacks_t * )callbacksBuffer;
+
+    cbs->init = cukControlEnergyInitialize;
+    cbs->run = cukControlEnergyRun;
+    cbs->setParams = cukControlEnergySetParams;
+    cbs->getParams = cukControlEnergyGetParams;
+    cbs->reset = cukControlEnergyReset;
+    cbs->firstEntry = 0;
+    cbs->lastExit = 0;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -182,6 +220,8 @@ static void cukControlEnergyFilterReset(void){
     notch.y = 0.0f;
     notch.y_1 = 0.0f;
     notch.y_2 = 0.0f;
+
+    first_enter = 0;
 }
 //-----------------------------------------------------------------------------
 static float cukControlEnergyFilterRun(float x){
@@ -199,5 +239,3 @@ static float cukControlEnergyFilterRun(float x){
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
-
-#endif /* SOC_CPU1 */

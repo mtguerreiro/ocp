@@ -26,13 +26,15 @@
 //-----------------------------------------------------------------------------
 void cukControlEnergyMpcInitialize(void);
 //-----------------------------------------------------------------------------
+int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+//-----------------------------------------------------------------------------
 int32_t cukControlEnergyMpcSetParams(void *params, uint32_t n);
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergyMpcGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-int32_t cukControlEnergyMpcRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
-//-----------------------------------------------------------------------------
 void cukControlEnergyMpcReset(void);
+//-----------------------------------------------------------------------------
+void cukControlEnergyMpcGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
