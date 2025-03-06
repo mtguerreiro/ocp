@@ -20,7 +20,6 @@
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
-static float u = 0.0f;
 static float u_ref  = 0.5f;
 static float u_step = 0.001;
 //=============================================================================
@@ -65,24 +64,21 @@ int32_t cukControlRampRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, 
     cukConfigReferences_t *r = (cukConfigReferences_t *)refs;
     cukConfigControl_t *o = (cukConfigControl_t *)outputs;
 
-    if( u < u_ref  ){
-        u = u + u_step;
-        if(u > u_ref ) u = u_ref ;
+    if( o->u < u_ref  ){
+        o->u = o->u + u_step;
+        if(o->u > u_ref ) o->u = u_ref ;
     }
 
     else{
-        u = u - u_step;
-        if(u < u_ref ) u = u_ref ;
+        o->u = o->u - u_step;
+        if(o->u < u_ref ) o->u = u_ref ;
     }
-
-    o->u = u;
 
     return sizeof(cukConfigControl_t);
 }
 //-----------------------------------------------------------------------------
 void cukControlRampReset(void){
 
-    u = 0.0f;
 }
 //-----------------------------------------------------------------------------
 void cukControlRampGetCallbacks(void *callbacksBuffer){
