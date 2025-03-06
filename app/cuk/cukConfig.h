@@ -22,36 +22,36 @@ typedef struct{
     //---------------------------------
     // Sensor-based measurements
     //---------------------------------
-    float i_i;
-    float i_1;
-    float v_in;
-    float v_dc;
-    float v_1;
+    float ii;
+    float i1;
+    float vi;
+    float vi_dc;
+    float v1;
 
-    float i_o;
-    float i_2;
-    float v_out;
-    float v_dc_out;
-    float v_2;
+    float io;
+    float i2;
+    float vo;
+    float vo_dc;
+    float v2;
     //---------------------------------
 
     //---------------------------------
     // Software-based measurements
     //---------------------------------
-    float i_i_filt;
-    float i_1_filt;
-    float v_in_filt;
-    float v_dc_filt;
-    float v_1_filt;
+    float ii_filt;
+    float i1_filt;
+    float vi_filt;
+    float vi_dc_filt;
+    float v1_filt;
 
-    float i_o_filt;
-    float i_2_filt;
-    float v_out_filt;
-    float v_dc_out_filt;
-    float v_2_filt;
+    float io_filt;
+    float i2_filt;
+    float vo_filt;
+    float vo_dc_filt;
+    float v2_filt;
     
-    float p_in;
-    float p_out;
+    float pi;
+    float po;
 
     float p_load;
     //---------------------------------
@@ -63,40 +63,40 @@ typedef struct{
 }cukConfigControl_t;
 
 typedef struct{
-    float v_o;
+    float vo;
 }cukConfigReferences_t;
 
 
 typedef struct{
-    float i_i_gain;
-    float i_i_ofs;
+    float ii_gain;
+    float ii_ofs;
 
-    float i_1_gain;
-    float i_1_ofs;
+    float i1_gain;
+    float i1_ofs;
 
-    float v_in_gain;
-    float v_in_ofs;
+    float vi_gain;
+    float vi_ofs;
 
-    float v_dc_gain;
-    float v_dc_ofs;
+    float vi_dc_gain;
+    float vi_dc_ofs;
 
-    float v_1_gain;
-    float v_1_ofs;
+    float v1_gain;
+    float v1_ofs;
 
-    float i_o_gain;
-    float i_o_ofs;
+    float io_gain;
+    float io_ofs;
 
-    float i_2_gain;
-    float i_2_ofs;
+    float i2_gain;
+    float i2_ofs;
 
-    float v_out_gain;
-    float v_out_ofs;
+    float vo_gain;
+    float vo_ofs;
 
-    float v_dc_out_gain;
-    float v_dc_out_ofs;
+    float vo_dc_gain;
+    float vo_dc_ofs;
 
-    float v_2_gain;
-    float v_2_ofs;
+    float v2_gain;
+    float v2_ofs;
 }cukConfigMeasGains_t;
 
 #define CUK_CONFIG_ADC_GAIN_INV             (float)((5.0f / 4095.0f))

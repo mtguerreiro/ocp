@@ -1,19 +1,12 @@
-/*
- * cukHwWin.c
- *
- *  Created on: 06.10.2023
- *      Author: mguerreiro
- */
-
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
 #include "cukHwOpil.h"
 
-#include "cukOpil.h"
-
 #include "cukConfig.h"
+
+#include "stypes.h"
 //=============================================================================
 
 //=============================================================================
@@ -25,12 +18,19 @@ typedef struct{
 
     float alpha;
 
+    uint32_t pwmFrequency;
+
 }cukHwControl_t;
 //=============================================================================
 
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
+static stypesMeasurements_t xtMeasurements;
+static stypesSimData_t xtSimData;
+static stypesControl_t xtControl;
+static stypesControllerData_t xtControllerData;
+
 static cukHwControl_t hwControl = {.status = 0, .alpha = 0.2f};
 static float i_i_filt = 0.0f, i_1_filt = 0.0f, i_o_filt = 0.0f, i_2_filt = 0.0f;
 //=============================================================================
@@ -39,272 +39,326 @@ static float i_i_filt = 0.0f, i_1_filt = 0.0f, i_o_filt = 0.0f, i_2_filt = 0.0f;
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-int32_t cukHwOpilInitialize(void){
+int32_t cukHwInitialize(void){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t cukHwOpilStatus(void){
+int32_t cukHwStatus(void){
 
     return hwControl.status;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilStatusClear(void){
+void cukHwStatusClear(void){
 
     hwControl.status = 0;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmReset(uint32_t reset){
+void cukHwSetPwmReset(uint32_t reset){
 
 }
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetPwmReset(void){
-
-    return 0;
-}
-//-----------------------------------------------------------------------------
-void cukHwOpilSetPwmOutputEnable(uint32_t enable){
-
-}
-//-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetPwmOutputEnable(void){
+uint32_t cukHwGetPwmReset(void){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmOvfTriggerEnable(uint32_t enable){
+void cukHwSetPwmOutputEnable(uint32_t enable){
 
 }
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetPwmOvfTriggerEnable(void){
+uint32_t cukHwGetPwmOutputEnable(void){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmFrequency(uint32_t freq){
+void cukHwSetPwmOvfTriggerEnable(uint32_t enable){
 
 }
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetPwmFrequency(void){
+uint32_t cukHwGetPwmOvfTriggerEnable(void){
 
-    return 100000;
+    return 0;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmDuty(float duty){
+void cukHwSetPwmFrequency(uint32_t freq){
 
-    cukOpilSetPwmDuty(duty);
+    hwControl.pwmFrequency = freq;
 }
 //-----------------------------------------------------------------------------
-float cukHwOpilGetPwmDuty(void){
+uint32_t cukHwGetPwmFrequency(void){
 
-    return cukOpilGetPwmDuty();
+    return hwControl.pwmFrequency;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmDeadTime(float deadtime){
+void cukHwSetPwmDuty(float duty){
+
+    xtControl.u = duty;
+}
+//-----------------------------------------------------------------------------
+float cukHwGetPwmDuty(void){
+
+    return xtControl.u;
+}
+//-----------------------------------------------------------------------------
+void cukHwSetPwmDeadTime(float deadtime){
 
 }
 //-----------------------------------------------------------------------------
-float cukHwOpilGetPwmDeadTime(void){
+float cukHwGetPwmDeadTime(void){
 
     return 0.0f;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetAdcEnable(uint32_t enable){
+void cukHwSetAdcEnable(uint32_t enable){
 
 }
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetAdcEnable(void){
-
-    return 0;
-}
-//-----------------------------------------------------------------------------
-void cukHwOpilSetAdcManualTrigger(uint32_t trigger){
-
-}
-//-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetAdcManualTrigger(void){
+uint32_t cukHwGetAdcEnable(void){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetAdcInterruptEnable(uint32_t enable){
+void cukHwSetAdcManualTrigger(uint32_t trigger){
 
 }
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetAdcInterruptEnable(void){
-
-    return 0;
-}
-//-----------------------------------------------------------------------------
-void cukHwOpilSetAdcSpiFreq(uint32_t freq){
-
-}
-//-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetAdcSpiFreq(void){
+uint32_t cukHwGetAdcManualTrigger(void){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t cukHwOpilGetMeasurements(void *meas){
+void cukHwSetAdcInterruptEnable(uint32_t enable){
+
+}
+//-----------------------------------------------------------------------------
+uint32_t cukHwGetAdcInterruptEnable(void){
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+void cukHwSetAdcSpiFreq(uint32_t freq){
+
+}
+//-----------------------------------------------------------------------------
+uint32_t cukHwGetAdcSpiFreq(void){
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t cukHwGetMeasurements(void *meas){
 
     int32_t meassize;
 
-    cukConfigMeasurements_t *cukmeas;
+    cukConfigMeasurements_t *dst;
 
-    cukmeas = (cukConfigMeasurements_t *)meas;
+    dst = (cukConfigMeasurements_t *)meas;
 
-    meassize = cukOpilGetMeasurements(meas);
+    dst->ii = xtMeasurements.ii;
+    dst->i1 = xtMeasurements.i1;
 
-    i_1_filt = cukHwOpilExpMovAvg(cukmeas->i_1, i_1_filt);
-    cukmeas->i_1_filt = i_1_filt;
+    dst->vi = xtMeasurements.vi;
+    dst->vi_dc = xtMeasurements.vi_dc;
+    dst->v1 = xtMeasurements.v1;
 
-    i_i_filt = cukHwOpilExpMovAvg(cukmeas->i_i, i_i_filt);
-    cukmeas->i_i_filt = i_i_filt;
+    dst->io = xtMeasurements.io;
+    dst->i2 = xtMeasurements.i2;
 
-    i_o_filt = cukHwOpilExpMovAvg(cukmeas->i_o, i_o_filt);
-    cukmeas->i_o_filt = i_o_filt;
+    dst->vo = xtMeasurements.vo;
+    dst->vo_dc = xtMeasurements.vo_dc;
+    dst->v2 = xtMeasurements.v2;
 
-    i_2_filt = cukHwOpilExpMovAvg(cukmeas->i_2, i_2_filt);
-    cukmeas->i_2_filt = i_2_filt;
+    dst->ii_filt = 0.0f;
+    dst->i1_filt = 0.0f;
 
-    cukmeas->p_in = cukmeas->i_1 * cukmeas->v_dc;
-    cukmeas->p_out = i_o_filt * cukmeas->v_dc_out;
+    dst->vi_filt = 0.0f;
+    dst->vi_dc_filt = 0.0f;
+    dst->v1_filt = 0.0f;
 
-    return meassize;
+    dst->io_filt = 0.0f;
+    dst->i2_filt = 0.0f;
+
+    dst->vo_filt = 0.0f;
+    dst->vo_dc_filt = 0.0f;
+    dst->v2_filt = 0.0f;
+
+    dst->p_load = xtMeasurements.p_load;
+
+    i_1_filt = cukHwExpMovAvg(dst->i1, i_1_filt);
+    dst->i1_filt = i_1_filt;
+
+    i_i_filt = cukHwExpMovAvg(dst->ii, i_i_filt);
+    dst->ii_filt = i_i_filt;
+
+    i_o_filt = cukHwExpMovAvg(dst->io, i_o_filt);
+    dst->io_filt = i_o_filt;
+
+    i_2_filt = cukHwExpMovAvg(dst->i2, i_2_filt);
+    dst->i2_filt = i_2_filt;
+
+    dst->pi = dst->i1 * dst->vi_dc;
+    dst->po = i_o_filt * dst->vo_dc;
 
     /* Protection */
-//    if( (cukmeas->i_i > CUK_CONFIG_I_PRIM_LIM) || (cukmeas->i_1 > CUK_CONFIG_I_PRIM_LIM) ) hwControl.status = 1;
-//    if( (cukmeas->i_i < -CUK_CONFIG_I_PRIM_LIM) || (cukmeas->i_1 < -CUK_CONFIG_I_PRIM_LIM) ) hwControl.status = 1;
-//
-//    if( (cukmeas->v_in > CUK_CONFIG_V_PRIM_LIM) || (cukmeas->v_dc > CUK_CONFIG_V_PRIM_LIM) || (cukmeas->v_1 > CUK_CONFIG_V_PRIM_LIM) ) hwControl.status = 1;
-//
-//    if( (cukmeas->i_o > CUK_CONFIG_I_SEC_LIM) || (cukmeas->i_2 > CUK_CONFIG_I_SEC_LIM) ) hwControl.status = 1;
-//    if( (cukmeas->i_o < -CUK_CONFIG_I_SEC_LIM) || (cukmeas->i_2 < -CUK_CONFIG_I_SEC_LIM) ) hwControl.status = 1;
-//
-//    if( (cukmeas->v_out > CUK_CONFIG_V_SEC_LIM) || (cukmeas->v_dc_out > CUK_CONFIG_V_SEC_LIM) || (cukmeas->v_2 > CUK_CONFIG_V_SEC_LIM) ) hwControl.status = 1;
-//
-//    i_1_filt = cukHwOpilExpMovAvg(cukmeas->i_1, i_1_filt);
-//    cukmeas->i_1_filt = i_1_filt;
-//
-//    i_i_filt = cukHwOpilExpMovAvg(cukmeas->i_i, i_i_filt);
-//    cukmeas->i_i_filt = i_i_filt;
-//
-//    i_o_filt = cukHwOpilExpMovAvg(cukmeas->i_o, i_o_filt);
-//    cukmeas->i_o_filt = i_o_filt;
-//
-//    i_2_filt = cukHwOpilExpMovAvg(cukmeas->i_2, i_2_filt);
-//    cukmeas->i_2_filt = i_2_filt;
-//
-//    cukmeas->p_in = cukmeas->i_1 * cukmeas->v_dc;
-//    cukmeas->p_out = i_o_filt * cukmeas->v_dc_out;
-//
-//    if( hwControl.status != 0 ){
-//        //cukOpilSetPwmDuty(0.0f);
-//        cukHwOpilShutDown();
-//        return -1;
-//    }
-//    else
-//        return meassize;
-}
-//-----------------------------------------------------------------------------
-int32_t cukHwOpilApplyOutputs(void *outputs, int32_t size){
+    if( (dst->ii > CUK_CONFIG_I_PRIM_LIM) || (dst->i1 > CUK_CONFIG_I_PRIM_LIM) ) hwControl.status = 1;
+    if( (dst->ii < -CUK_CONFIG_I_PRIM_LIM) || (dst->i1 < -CUK_CONFIG_I_PRIM_LIM) ) hwControl.status = 1;
 
-    return cukOpilUpdateControl(outputs, size);
+    if( (dst->vi > CUK_CONFIG_V_PRIM_LIM) || (dst->vi_dc > CUK_CONFIG_V_PRIM_LIM) || (dst->v1 > CUK_CONFIG_V_PRIM_LIM) ) hwControl.status = 1;
+
+    if( (dst->i2 > CUK_CONFIG_I_SEC_LIM) ) hwControl.status = 1;
+    if( (dst->i2 < -CUK_CONFIG_I_SEC_LIM) ) hwControl.status = 1;
+
+    if( (dst->vo > CUK_CONFIG_V_SEC_LIM) || (dst->vo_dc > CUK_CONFIG_V_SEC_LIM) || (dst->v2 > CUK_CONFIG_V_SEC_LIM) ) hwControl.status = 1;
+
+    if( hwControl.status != 0 ){
+        //cukHwSetPwmOutputEnable(0);
+        cukHwShutDown();
+        return -1;
+    }
+    else
+        return sizeof(cukConfigMeasurements_t);
+
+    return sizeof(cukConfigMeasurements_t);
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilDisable(void){
+int32_t cukHwApplyOutputs(void *outputs, int32_t size){
+
+    return cukHwOpilUpdateControl(outputs, size);
+}
+//-----------------------------------------------------------------------------
+void cukHwDisable(void){
+
+    cukHwSetPwmDuty(0.0f);
+}
+//-----------------------------------------------------------------------------
+void cukHwEnable(void){
 
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilEnable(void){
+void cukHwControllerDisable(void){
 
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilControllerDisable(void){
+void cukHwControllerEnable(void){
 
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilControllerEnable(void){
+void cukHwSetLoadSwitch(uint32_t state){
+
+    xtControllerData.load_sw = state;
+}
+//-----------------------------------------------------------------------------
+uint32_t cukHwGetLoadSwitch(void){
+
+    return ( (uint32_t)xtControllerData.load_sw );
+}
+//-----------------------------------------------------------------------------
+void cukHwSetOutputSwitch(uint32_t state){
+
+    xtControllerData.output_sw = state;
+}
+//-----------------------------------------------------------------------------
+uint32_t cukHwGetOutputSwitch(void){
+
+    return ( (uint32_t)xtControllerData.output_sw );
+}
+//-----------------------------------------------------------------------------
+void cukHwSetMeasGains(cukConfigMeasGains_t *gains){
 
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetLoadSwitch(uint32_t state){
-
-    float statef = 0.0f;
-
-    if( state ) statef = 1.0f;
-
-    cukOpilSetLoadSwitch(statef);
-}
-//-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetLoadSwitch(void){
-
-    uint32_t state = 0;
-    float statef;
-
-    statef = cukOpilGetLoadSwitch();
-
-    if( statef ) state = 1;
-
-    return state;
-}
-//-----------------------------------------------------------------------------
-void cukHwOpilSetOutputSwitch(uint32_t state){
-
-    float statef = 0.0f;
-
-    if( state ) statef = 1.0f;
-
-    cukOpilSetOutputSwitch(statef);
-}
-//-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetOutputSwitch(void){
-
-    uint32_t state = 0;
-    float statef;
-
-    statef = cukOpilGetOutputSwitch();
-
-    if( statef ) state = 1;
-
-    return state;
-}
-//-----------------------------------------------------------------------------
-void cukHwOpilSetMeasGains(cukConfigMeasGains_t *gains){
-
-
-}
-//-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetMeasGains(cukConfigMeasGains_t *gains){
+uint32_t cukHwGetMeasGains(cukConfigMeasGains_t *gains){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilSetFilterCoef(float alpha){
+void cukHwSetFilterCoef(float alpha){
 
     hwControl.alpha = alpha;
 }
 //-----------------------------------------------------------------------------
-float cukHwOpilGetFilterCoef(void){
+float cukHwGetFilterCoef(void){
 
     return hwControl.alpha;
 }
 //-----------------------------------------------------------------------------
-float cukHwOpilExpMovAvg(float sample, float average){
+float cukHwExpMovAvg(float sample, float average){
 
     return hwControl.alpha * sample + (1.0f - hwControl.alpha) * average;
 }
 //-----------------------------------------------------------------------------
-void cukHwOpilShutDown(void){
+void cukHwShutDown(void){
 
-    float u;
+    cukHwSetPwmDuty(0);
+}
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilUpdateMeasurements(void *meas, int32_t size){
 
-    u = cukHwOpilGetPwmDuty();
+    uint8_t *src, *dst;
 
-    u = u - CUK_CONFIG_SHUTDOWN_U_DEC;
-    if( u < 0.0f ) u = 0.0f;
+    dst = (uint8_t *)( &xtMeasurements );
+    src = (uint8_t *)( meas );
 
-    cukHwOpilSetPwmDuty(u);
+    while(size--) *dst++ = *src++;
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilUpdateSimData(void *simData, int32_t size){
+
+    uint8_t *src, *dst;
+
+    dst = (uint8_t *)( &xtSimData );
+    src = (uint8_t *)( simData );
+
+    while(size--) *dst++ = *src++;
+
+    return 0;
+}
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilGetSimData(void **simData, int32_t size){
+
+    *simData = (void *)( &xtSimData );
+
+    return sizeof(stypesSimData_t);
+}
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilUpdateControl(void *control, int32_t size){
+
+    uint8_t *src, *dst;
+    int32_t n;
+
+    dst = (uint8_t *)( &xtControl );
+    src = (uint8_t *)( control );
+
+    n = size;
+    while(n--) *dst++ = *src++;
+
+    return size;
+}
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilGetControl(void **control){
+
+    *control = (void *)( &xtControl );
+
+    return sizeof(stypesControl_t);
+}
+//-----------------------------------------------------------------------------
+void cukHwOpilUpdateControllerData(void *data, int32_t size){
+
+    uint8_t *src, *dst;
+
+    dst = (uint8_t *)( &xtControllerData );
+    src = (uint8_t *)( data );
+
+    while(size--) *dst++ = *src++;
+}
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilGetControllerData(void **controllerData){
+
+    *controllerData = (void *)( &xtControllerData );
+
+    return sizeof(stypesControllerData_t);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

@@ -11,7 +11,7 @@
 #include "cukControlSfb.h"
 
 #include "ocpConfig.h"
-#include "ocpTrace.h"
+#include "ocp/ocpTrace.h"
 
 #include "cukConfig.h"
 
@@ -47,8 +47,9 @@ static uint32_t first_enter = 0;
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void cukControlSfbInitialize(void){
+int32_t cukControlSfbInitialize(void){
 
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t cukControlSfbRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs){
@@ -61,13 +62,13 @@ int32_t cukControlSfbRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, v
     static float vc;
     static float u, ud;
 
-    vc = m->v_1 + (1.0f / CUK_CONFIG_TF_N2N1) * m->v_2;
+    vc = m->v1 + (1.0f / CUK_CONFIG_TF_N2N1) * m->v2;
 
     /* Deviations */
-    x1e = m->i_1 - xs[0];
-    x2e = m->i_2 - xs[1];
+    x1e = m->i1 - xs[0];
+    x2e = m->i2 - xs[1];
     x3e = vc - xs[2];
-    x4e = m->v_dc_out - xs[3];
+    x4e = m->vo_dc - xs[3];
 
     /* Integral */
     if( first_enter == 0 ){
@@ -75,7 +76,7 @@ int32_t cukControlSfbRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, v
         xe = -(k[0] * x1e + k[1] * x2e + k[2] * x3e +  k[3] * x4e) / ke;
     }
     else{
-        xe = xe_1 + dt * (r->v_o - m->v_dc_out);
+        xe = xe_1 + dt * (r->vo - m->vo_dc);
     }
     xe_1 = xe;
 
@@ -113,9 +114,9 @@ int32_t cukControlSfbSetParams(void *params, uint32_t n){
     return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t cukControlSfbGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
+int32_t cukControlSfbGetParams(void *buffer, uint32_t size){
 
-    float *p = (float *)out;
+    float *p = (float *)buffer;
 
     *p++ = k[0];
     *p++ = k[1];

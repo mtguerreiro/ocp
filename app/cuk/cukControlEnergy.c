@@ -11,7 +11,7 @@
 #include "cukControlEnergy.h"
 
 #include "ocpConfig.h"
-#include "ocpTrace.h"
+#include "ocp/ocpTrace.h"
 
 #include "cukConfig.h"
 
@@ -73,8 +73,9 @@ static float C_out = CUK_CONFIG_C_O;
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void cukControlEnergyInitialize(void){
+int32_t cukControlEnergyInitialize(void){
 
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs){
@@ -88,25 +89,25 @@ int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs
     static float e_x1_r, e_x2_r, e_x3_r, e_x4_r;
     static float v;
 
-    vc = m->v_1 + (1.0f / CUK_CONFIG_TF_N2N1) * m->v_2;
+    vc = m->v1 + (1.0f / CUK_CONFIG_TF_N2N1) * m->v2;
 
     /* Energies */
-    e_x1 = (0.5f) * CUK_CONFIG_L_IN * m->i_1 * m->i_1;
-    e_x2 = (0.5f) * CUK_CONFIG_L_OUT * m->i_2 * m->i_2;
+    e_x1 = (0.5f) * CUK_CONFIG_L_IN * m->i1 * m->i1;
+    e_x2 = (0.5f) * CUK_CONFIG_L_OUT * m->i2 * m->i2;
     e_x3 = (0.5f) * CUK_CONFIG_C_C * vc * vc * CUK_CONFIG_TF_N2N1_SQ / (CUK_CONFIG_TF_N2N1_SQ + 1.0f);
-    e_x4 = (0.5f) * C_out * m->v_dc_out * m->v_dc_out;
+    e_x4 = (0.5f) * C_out * m->vo_dc * m->vo_dc;
     y = e_x1 + e_x2 + e_x3 + e_x4;
 
     /* Input, output and converter power */
-    p_in = m->p_in;
-    p_out = m->p_out;
+    p_in = m->pi;
+    p_out = m->po;
     y_dot = p_in - p_out;
 
     /* References */
-    x4_r = r->v_o;
-    x1_r = p_out / m->v_dc;
+    x4_r = r->vo;
+    x1_r = p_out / m->vi_dc;
     x2_r = p_out / x4_r;
-    x3_r = m->v_dc + x4_r * (1.0f / CUK_CONFIG_TF_N2N1);
+    x3_r = m->vi_dc + x4_r * (1.0f / CUK_CONFIG_TF_N2N1);
 
     e_x1_r = (0.5f) * CUK_CONFIG_L_IN * x1_r * x1_r;
     e_x2_r = (0.5f) * CUK_CONFIG_L_OUT * x2_r * x2_r;
@@ -129,7 +130,7 @@ int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs
 
     if( notchEnable > 0.5f ) v = cukControlEnergyFilterRun(v);
 
-    u =  1 - (m->v_dc * m->v_dc / CUK_CONFIG_L_IN - v) * CUK_CONFIG_L_IN / (vc * m->v_dc);
+    u =  1 - (m->vi_dc * m->vi_dc / CUK_CONFIG_L_IN - v) * CUK_CONFIG_L_IN / (vc * m->vi_dc);
 
     if( u > 1.0f ) u = 1.0f;
     if( u < 0.0f ) u = 0.0f;
@@ -162,9 +163,9 @@ int32_t cukControlEnergySetParams(void *params, uint32_t n){
     return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t cukControlEnergyGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize){
+int32_t cukControlEnergyGetParams(void *buffer, uint32_t size){
 
-    float *p = (float *)out;
+    float *p = (float *)buffer;
 
     *p++ = k1;
     *p++ = k2;

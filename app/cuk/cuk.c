@@ -121,17 +121,17 @@ static int32_t cukInitializeTraceSignals(void){
 
     /* Adds measurements to trace */
     meas = (cukConfigMeasurements_t *)bInputs;
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_i, "Input current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_1, "Primary inductor current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_in, "Input voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc, "DC link voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_1, "Primary coupling cap voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->ii, "Input current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i1, "Primary inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->vi, "Input voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->vi_dc, "DC link voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v1, "Primary coupling cap voltage");
 
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_o, "Output current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_2, "Secondary inductor current");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_out, "Output voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_dc_out, "Output DC link voltage");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->v_2, "Secondary coupling cap voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->io, "Output current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i2, "Secondary inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->vo, "Output voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->vo_dc, "Output DC link voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v2, "Secondary coupling cap voltage");
 
     /* Adds control signals to trace */
     outputs = (cukConfigControl_t *)bOutputs;
@@ -141,10 +141,10 @@ static int32_t cukInitializeTraceSignals(void){
     /* Other signals to add */
     ocpTraceAddSignal(OCP_TRACE_1, &texec, "Exec. time");
 
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->i_o_filt, "Io filt");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->io_filt, "Io filt");
 
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->p_in, "Input power");
-    ocpTraceAddSignal(OCP_TRACE_1, &meas->p_out, "Output power");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->pi, "Input power");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->po, "Output power");
 
     return 0;
 }

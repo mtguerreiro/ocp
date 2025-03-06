@@ -24,13 +24,13 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void cukControlEnergyInitialize(void);
+int32_t cukControlEnergyInitialize(void);
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
 int32_t cukControlEnergySetParams(void *params, uint32_t n);
 //-----------------------------------------------------------------------------
-int32_t cukControlEnergyGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
+int32_t cukControlEnergyGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
 void cukControlEnergyReset(void);
 //-----------------------------------------------------------------------------

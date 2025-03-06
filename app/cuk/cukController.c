@@ -77,7 +77,7 @@ int32_t cukControllerInit(void){
 
     ocpTraceAddSignal(
             CUK_CONFIG_TRACE_ID,
-            (void *)&xcukControler.refs.v_o,
+            (void *)&xcukControler.refs.vo,
             "Voltage reference"
     );
 

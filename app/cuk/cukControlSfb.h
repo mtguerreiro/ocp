@@ -24,13 +24,13 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-void cukControlSfbInitialize(void);
+int32_t cukControlSfbInitialize(void);
 //-----------------------------------------------------------------------------
 int32_t cukControlSfbRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
 int32_t cukControlSfbSetParams(void *params, uint32_t n);
 //-----------------------------------------------------------------------------
-int32_t cukControlSfbGetParams(void *in, uint32_t insize, void *out, uint32_t maxoutsize);
+int32_t cukControlSfbGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
 void cukControlSfbReset(void);
 //-----------------------------------------------------------------------------

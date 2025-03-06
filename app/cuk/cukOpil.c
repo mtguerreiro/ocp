@@ -1,16 +1,44 @@
-/*
- * cukOpil.c
- *
- *  Created on: 11.09.2023
- *      Author: LRS
- */
+
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
 #include "cukOpil.h"
 
-#include "config/stypesCuk.h"
+/* Open controller project */
+#include "ocpConfig.h"
+#include "ocp/ocpTrace.h"
+#include "ocp/ocpCS.h"
+#include "ocp/ocpIf.h"
+#include "ocp/ocpOpil.h"
+
+/* Controller lib */
+#include "controller/controller.h"
+
+/* Application */
+#include "cukConfig.h"
+
+//#include "cukOpil.h"
+#include "cukController.h"
+
+#include "cukHwIf.h"
+#include "cukHwOpil.h"
+#include "cukConfig.h"
+
+//=============================================================================
+
+//=============================================================================
+/*-------------------------------- Prototypes -------------------------------*/
+//=============================================================================
+//-----------------------------------------------------------------------------
+static int32_t cukInitializeTrace(void);
+//-----------------------------------------------------------------------------
+static int32_t cukInitializeTraceSignals(void);
+//-----------------------------------------------------------------------------
+static int32_t cukInitializeControlSystem(void);
+//-----------------------------------------------------------------------------
+void cukAdcIrq(void *callbackRef);
+//-----------------------------------------------------------------------------
 //=============================================================================
 
 //=============================================================================
@@ -22,214 +50,148 @@
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
-static stypesMeasurements_t xtMeasurements;
-static stypesSimData_t xtSimData;
-static stypesControl_t xtControl;
-static stypesControllerData_t xtControllerData;
+static char traceRawData[50 * 1024 * 1024];
 
+static char traceNames[CUK_CONFIG_TRACE_0_NAME_LEN];
+static size_t traceData[CUK_CONFIG_TRACE_0_MAX_SIGNALS];
+
+static float bInputs[CUK_CONFIG_INPUT_BUF_SIZE];
+static float bOutputs[CUK_CONFIG_OUTPUT_BUG_SIZE];
+
+static float texec = 0.0f;
 //=============================================================================
 
 //=============================================================================
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-int32_t cukOpilUpdateMeasurements(void *meas, int32_t size){
+void cukInit(void *intcInst){
 
-	uint8_t *src, *dst;
+    cukInitializeTrace();
 
-	dst = (uint8_t *)( &xtMeasurements );
-	src = (uint8_t *)( meas );
+    cukInitializeControlSystem();
 
-	while(size--) *dst++ = *src++;
+    /* Initializes OPiL interface */
+    ocpOpilConfig_t config;
 
-	return 0;
+    config.updateMeas = cukHwOpilUpdateMeasurements;
+    config.updateSimData = cukHwOpilUpdateSimData;
+
+    config.initControl = 0;
+    config.runControl = cukAdcIrq;
+
+    config.getControl = cukHwOpilGetControl;
+    config.getControllerData = cukHwOpilGetControllerData;
+
+    ocpOpilInitialize(&config);
 }
 //-----------------------------------------------------------------------------
-int32_t cukOpilGetMeasurements(void *meas){
+//=============================================================================
 
-    float *src;
-    cukConfigMeasurements_t *dst;
 
-    src = (float *)(&xtMeasurements);
-    dst = (cukConfigMeasurements_t *)meas;
+//=============================================================================
+/*---------------------------- Static functions -----------------------------*/
+//=============================================================================
+//-----------------------------------------------------------------------------
+static int32_t cukInitializeTrace(void){
 
-    dst->i_i =  xtMeasurements.i_i;
-    dst->i_1 =  xtMeasurements.i_1;
+    ocpTraceConfig_t config;
 
-    dst->v_in = xtMeasurements.v_in;
-    dst->v_dc = xtMeasurements.v_dc;
-    dst->v_1  = xtMeasurements.v_1;
+    config.mem = (void *)traceRawData;
+    config.size = sizeof(traceRawData);
+    config.data = (void **)traceData;
+    config.names = traceNames;
 
-    dst->i_o =  xtMeasurements.i_o;
-    dst->i_2 =  xtMeasurements.i_2;
+    ocpTraceInitialize(CUK_CONFIG_TRACE_ID, &config, "Cuk trace");
 
-    dst->v_out =    xtMeasurements.v_out;
-    dst->v_dc_out = xtMeasurements.v_dc_out;
-    dst->v_2 =      xtMeasurements.v_2;
+    cukInitializeTraceSignals();
 
-//    dst->i_i =  ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS712_OFFS ) * CUK_CONFIG_ISENS_ACS712_GAIN_INV;
-//    dst->i_1 =  ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS730_OFFS ) * CUK_CONFIG_ISENS_ACS730_GAIN_INV;
-//
-//    dst->v_in = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-//    dst->v_dc = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-//    dst->v_1  = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-//
-//    dst->i_o =  - ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS712_OFFS ) * CUK_CONFIG_ISENS_ACS712_GAIN_INV;
-//    dst->i_2 =  - ( (CUK_CONFIG_ADC_GAIN_INV * (*src++)) - CUK_CONFIG_ISENS_ACS730_OFFS ) * CUK_CONFIG_ISENS_ACS730_GAIN_INV;
-//
-//    dst->v_out =    ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-//    dst->v_dc_out = ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-//    dst->v_2 =      ( CUK_CONFIG_ADC_GAIN_INV * (*src++) ) * CUK_CONFIG_VSENS_GAIN_INV;
-
-    dst->i_i_filt = 0.0f;
-    dst->i_1_filt = 0.0f;
-
-    dst->v_in_filt = 0.0f;
-    dst->v_dc_filt = 0.0f;
-    dst->v_1_filt  = 0.0f;
-
-    dst->i_o_filt = 0.0f;
-    dst->i_2_filt = 0.0f;
-
-    dst->v_out_filt =    0.0f;
-    dst->v_dc_out_filt = 0.0f;
-    dst->v_2_filt =      0.0f;
-
-    dst->p_load = xtMeasurements.p_load;
-
-//    int32_t size;
-//
-//    uint8_t *src, *dst;
-//
-//    dst = (uint8_t *)( meas );
-//    src = (uint8_t *)( &xtMeasurements );
-//    size = sizeof(stypesMeasurements_t);
-//
-//    while(size--) *dst++ = *src++;
-
-    return sizeof(cukConfigMeasurements_t);
+    return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t cukOpilUpdateSimData(void *simData, int32_t size){
+static int32_t cukInitializeTraceSignals(void){
 
-	uint8_t *src, *dst;
+    cukConfigMeasurements_t *meas;
+    cukConfigControl_t *outputs;
 
-	dst = (uint8_t *)( &xtSimData );
-	src = (uint8_t *)( simData );
+    /* Adds measurements to trace */
+    meas = (cukConfigMeasurements_t *)bInputs;
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->ii, "Input current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i1, "Primary inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->vi, "Input voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->vi_dc, "DC link voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v1, "Primary coupling cap voltage");
 
-	while(size--) *dst++ = *src++;
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->io, "Output current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->i2, "Secondary inductor current");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->vo, "Output voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->vo_dc, "Output DC link voltage");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->v2, "Secondary coupling cap voltage");
 
-	return 0;
+    /* Adds control signals to trace */
+    outputs = (cukConfigControl_t *)bOutputs;
+    ocpTraceAddSignal(OCP_TRACE_1, &outputs->u, "Duty-cycle");
+    //ocpTraceAddSignal(OCP_TRACE_1, &outputs->sw_o, "Output switch");
+
+    /* Other signals to add */
+    ocpTraceAddSignal(OCP_TRACE_1, &texec, "Exec. time");
+
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->io_filt, "Io filt");
+
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->pi, "Input power");
+    ocpTraceAddSignal(OCP_TRACE_1, &meas->po, "Output power");
+
+    return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t cukOpilGetSimData(void **simData, int32_t size){
+static int32_t cukInitializeControlSystem(void){
 
-    *simData = (void *)( &xtSimData );
+    ocpCSConfig_t config;
 
-    return sizeof(stypesSimData_t);
+    /* Initializes controller and hardware interface libs */
+    cukControllerInit();
+    cukHwIfInitialize();
+
+    /* Initializes control sys lib */
+    config.binputs = (void *)bInputs;
+    config.boutputs = (void *)bOutputs;
+
+    config.fhwInterface = cukHwIf;
+    config.fhwStatus = cukHwStatus;
+
+    //config.fgetInputs = buckOpilGetMeasurements;
+    config.fgetInputs = cukHwGetMeasurements;
+
+    //config.fapplyOutputs = buckOpilUpdateControl;
+    config.fapplyOutputs = cukHwApplyOutputs;
+
+    config.frun = cukControllerRun;
+    config.fcontrollerInterface = cukControllerIf;
+    config.fcontrollerStatus = cukControllerStatus;
+
+    config.fenable = cukHwEnable;
+    //config.fenable = 0;
+    config.fdisable = cukHwDisable;
+    //config.fdisable = buckOpilDisable;
+
+    config.fonEntry = 0;
+    config.fonExit = 0;
+
+    ocpCSInitialize(CUK_CONFIG_CS_ID, &config, "Cuk control");
+
+    return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t cukOpilUpdateControl(void *control, int32_t size){
+//=============================================================================
 
-    uint8_t *src, *dst;
-    int32_t n;
-
-    dst = (uint8_t *)( &xtControl );
-    src = (uint8_t *)( control );
-
-    n = size;
-    while(n--) *dst++ = *src++;
-
-    return size;
-}
+//=============================================================================
+/*----------------------------------- IRQ -----------------------------------*/
+//=============================================================================
 //-----------------------------------------------------------------------------
-int32_t cukOpilGetControl(void **control){
+void cukAdcIrq(void *callbackRef){
 
-	*control = (void *)( &xtControl );
-
-	return sizeof(stypesControl_t);
-}
-//-----------------------------------------------------------------------------
-void cukOpilUpdateControllerData(void *data, int32_t size){
-
-    uint8_t *src, *dst;
-
-    dst = (uint8_t *)( &xtControllerData );
-    src = (uint8_t *)( data );
-
-    while(size--) *dst++ = *src++;
-}
-//-----------------------------------------------------------------------------
-int32_t cukOpilGetControllerData(void **controllerData){
-
-	*controllerData = (void *)( &xtControllerData );
-
-	return sizeof(stypesControllerData_t);
-}
-//-----------------------------------------------------------------------------
-int32_t cukOpilProcInputs(void *inputs, void *procinputs, int32_t size){
-
-    uint8_t *src, *dst;
-    int32_t n;
-
-    dst = (uint8_t *)( procinputs );
-    src = (uint8_t *)( inputs );
-    n = size;
-
-    while(n--) *dst++ = *src++;
-
-    return size;
-}
-//-----------------------------------------------------------------------------
-int32_t cukOpilProcOutputs(void *outputs, void *procoutputs, int32_t size){
-
-    uint8_t *src, *dst;
-    int32_t n;
-
-    dst = (uint8_t *)( procoutputs );
-    src = (uint8_t *)( outputs );
-    n = size;
-
-    while(n--) *dst++ = *src++;
-
-    return size;
-}
-//-----------------------------------------------------------------------------
-void cukOpilSetPwmDuty(float duty){
-
-    xtControl.u = duty;
-}
-//-----------------------------------------------------------------------------
-float cukOpilGetPwmDuty(void){
-
-    return xtControl.u;
-}
-//-----------------------------------------------------------------------------
-void cukOpilDisable(void){
-
-    xtControl.u = 0.0f;
-    xtControllerData.sw_o = 0;
-    xtControllerData.sw_l = 0;
-}
-//-----------------------------------------------------------------------------
-void cukOpilSetLoadSwitch(float state){
-
-    xtControllerData.sw_l = state;
-}
-//-----------------------------------------------------------------------------
-float cukOpilGetLoadSwitch(void){
-
-    return xtControllerData.sw_l;
-}
-//-----------------------------------------------------------------------------
-void cukOpilSetOutputSwitch(float state){
-
-    xtControllerData.sw_o = state;
-}
-//-----------------------------------------------------------------------------
-float cukOpilGetOutputSwitch(void){
-
-    return xtControllerData.sw_o;
+    ocpCSRun(CUK_CONFIG_CS_ID);
+    ocpTraceSave(CUK_CONFIG_TRACE_ID);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

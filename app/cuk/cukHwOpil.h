@@ -1,9 +1,3 @@
-/*
- * cukHwOpil.h
- *
- *  Created on: 06.10.2023
- *      Author: mguerreiro
- */
 
 #ifndef CUK_HW_OPIL_H_
 #define CUK_HW_OPIL_H_
@@ -20,83 +14,97 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-int32_t cukHwOpilInitialize(void);
+int32_t cukHwInitialize(void);
 //-----------------------------------------------------------------------------
-int32_t cukHwOpilStatus(void);
+int32_t cukHwStatus(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilStatusClear(void);
+void cukHwStatusClear(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmReset(uint32_t reset);
+void cukHwSetPwmReset(uint32_t reset);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetPwmReset(void);
+uint32_t cukHwGetPwmReset(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmOutputEnable(uint32_t enable);
+void cukHwSetPwmOutputEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetPwmOutputEnable(void);
+uint32_t cukHwGetPwmOutputEnable(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmOvfTriggerEnable(uint32_t enable);
+void cukHwSetPwmOvfTriggerEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetPwmOvfTriggerEnable(void);
+uint32_t cukHwGetPwmOvfTriggerEnable(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmFrequency(uint32_t freq);
+void cukHwSetPwmFrequency(uint32_t freq);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetPwmFrequency(void);
+uint32_t cukHwGetPwmFrequency(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmDuty(float duty);
+void cukHwSetPwmDuty(float duty);
 //-----------------------------------------------------------------------------
-float cukHwOpilGetPwmDuty(void);
+float cukHwGetPwmDuty(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetPwmDeadTime(float deadtime);
+void cukHwSetPwmDeadTime(float deadtime);
 //-----------------------------------------------------------------------------
-float cukHwOpilGetPwmDeadTime(void);
+float cukHwGetPwmDeadTime(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetAdcEnable(uint32_t enable);
+void cukHwSetAdcEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetAdcEnable(void);
+uint32_t cukHwGetAdcEnable(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetAdcManualTrigger(uint32_t trigger);
+void cukHwSetAdcManualTrigger(uint32_t trigger);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetAdcManualTrigger(void);
+uint32_t cukHwGetAdcManualTrigger(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetAdcInterruptEnable(uint32_t enable);
+void cukHwSetAdcInterruptEnable(uint32_t enable);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetAdcInterruptEnable(void);
+uint32_t cukHwGetAdcInterruptEnable(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetAdcSpiFreq(uint32_t freq);
+void cukHwSetAdcSpiFreq(uint32_t freq);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetAdcSpiFreq(void);
+uint32_t cukHwGetAdcSpiFreq(void);
 //-----------------------------------------------------------------------------
-int32_t cukHwOpilGetMeasurements(void *meas);
+int32_t cukHwGetMeasurements(void *meas);
 //-----------------------------------------------------------------------------
-int32_t cukHwOpilApplyOutputs(void *outputs, int32_t size);
+int32_t cukHwApplyOutputs(void *outputs, int32_t size);
 //-----------------------------------------------------------------------------
-void cukHwOpilDisable(void);
+void cukHwDisable(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilEnable(void);
+void cukHwEnable(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilControllerDisable(void);
+void cukHwControllerDisable(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilControllerEnable(void);
+void cukHwControllerEnable(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetLoadSwitch(uint32_t state);
+void cukHwSetLoadSwitch(uint32_t state);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetLoadSwitch(void);
+uint32_t cukHwGetLoadSwitch(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetOutputSwitch(uint32_t state);
+void cukHwSetOutputSwitch(uint32_t state);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetOutputSwitch(void);
+uint32_t cukHwGetOutputSwitch(void);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetMeasGains(cukConfigMeasGains_t *gains);
+void cukHwSetMeasGains(cukConfigMeasGains_t *gains);
 //-----------------------------------------------------------------------------
-uint32_t cukHwOpilGetMeasGains(cukConfigMeasGains_t *gains);
+uint32_t cukHwGetMeasGains(cukConfigMeasGains_t *gains);
 //-----------------------------------------------------------------------------
-void cukHwOpilSetFilterCoef(float alpha);
+void cukHwSetFilterCoef(float alpha);
 //-----------------------------------------------------------------------------
-float cukHwOpilGetFilterCoef(void);
+float cukHwGetFilterCoef(void);
 //-----------------------------------------------------------------------------
-float cukHwOpilExpMovAvg(float sample, float average);
+float cukHwExpMovAvg(float sample, float average);
 //-----------------------------------------------------------------------------
-void cukHwOpilShutDown(void);
+void cukHwShutDown(void);
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilUpdateMeasurements(void *meas, int32_t size);
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilUpdateSimData(void *simData, int32_t size);
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilGetSimData(void **simData, int32_t size);
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilUpdateControl(void *control, int32_t size);
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilGetControl(void **control);
+//-----------------------------------------------------------------------------
+void cukHwOpilUpdateControllerData(void *data, int32_t size);
+//-----------------------------------------------------------------------------
+int32_t cukHwOpilGetControllerData(void **controllerData);
 //-----------------------------------------------------------------------------
 //=============================================================================
 

@@ -266,67 +266,67 @@ int32_t cukHwGetMeasurements(void *meas){
      */
     src++;
 
-    dst->i_i =  hwControl.gains.i_i_gain * ((float)(*src++)) + hwControl.gains.i_i_ofs;
-    dst->i_1 =  hwControl.gains.i_1_gain * ((float)(*src++)) + hwControl.gains.i_1_ofs;
+    dst->ii =  hwControl.gains.ii_gain * ((float)(*src++)) + hwControl.gains.ii_ofs;
+    dst->i1 =  hwControl.gains.i1_gain * ((float)(*src++)) + hwControl.gains.i1_ofs;
 
-    dst->v_in = hwControl.gains.v_in_gain * ((float)(*src++)) + hwControl.gains.v_in_ofs;
-    dst->v_dc = hwControl.gains.v_dc_gain * ((float)(*src++)) + hwControl.gains.v_dc_ofs;
-    dst->v_1  = hwControl.gains.v_1_gain * ((float)(*src++)) + hwControl.gains.v_1_ofs;
+    dst->vi = hwControl.gains.vi_gain * ((float)(*src++)) + hwControl.gains.vi_ofs;
+    dst->vi_dc = hwControl.gains.vi_dc_gain * ((float)(*src++)) + hwControl.gains.vi_dc_ofs;
+    dst->v1  = hwControl.gains.v1_gain * ((float)(*src++)) + hwControl.gains.v1_ofs;
 
     /* Skips the seventh adc channel of header */
     src++;
-    dst->i_o =  -( hwControl.gains.i_o_gain * ((float)(*src++)) + hwControl.gains.i_o_ofs );
-    dst->i_2 =  -( hwControl.gains.i_2_gain * ((float)(*src++)) + hwControl.gains.i_2_ofs );
+    dst->io =  -( hwControl.gains.io_gain * ((float)(*src++)) + hwControl.gains.io_ofs );
+    dst->i2 =  -( hwControl.gains.i2_gain * ((float)(*src++)) + hwControl.gains.i2_ofs );
 
-    dst->v_out =    hwControl.gains.v_out_gain * ((float)(*src++)) + hwControl.gains.v_out_ofs;
-    dst->v_dc_out = hwControl.gains.v_dc_out_gain * ((float)(*src++)) + hwControl.gains.v_dc_out_ofs;
-    dst->v_2 =      hwControl.gains.v_2_gain * ((float)(*src++)) + hwControl.gains.v_2_ofs;
+    dst->vo =    hwControl.gains.vo_gain * ((float)(*src++)) + hwControl.gains.vo_ofs;
+    dst->vo_dc = hwControl.gains.vo_dc_gain * ((float)(*src++)) + hwControl.gains.vo_dc_ofs;
+    dst->v2 =      hwControl.gains.v2_gain * ((float)(*src++)) + hwControl.gains.v2_ofs;
     //-------------------------------------------------------------------------
 
     //-------------------------------------------------------------------------
     // Software-based measurements
     //-------------------------------------------------------------------------
-    dst->i_i_filt = 0.0f;
-    dst->i_1_filt = 0.0f;
+    dst->ii_filt = 0.0f;
+    dst->i1_filt = 0.0f;
 
-    dst->v_in_filt = 0.0f;
-    dst->v_dc_filt = 0.0f;
-    dst->v_1_filt  = 0.0f;
+    dst->vi_filt = 0.0f;
+    dst->vi_dc_filt = 0.0f;
+    dst->v1_filt  = 0.0f;
 
-    dst->i_o_filt = 0.0f;
-    dst->i_2_filt = 0.0f;
+    dst->io_filt = 0.0f;
+    dst->i2_filt = 0.0f;
 
-    dst->v_out_filt =    0.0f;
-    dst->v_dc_out_filt = 0.0f;
-    dst->v_2_filt =      0.0f;
+    dst->vo_filt =    0.0f;
+    dst->vo_dc_filt = 0.0f;
+    dst->v2_filt =      0.0f;
 
-    i_1_filt = cukHwExpMovAvg(dst->i_1, i_1_filt);
-    dst->i_1_filt = i_1_filt;
+    i_1_filt = cukHwExpMovAvg(dst->i1, i_1_filt);
+    dst->i1_filt = i_1_filt;
 
-    i_i_filt = cukHwExpMovAvg(dst->i_i, i_i_filt);
-    dst->i_i_filt = i_i_filt;
+    i_i_filt = cukHwExpMovAvg(dst->ii, i_i_filt);
+    dst->ii_filt = i_i_filt;
 
-    i_o_filt = cukHwExpMovAvg(dst->i_o, i_o_filt);
-    dst->i_o_filt = i_o_filt;
+    i_o_filt = cukHwExpMovAvg(dst->io, i_o_filt);
+    dst->io_filt = i_o_filt;
 
-    i_2_filt = cukHwExpMovAvg(dst->i_2, i_2_filt);
-    dst->i_2_filt = i_2_filt;
+    i_2_filt = cukHwExpMovAvg(dst->i2, i_2_filt);
+    dst->i2_filt = i_2_filt;
 
-    dst->p_in = dst->i_1 * dst->v_dc;
-    dst->p_out = i_o_filt * dst->v_dc_out;
-    dst->p_load = dst->p_out;
+    dst->pi = dst->i1 * dst->vi_dc;
+    dst->po = i_o_filt * dst->vo_dc;
+    dst->p_load = dst->po;
     //-------------------------------------------------------------------------
 
     /* Protection */
-    if( (dst->i_i > CUK_CONFIG_I_PRIM_LIM) || (dst->i_1 > CUK_CONFIG_I_PRIM_LIM) ) hwControl.status = 1;
-    if( (dst->i_i < -CUK_CONFIG_I_PRIM_LIM) || (dst->i_1 < -CUK_CONFIG_I_PRIM_LIM) ) hwControl.status = 1;
+    if( (dst->ii > CUK_CONFIG_I_PRIM_LIM) || (dst->i1 > CUK_CONFIG_I_PRIM_LIM) ) hwControl.status = 1;
+    if( (dst->ii < -CUK_CONFIG_I_PRIM_LIM) || (dst->i1 < -CUK_CONFIG_I_PRIM_LIM) ) hwControl.status = 1;
 
-    if( (dst->v_in > CUK_CONFIG_V_PRIM_LIM) || (dst->v_dc > CUK_CONFIG_V_PRIM_LIM) || (dst->v_1 > CUK_CONFIG_V_PRIM_LIM) ) hwControl.status = 1;
+    if( (dst->vi > CUK_CONFIG_V_PRIM_LIM) || (dst->vi_dc > CUK_CONFIG_V_PRIM_LIM) || (dst->v1 > CUK_CONFIG_V_PRIM_LIM) ) hwControl.status = 1;
 
-    if( (dst->i_2 > CUK_CONFIG_I_SEC_LIM) ) hwControl.status = 1;
-    if( (dst->i_2 < -CUK_CONFIG_I_SEC_LIM) ) hwControl.status = 1;
+    if( (dst->i2 > CUK_CONFIG_I_SEC_LIM) ) hwControl.status = 1;
+    if( (dst->i2 < -CUK_CONFIG_I_SEC_LIM) ) hwControl.status = 1;
 
-    if( (dst->v_out > CUK_CONFIG_V_SEC_LIM) || (dst->v_dc_out > CUK_CONFIG_V_SEC_LIM) || (dst->v_2 > CUK_CONFIG_V_SEC_LIM) ) hwControl.status = 1;
+    if( (dst->vo > CUK_CONFIG_V_SEC_LIM) || (dst->vo_dc > CUK_CONFIG_V_SEC_LIM) || (dst->v2 > CUK_CONFIG_V_SEC_LIM) ) hwControl.status = 1;
 
     if( hwControl.status != 0 ){
         //cukHwSetPwmOutputEnable(0);
@@ -510,35 +510,35 @@ static void cukHwInitializeGpio(void){
 //-----------------------------------------------------------------------------
 static void cukHwInitializeMeasGains(void){
 
-    hwControl.gains.i_i_gain = 0.012609869672308061f;
-    hwControl.gains.i_i_ofs =  -25.269847795362907f;
+    hwControl.gains.ii_gain = 0.012609869672308061f;
+    hwControl.gains.ii_ofs =  -25.269847795362907f;
 
-    hwControl.gains.i_1_gain = 0.026246737138454348f;
-    hwControl.gains.i_1_ofs =  -52.861529301961006f;
+    hwControl.gains.i1_gain = 0.026246737138454348f;
+    hwControl.gains.i1_ofs =  -52.861529301961006f;
 
-    hwControl.gains.v_in_gain = 0.014919542630730998f;
-    hwControl.gains.v_in_ofs =  0.02983490778952813f;
+    hwControl.gains.vi_gain = 0.014919542630730998f;
+    hwControl.gains.vi_ofs =  0.02983490778952813f;
 
-    hwControl.gains.v_dc_gain = 0.01490254584622419f;
-    hwControl.gains.v_dc_ofs =  0.014667383672769319f;
+    hwControl.gains.vi_dc_gain = 0.01490254584622419f;
+    hwControl.gains.vi_dc_ofs =  0.014667383672769319f;
 
-    hwControl.gains.v_1_gain = 0.014919540229885057f;
-    hwControl.gains.v_1_ofs = 0.014919540229886508f;
+    hwControl.gains.v1_gain = 0.014919540229885057f;
+    hwControl.gains.v1_ofs = 0.014919540229886508f;
 
-    hwControl.gains.i_o_gain = 0.012327860955684866f;
-    hwControl.gains.i_o_ofs =  -24.943995861772958f;
+    hwControl.gains.io_gain = 0.012327860955684866f;
+    hwControl.gains.io_ofs =  -24.943995861772958f;
 
-    hwControl.gains.i_2_gain = 0.02595658415851647f;
-    hwControl.gains.i_2_ofs =  -53.053563135347005f;
+    hwControl.gains.i2_gain = 0.02595658415851647f;
+    hwControl.gains.i2_ofs =  -53.053563135347005f;
 
-    hwControl.gains.v_out_gain = 0.01490621920998692f;
-    hwControl.gains.v_out_ofs =  0.021628758244869317f;
+    hwControl.gains.vo_gain = 0.01490621920998692f;
+    hwControl.gains.vo_ofs =  0.021628758244869317f;
 
-    hwControl.gains.v_dc_out_gain = 0.014901654476279058f;
-    hwControl.gains.v_dc_out_ofs =  0.04172051494698792f;
+    hwControl.gains.vo_dc_gain = 0.014901654476279058f;
+    hwControl.gains.vo_dc_ofs =  0.04172051494698792f;
 
-    hwControl.gains.v_2_gain = 0.01487120334913248f;
-    hwControl.gains.v_2_ofs =  0.058881268243716534f;
+    hwControl.gains.v2_gain = 0.01487120334913248f;
+    hwControl.gains.v2_ofs =  0.058881268243716534f;
 }
 //-----------------------------------------------------------------------------
 static float cukHwExpMovAvg(float sample, float average){
