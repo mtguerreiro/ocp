@@ -2,8 +2,7 @@
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
-#include "fsbuckboostControlSfb.h"
-
+#include "fsbuckboostControlBuckSfb.h"
 #include "fsbuckboostConfig.h"
 
 #include "controller/controller.h"
@@ -42,12 +41,12 @@ static float u;
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbInit(void){
+int32_t fsbuckboostControlBuckSfbInit(void){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbRun(void *meas, int32_t nmeas,
+int32_t fsbuckboostControlBuckSfbRun(void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
     void *outputs, int32_t nmaxoutputs){
 
@@ -73,7 +72,7 @@ int32_t fsbuckboostControllerSfbRun(void *meas, int32_t nmeas,
     return sizeof(fsbuckboostConfigControl_t);
 }
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbSetParams(void *params, uint32_t size){
+int32_t fsbuckboostControlBuckSfbSetParams(void *params, uint32_t size){
 
     float *p = (float *)params;
 
@@ -85,7 +84,7 @@ int32_t fsbuckboostControllerSfbSetParams(void *params, uint32_t size){
     return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbGetParams(void *buffer, uint32_t size){
+int32_t fsbuckboostControlBuckSfbGetParams(void *buffer, uint32_t size){
 
     float *p = (float *)buffer;
 
@@ -97,38 +96,38 @@ int32_t fsbuckboostControllerSfbGetParams(void *buffer, uint32_t size){
     return 16;
 }
 //-----------------------------------------------------------------------------
-void fsbuckboostControllerSfbReset(void){
+void fsbuckboostControlBuckSfbReset(void){
 
     e = 0.0f;
 
     ev_1 = 0.0f;
 }
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbFirstEntry(void *meas, int32_t nmeas,
+int32_t fsbuckboostControlBuckSfbFirstEntry(void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
     void *outputs, int32_t nmaxoutputs){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbLastExit(void *meas, int32_t nmeas,
+int32_t fsbuckboostControlBuckSfbLastExit(void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
     void *outputs, int32_t nmaxoutputs){
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-void fsbuckboostControlSfbGetCallbacks(void *callbacksBuffer){
+void fsbuckboostControlBuckSfbGetCallbacks(void *callbacksBuffer){
 
     controllerCallbacks_t *cbs = (controllerCallbacks_t * )callbacksBuffer;
 
-    cbs->init = fsbuckboostControllerSfbInit;
-    cbs->run = fsbuckboostControllerSfbRun;
-    cbs->setParams = fsbuckboostControllerSfbSetParams;
-    cbs->getParams = fsbuckboostControllerSfbGetParams;
-    cbs->reset = fsbuckboostControllerSfbReset;
-    cbs->firstEntry = fsbuckboostControllerSfbFirstEntry;
-    cbs->lastExit = fsbuckboostControllerSfbLastExit;
+    cbs->init = fsbuckboostControlBuckSfbInit;
+    cbs->run = fsbuckboostControlBuckSfbRun;
+    cbs->setParams = fsbuckboostControlBuckSfbSetParams;
+    cbs->getParams = fsbuckboostControlBuckSfbGetParams;
+    cbs->reset = fsbuckboostControlBuckSfbReset;
+    cbs->firstEntry = fsbuckboostControlBuckSfbFirstEntry;
+    cbs->lastExit = fsbuckboostControlBuckSfbLastExit;
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

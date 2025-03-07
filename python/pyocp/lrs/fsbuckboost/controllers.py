@@ -1,6 +1,6 @@
 """
-Module ``buck_controller``
-===========================
+Module ``controllers``
+======================
 
 
 """
@@ -18,6 +18,7 @@ class ModelParams:
     R : float = 22
     L : float = 15e-6
     Co : float = 100e-6
+
 
 class Reference(pyocp.controller.ReferenceTemplate):
 
@@ -48,7 +49,7 @@ class Controllers:
 
         self.idle = _Idle(0, ctl_if)
         self.ramp = _Ramp(1, ctl_if)
-        self.sfb = _SFB(2, ctl_if)
+        self.buck_sfb = _BuckSFB(2, ctl_if)
         #self.cascaded = _Cascaded(3, ctl_if)
 
 
@@ -86,7 +87,7 @@ class _Ramp(pyocp.controller.ControllerTemplate):
         return params_bin
 
 
-class _SFB(pyocp.controller.ControllerTemplate):
+class _BuckSFB(pyocp.controller.ControllerTemplate):
     
     def __init__(self, ctl_id, ctl_if):
         super().__init__(ctl_id, ctl_if)

@@ -1,6 +1,6 @@
 
-#ifndef FS_BUCK_BOOST_CONTROLLER_SFB_H_
-#define FS_BUCK_BOOST_CONTROLLER_SFB_H_
+#ifndef FS_BUCK_BOOST_CONTROLLER_BUCK_SFB_H_
+#define FS_BUCK_BOOST_CONTROLLER_BUCK_SFB_H_
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -20,28 +20,28 @@
 /*-------------------------------- Functions --------------------------------*/
 //=============================================================================
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbInit(void);
+int32_t fsbuckboostControlBuckSfbInit(void);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbRun(void *meas, int32_t nmeas,
+int32_t fsbuckboostControlBuckSfbRun(void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
     void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbSetParams(void *params, uint32_t size);
+int32_t fsbuckboostControlBuckSfbSetParams(void *params, uint32_t size);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbGetParams(void *buffer, uint32_t size);
+int32_t fsbuckboostControlBuckSfbGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
-void fsbuckboostControllerSfbReset(void);
+void fsbuckboostControlBuckSfbReset(void);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbFirstEntry(void *meas, int32_t nmeas,
+int32_t fsbuckboostControlBuckSfbFirstEntry(void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
     void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-int32_t fsbuckboostControllerSfbLastExit(void *meas, int32_t nmeas,
+int32_t fsbuckboostControlBuckSfbLastExit(void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
     void *outputs, int32_t nmaxoutputs);
 //-----------------------------------------------------------------------------
-void fsbuckboostControlSfbGetCallbacks(void *callbacksBuffer);
+void fsbuckboostControlBuckSfbGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-#endif /* FS_BUCK_BOOST_CONTROLLER_SFB_H_ */
+#endif /* FS_BUCK_BOOST_CONTROLLER_BUCK_SFB_H_ */
