@@ -67,6 +67,8 @@ static float notchEnable = 0.0f;
 static uint32_t first_enter = 0;
 
 static float C_out = CUK_CONFIG_C_O;
+
+static float kd = 0.5f;
 //=============================================================================
 
 //=============================================================================
@@ -104,7 +106,7 @@ int32_t cukControlEnergyRun(void *meas, int32_t nmeas, void *refs, int32_t nrefs
     y_dot = p_in - p_out;
 
     /* References */
-    x4_r = r->vo;
+    x4_r = r->vo - kd * m->io_filt;
     x1_r = p_out / m->vi_dc;
     x2_r = p_out / x4_r;
     x3_r = m->vi_dc + x4_r * (1.0f / CUK_CONFIG_TF_N2N1);
@@ -160,6 +162,8 @@ int32_t cukControlEnergySetParams(void *params, uint32_t n){
 
     C_out = *p++;
 
+    kd = *p++;
+
     return 0;
 }
 //-----------------------------------------------------------------------------
@@ -183,7 +187,9 @@ int32_t cukControlEnergyGetParams(void *buffer, uint32_t size){
 
     *p++ = C_out;
 
-    return 44;
+    *p++ = kd;
+
+    return 48;
 }
 //-----------------------------------------------------------------------------
 void cukControlEnergyReset(void){

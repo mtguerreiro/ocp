@@ -101,7 +101,8 @@ class _Energy(pyocp.controller.ControllerTemplate):
         self.keys = (
             'k1', 'k2', 'k3', 'dt',
             'a0', 'a1', 'a2', 'b1', 'b2', 'notch_en',
-            'C_out'
+            'C_out',
+            'kd'
         )
         
 
