@@ -79,14 +79,14 @@ def ramp_duty_up(cuk, ramp_params):
         })
     cuk.ramp.reset()
     cuk.ramp.enable()
-    time.sleep(0.15)
+    time.sleep(0.1)
 
 
 def ramp_duty_down(cuk):
 
     cuk.ramp.set_params({'u_ref':0})
     cuk.ramp.enable()
-    time.sleep(0.15)
+    time.sleep(0.1)
 
 
 def wait_for_trigger(cuk):
@@ -147,14 +147,13 @@ def run_load_step(settings, run_params, save=False):
     }
     set_trace(cuk, trace_mode=trace_mode, trace_params=trace_params)  
 
-
     status = enable_cs(cuk)
     if status != 0:
         return (-1, 0)
     time.sleep(0.1 * k)
     
     ramp_duty_up(cuk, ramp_params)
-    time.sleep(0.1 * k)
+    time.sleep(0.05 * k)
     
     # Runs the experiment
     print('Running the experiment...')
@@ -169,6 +168,12 @@ def run_load_step(settings, run_params, save=False):
     cuk.set_ref(exp_params['v_ref'])
     time.sleep(0.1 * k)
 
+    cuk.set_ref(exp_params['v_ref_step_down'])
+    time.sleep(0.1 * k)
+
+    cuk.set_ref(exp_params['v_ref'])
+    time.sleep(0.1 * k)
+    
     # Load switch
     cuk.hw.set_load_switch(1)
     time.sleep(0.1 * k)

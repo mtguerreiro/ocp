@@ -446,17 +446,8 @@ float cukHwGetFilterCoef(void){
 //-----------------------------------------------------------------------------
 void cukHwShutDown(void){
 
-    float u;
-
-    u = cukHwGetPwmDuty();
-
-    u = u - CUK_CONFIG_SHUTDOWN_U_DEC;
-    if( u < 0.0f ){
-        //cukHwSetPwmOutputEnable(0);
-        u = 0.0f;
-    }
-
-    cukHwSetPwmDuty(u);
+    cukHwSetPwmOutputEnable(0);
+    cukHwSetPwmDuty(0);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
