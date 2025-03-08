@@ -19,6 +19,8 @@
 #include "fsbuckboostControlIdle.h"
 #include "fsbuckboostControlRamp.h"
 #include "fsbuckboostControlBuckSfb.h"
+#include "fsbuckboostControlBoostEnergy.h"
+
 //#include "appControllerCascaded.h"
 //============================================================================
 
@@ -29,7 +31,7 @@ typedef enum{
     FS_BUCK_BOOST_CONTROLLER_IDLE,
     FS_BUCK_BOOST_CONTROLLER_RAMP,
     FS_BUCK_BOOST_CONTROLLER_BUCK_SFB,
-    //FS_BUCK_BOOST_CONTROLLER_CASCADED,
+    FS_BUCK_BOOST_CONTROLLER_BOOST_ENERGY,
     FS_BUCK_BOOST_CONTROLLER_END
 }appControllersEnum_t;
 
@@ -59,7 +61,7 @@ int32_t fsbuckboostControllerInit(void){
     ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_IDLE] = fsbuckboostControlIdleGetCallbacks;
     ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_RAMP] = fsbuckboostControlRampGetCallbacks;
     ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_BUCK_SFB] = fsbuckboostControlBuckSfbGetCallbacks;
-    //ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_CASCADED] = appControlCascadedGetCallbacks;
+    ctlGetCbs[FS_BUCK_BOOST_CONTROLLER_BOOST_ENERGY] = fsbuckboostControlBoostEnergyGetCallbacks;
 
     config.refBuffer = (void *)&xfsbuckboostControler.refs;
     config.refSize = sizeof(xfsbuckboostControler.refs);

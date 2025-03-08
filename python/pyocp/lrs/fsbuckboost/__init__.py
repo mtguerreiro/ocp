@@ -9,3 +9,4 @@ from . import iface
 from . import plot
 from . import trace
 from . import exp_buck
+from . import exp_boost

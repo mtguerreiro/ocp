@@ -39,6 +39,11 @@ target_sources(ocp
     controller/controllerIf.c
 )
 
+# Utils
+target_sources(ocp
+    PRIVATE
+    utils/dfilt.c
+)
 target_include_directories(ocp
     PRIVATE
     ${PROJECT_SOURCE_DIR}/
