@@ -187,7 +187,8 @@ class _BoostEnergy(pyocp.controller.ControllerTemplate):
 
         self.keys = (
             'k1', 'k2', 'k3', 'dt',
-            'C', 'L', 'alpha', 'filt_en'
+            'C', 'L', 'alpha', 'filt_en',
+            'kd'
             )
         self._model_params = ModelParams
         

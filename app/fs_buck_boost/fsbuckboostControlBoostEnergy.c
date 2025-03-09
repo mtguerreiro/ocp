@@ -44,6 +44,8 @@ static uint32_t filt_en = 0;
 
 static uint32_t first_enter = 0;
 
+static float kd = 5;
+
 //=============================================================================
 
 
@@ -74,7 +76,7 @@ int32_t fsbuckboostControlBoostEnergyRun(void *meas, int32_t nmeas,
     /* References */
     il_r = m->v_dc_out * io_filt / m->v_in;
 
-    vo_r = r->v_out;
+    vo_r = r->v_out - kd * io_filt;
 
     yr = (1. / 2.) * C * vo_r * vo_r + (1. / 2.) * L * il_r * il_r;
 
@@ -119,6 +121,8 @@ int32_t fsbuckboostControlBoostEnergySetParams(void *params, uint32_t size){
     alpha = *p++;
     filt_en = (uint32_t)*p++;
 
+    kd = *p++;
+
     return 0;
 }
 //-----------------------------------------------------------------------------
@@ -137,7 +141,9 @@ int32_t fsbuckboostControlBoostEnergyGetParams(void *buffer, uint32_t size){
     *p++ = alpha;
     *p++ = (float)filt_en;
 
-    return 32;
+    *p++ = kd;
+
+    return 36;
 }
 //-----------------------------------------------------------------------------
 void fsbuckboostControlBoostEnergyReset(void){
