@@ -30,9 +30,10 @@
 //=============================================================================
 /*--------------------------------- Defines ---------------------------------*/
 //=============================================================================
-#define BLINK_XIL_LED_ID 		XPAR_AXI_GPIO_RGB_LED_DEVICE_ID
+//#define BLINK_XIL_LED_ID 		XPAR_AXI_GPIO_RGB_LED_DEVICE_ID
 #define BLINK_XIL_LED_CHANNEL 	1
 #define BLINK_XIL_LED_MASK 		0b111
+#define BLINK_XIL_LED_ADDRESS   XPAR_AXI_GPIO_RGB_LED_BASEADDR
 
 #define BLINK_LED_BLUE		(1 << 0)
 #define BLINK_LED_GREEN		(1 << 1)
@@ -86,11 +87,8 @@ void blink(void *param){
 //-----------------------------------------------------------------------------
 static void blinkInitialize(void){
 
-	XGpio_Config *cfg;
-
 	/* Initializes PYNQ's (RGB) LEDs */
-	cfg = XGpio_LookupConfig(BLINK_XIL_LED_ID);
-	XGpio_CfgInitialize(&xblinkControl.rgbled, cfg, cfg->BaseAddress);
+	XGpio_CfgInitialize(&xblinkControl.rgbled, NULL, BLINK_XIL_LED_ADDRESS);
 	XGpio_SetDataDirection(&xblinkControl.rgbled, BLINK_XIL_LED_CHANNEL, 0);
 
 	/* Sets default blinking period */

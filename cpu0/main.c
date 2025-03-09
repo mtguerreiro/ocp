@@ -43,7 +43,8 @@
 #define sev()			__asm__("sev")
 
 /* Definitions for the interrupt controller */
-#define MAIN_XIL_INTC_DEVICE_ID			XPAR_PS7_SCUGIC_0_DEVICE_ID
+//#define MAIN_XIL_INTC_DEVICE_ID			XPAR_PS7_SCUGIC_0_DEVICE_ID
+#define MAIN_XIL_INTC_ADDRESS           XPAR_XSCUGIC_0_BASEADDR
 #define MAIN_XIL_INTC_HANDLER			XScuGic_InterruptHandler
 
 /*
@@ -155,13 +156,13 @@ static int mainSetupIntrSystem(XScuGic *intcInstance)
 	 * Initialize the interrupt controller driver so that it is ready to
 	 * use.
 	 */
-	IntcConfig = XScuGic_LookupConfig(MAIN_XIL_INTC_DEVICE_ID);
-	if (NULL == IntcConfig) {
-		return XST_FAILURE;
-	}
+	// IntcConfig = XScuGic_LookupConfig(MAIN_XIL_INTC_DEVICE_ID);
+	// if (NULL == IntcConfig) {
+	// 	return XST_FAILURE;
+	// }
 
-	Status = XScuGic_CfgInitialize(intcInstance, IntcConfig,
-					IntcConfig->CpuBaseAddress);
+	Status = XScuGic_CfgInitialize(intcInstance, NULL,
+					MAIN_XIL_INTC_ADDRESS);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;
 	}

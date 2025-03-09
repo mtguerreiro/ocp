@@ -44,14 +44,37 @@ target_sources(ocp
     PRIVATE
     utils/dfilt.c
 )
+
+# IPC
+target_sources(ocp
+    PRIVATE
+    ipc/ipcClient.c
+)
+
+# Zynq
+target_sources(ocp
+    PRIVATE
+    cpu0/tasks/blink.c
+    cpu0/tasks/sysinit.c
+    cpu0/tasks/uiface.c
+    hardware/zynq/opilZynqCpu0.c
+    hardware/zynq/ocpZynqCpu0.c
+    hardware/zynq/ipcClientZynq.c
+)
+
 target_include_directories(ocp
     PRIVATE
     ${PROJECT_SOURCE_DIR}/
     ./
+    cpu0/
+    cpu0/tasks/
+    hardware/zynq/
 )
 
 target_include_directories(ocp
     PUBLIC
     ./
+    cpu0/tasks/
+    hardware/zynq/
 )
 
