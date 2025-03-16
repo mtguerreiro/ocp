@@ -156,12 +156,12 @@ static int mainSetupIntrSystem(XScuGic *intcInstance)
 	 * Initialize the interrupt controller driver so that it is ready to
 	 * use.
 	 */
-	// IntcConfig = XScuGic_LookupConfig(MAIN_XIL_INTC_DEVICE_ID);
-	// if (NULL == IntcConfig) {
-	// 	return XST_FAILURE;
-	// }
+	IntcConfig = XScuGic_LookupConfig(MAIN_XIL_INTC_ADDRESS);
+	if (NULL == IntcConfig) {
+		return XST_FAILURE;
+	}
 
-	Status = XScuGic_CfgInitialize(intcInstance, NULL,
+	Status = XScuGic_CfgInitialize(intcInstance, IntcConfig,
 					MAIN_XIL_INTC_ADDRESS);
 	if (Status != XST_SUCCESS) {
 		return XST_FAILURE;

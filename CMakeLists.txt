@@ -52,6 +52,7 @@ target_sources(ocp
 )
 
 # Zynq
+if ( OCP_CPU STREQUAL "0" )
 target_sources(ocp
     PRIVATE
     cpu0/tasks/blink.c
@@ -61,20 +62,32 @@ target_sources(ocp
     hardware/zynq/ocpZynqCpu0.c
     hardware/zynq/ipcClientZynq.c
 )
+endif()
 
 target_include_directories(ocp
     PRIVATE
     ${PROJECT_SOURCE_DIR}/
     ./
-    cpu0/
-    cpu0/tasks/
-    hardware/zynq/
 )
+
+if ( OCP_CPU STREQUAL "0" )
+    target_include_directories(ocp
+        PRIVATE
+        cpu0/
+        cpu0/tasks/
+        hardware/zynq/
+    )
+endif()
 
 target_include_directories(ocp
     PUBLIC
     ./
+)
+
+if ( OCP_CPU STREQUAL "0" )
+target_include_directories(ocp
+    PUBLIC
     cpu0/tasks/
     hardware/zynq/
 )
-
+endif()

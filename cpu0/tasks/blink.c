@@ -87,9 +87,12 @@ void blink(void *param){
 //-----------------------------------------------------------------------------
 static void blinkInitialize(void){
 
+    XGpio_Config *cfg;
+
 	/* Initializes PYNQ's (RGB) LEDs */
-	XGpio_CfgInitialize(&xblinkControl.rgbled, NULL, BLINK_XIL_LED_ADDRESS);
-	XGpio_SetDataDirection(&xblinkControl.rgbled, BLINK_XIL_LED_CHANNEL, 0);
+	//XGpio_CfgInitialize(&xblinkControl.rgbled, cfg, BLINK_XIL_LED_ADDRESS);
+	//XGpio_SetDataDirection(&xblinkControl.rgbled, BLINK_XIL_LED_CHANNEL, 0);
+    XGpio_Initialize(&xblinkControl.rgbled, BLINK_XIL_LED_ADDRESS);
 
 	/* Sets default blinking period */
 	xblinkControl.period = BLINK_CONFIG_DEFAULT_PERIOD_MS / portTICK_PERIOD_MS;
