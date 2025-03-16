@@ -1,5 +1,4 @@
 
-#ifdef SOC_CPU1
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
 //=============================================================================
@@ -9,14 +8,14 @@
 #include "benchmarking_zynq.h"
 
 /* Inter-processor communication */
-#include "../ipc/ipcServer.h"
+#include "ipc/ipcServer.h"
 
 /* Zynq-specific stuff */
 #include "zynqConfig.h"
-#include "ipcServerZynq.h"
+#include "hardware/zynq/ipcServerZynq.h"
 
 /* Open controller project */
-#include "ocpIf.h"
+#include "ocp/ocpIf.h"
 
 /* Application */
 #include "fsbuckboost.h"
@@ -87,4 +86,3 @@ static int32_t ocpZynqCpu1InitializeHw(void *intcInst){
 //-----------------------------------------------------------------------------
 //=============================================================================
 
-#endif /* SOC_CPU1 */

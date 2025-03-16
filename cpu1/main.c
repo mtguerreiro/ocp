@@ -24,13 +24,7 @@
 #include "xgpio.h"
 #include "xil_types.h"
 
-#include "zynqAxiPwm.h"
-#include "zynqAxiAdc.h"
-
-//#include "afe.h"
-//#include "afeIf.h"
-
-#include "ocpZynqCpu1.h"
+#include "hardware/zynq/ocpZynqCpu1.h"
 
 #include "zynqConfig.h"
 //=============================================================================
@@ -40,7 +34,8 @@
 //=============================================================================
 #define SYNC_FLAG  		(*(volatile unsigned long *)(ZYNQ_CONFIG_CPU0_CPU1_SYNC_FLAG_ADR))
 
-#define MAIN_LED_ID         XPAR_AXI_GPIO_RGB_LED_DEVICE_ID
+//#define MAIN_LED_ID         XPAR_AXI_GPIO_RGB_LED_DEVICE_ID
+#define MAIN_LED_ADDRESS    XPAR_AXI_GPIO_RGB_LED_BASEADDR
 #define MAIN_LED_CHANNEL    1
 #define MAIN_LED_MASK       0b111
 #define MAIN_LED_OFS        3
@@ -50,7 +45,8 @@
 #define MAIN_LED_RED       (1 << 2)
 
 #define INTC		    XScuGic
-#define INTC_DEVICE_ID	XPAR_PS7_SCUGIC_0_DEVICE_ID
+//#define INTC_DEVICE_ID	XPAR_PS7_SCUGIC_0_DEVICE_ID
+#define MAIN_XIL_INTC_ADDRESS           XPAR_XSCUGIC_0_BASEADDR
 #define INTC_HANDLER	XScuGic_InterruptHandler
 
 //=============================================================================
@@ -120,7 +116,7 @@ static int mainSysInit(void){
 	ocpZynqCpu1Initialize(&IntcInstancePtr);
 
 	/* Initializes PYNQ's (RGB) LEDs */
-    cfg_ptr = XGpio_LookupConfig(MAIN_LED_ID);
+    cfg_ptr = XGpio_LookupConfig(MAIN_LED_ADDRESS);
 	XGpio_CfgInitialize(&led, cfg_ptr, cfg_ptr->BaseAddress);
 	XGpio_SetDataDirection(&led, MAIN_LED_CHANNEL, 0);
 
@@ -140,7 +136,7 @@ static int mainSetupIntrSystem(INTC *IntcInstancePtr)
 	 * Initialize the interrupt controller driver so that it is ready to
 	 * use.
 	 */
-	IntcConfig = XScuGic_LookupConfig(INTC_DEVICE_ID);
+	IntcConfig = XScuGic_LookupConfig(MAIN_XIL_INTC_ADDRESS);
 	if (NULL == IntcConfig) {
 		return XST_FAILURE;
 	}
