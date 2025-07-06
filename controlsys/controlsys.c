@@ -29,6 +29,7 @@ void controlsysInitialize(controlsys_t *sys, controlsysConfig_t *config){
 
 	sys->fhwInterface = config->fhwInterface;
 	sys->fhwStatus = config->fhwStatus;
+	sys->fhwDisable = config->fhwDisable;
 
 	sys->fcontrollerInterface = config->fcontrollerInterface;
 	sys->fcontrollerStatus = config->fcontrollerStatus;
@@ -72,7 +73,10 @@ int32_t controlsysRun(controlsys_t *sys){
 
     if( sys->status == CONTROLSYS_STATUS_ENABLED ){
         noutputs = sys->frun( sys->binputs, ninputs, sys->boutputs, -1 );
-        if( noutputs < 0 ) sys->status = CONTROLSYS_STATUS_CONTROLLER_ERROR;
+        if( noutputs < 0 ) {
+            sys->status = CONTROLSYS_STATUS_CONTROLLER_ERROR;
+            sys->fhwDisable();
+        }
     }
 
     if( sys->status == CONTROLSYS_STATUS_ENABLED ){

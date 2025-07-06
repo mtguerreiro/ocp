@@ -253,6 +253,16 @@ typedef int32_t(*controlsysHardwareInterface_t)(void *in, uint32_t insize, void 
 typedef int32_t(*controlsysHardwareStatus_t)(void);
 
 /**
+ * @brief Disable the hardware.
+ *
+ * If the control system identify a fault condition, i.e. controlsysRun_t 
+ * returns < 0, this callback is called to disable the hardware.
+ *
+ * @return Status of the hardware.
+ */
+typedef void(*controlsysHardwareDisable_t)(void);
+
+/**
  * @brief Callback to enable sampling.
  *
  * Called when `controlsysEnable` is called. Typically, this would be a
@@ -283,6 +293,7 @@ typedef struct {
 
     controlsysHardwareInterface_t fhwInterface;
     controlsysHardwareStatus_t fhwStatus;
+    controlsysHardwareDisable_t fhwDisable;
 
     controlsysControllerInterface_t fcontrollerInterface;
     controlsysControllerStatus_t fcontrollerStatus;
