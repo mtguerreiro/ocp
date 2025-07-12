@@ -50,41 +50,22 @@ class _Cascaded(pyocp.controller.ControllerTemplate):
     def __init__(self, ctl_id, ctl_if):
 
         super().__init__(ctl_id, ctl_if)
+
+        self.keys = (
+            'ki', 'k_ei', 'kv', 'k_ev',
+            'i_max', 'i_min'
+        )
         self._model_params = _ModelParams
 
 
     def _decode(self, params_bin):
         
-        fmt = '<' + 'f' * round( len(params_bin) / 4 )
-        data = struct.unpack(fmt, params_bin)
-
-        params = {}
-        params['ki'] = data[0]
-        params['k_ei'] = data[1]
-        params['kv'] = data[2]
-        params['k_ev'] = data[3]
-
-        params['i_max'] = data[4]
-        params['i_min'] = data[5]
-
-        return params
+        return _dict_decode(self.keys, params_bin)
 
 
     def _encode(self, params):
 
-        fmt = '<' + 'f' * len(params)
-        
-        ki = params['ki']
-        k_ei = params['k_ei']
-        kv = params['kv']
-        k_ev = params['k_ev']
-
-        i_max = params['i_max']
-        i_min = params['i_min']
-
-        params_bin = struct.pack(fmt, ki, k_ei, kv, k_ev, i_max, i_min)
-
-        return params_bin
+        return _dict_encode(self.keys, params)
 
 
     def get_model_params(self):
@@ -118,23 +99,16 @@ class _Cascaded(pyocp.controller.ControllerTemplate):
         os_i = os_v
         ts_i = ts_v / 5
 
-        zeta_i, wn_i = self._zeta_wn(ts_i, os_i)
+        zeta_i, wn_i = _zeta_wn(ts_i, os_i)
         ki = (L / V_in) * 2 * zeta_i * wn_i
         k_ei = (L / V_in) * ( - wn_i**2 )
 
-        zeta_v, wn_v = self._zeta_wn(ts_v, os_v)
+        zeta_v, wn_v = _zeta_wn(ts_v, os_v)
         kv = ( CO ) * ( 2 * zeta_v * wn_v - 1 / R / CO )
         k_ev = ( CO ) * ( - wn_v**2 )
 
         return {'ki': ki, 'k_ei': k_ei, 'kv': kv, 'k_ev':k_ev}
 
-
-    def _zeta_wn(self, ts, os):
-
-        zeta = -np.log(os / 100) / np.sqrt( np.pi**2 + np.log(os / 100)**2 )
-        wn = 4 / ts / zeta
-
-        return (zeta, wn)
 
 
 class _SFB(pyocp.controller.ControllerTemplate):
@@ -142,33 +116,20 @@ class _SFB(pyocp.controller.ControllerTemplate):
     def __init__(self, ctl_id, ctl_if):
         
         super().__init__(ctl_id, ctl_if)
+        self.keys = (
+            'ki', 'k_ei', 'kv'
+        )
         self._model_params = _ModelParams
 
 
     def _decode(self, params_bin):
         
-        fmt = '<' + 'f' * round( len(params_bin) / 4 )
-        data = struct.unpack(fmt, params_bin)
-
-        params = {}
-        params['ki'] = data[0]
-        params['kv'] = data[1]
-        params['k_ev'] = data[2]
-
-        return params
+        return _dict_decode(self.keys, params_bin)
 
 
     def _encode(self, params):
 
-        fmt = '<' + 'f' * len(params)
-        
-        ki = params['ki']
-        kv = params['kv']
-        k_ev = params['k_ev']
-
-        params_bin = struct.pack(fmt, ki, kv, k_ev)
-
-        return params_bin
+        return _dict_encode(self.keys, params)
 
 
     def get_model_params(self):
@@ -217,9 +178,7 @@ class _SFB(pyocp.controller.ControllerTemplate):
         Ba[:2, 0] = B[:, 0]
 
         # Poles
-        zeta = -np.log(os/100) / np.sqrt( np.pi**2 + (np.log(os/100))**2 )
-        wn = 4 / ts / zeta
-
+        zeta, wn = _zeta_wn(ts, os)
         p1 = -zeta * wn + 1j * wn * np.sqrt(1 - zeta**2)
         p2 = p1.conj()
         p3 = 5 * p1.real
@@ -233,3 +192,27 @@ class _SFB(pyocp.controller.ControllerTemplate):
         k_ev = K[2]
         
         return {'ki':ki, 'kv':kv, 'k_ev':k_ev}
+
+
+def _dict_encode(keys, params):
+    
+    _params = [params[key] for key in keys]
+    params_bin = struct.pack(f'<{len(keys)}f', *_params)
+
+    return params_bin    
+
+
+def _dict_decode(keys, params_bin):
+    
+    _params = struct.unpack(f'<{len(keys)}f', params_bin)
+    params = dict(zip(keys, _params))
+
+    return params
+
+
+def _zeta_wn(ts, os):
+
+    zeta = -np.log(os / 100) / np.sqrt( np.pi**2 + np.log(os / 100)**2 )
+    wn = 4 / ts / zeta
+
+    return (zeta, wn)

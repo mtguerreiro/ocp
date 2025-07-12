@@ -24,23 +24,19 @@ These functions can be divided in two types: hardware functions and controller f
 
 ## File structure 
 
-Thus, one way to organize your application is to create four source files: `main.c`, `app.c`, `appHw.c`, and `appController.c`.
+One way to organize your application is to create four source files: `main.c`, `app.c`, `appHw.c`, and `appController.c`.
 
-`main.c` contains the `main` function, and can be used to initialize `ocp`'s interface, and the application. `app.c` can be used to initialize and connect everything together, while `appHw.c` and `appController.c` will contain the specific hardware and controller functions.
+`main.c` contains the `main` function, and is used to initialize `ocp`'s interface, and the application. Your application can be initialized in the `app.c` file, which in turn initializes your hardware and controller, and link them to `ocp`.
 
-This file is used to initialize the hardware, the controller, and link them to `ocp`. If you look at the initialization function of `app.c`, you'll see that it first initializes the trace. This is important because during hardware and controller initialization, they might add signals to the trace.
-
-After initializing the trace, the hardware and the controller are initialized. Last, `ocp`'s control system is initialized, which links the hardware and controller functions to `ocp`.
+Having a look at the `appInit` function in the `app.c` file, the traces are initialized first. This is important because the hardware and the controller might add signals to the traces, so it is important that they are already initialized. After initializing the trace, the hardware and the controller are initialized. Last, `ocp`'s control system is initialized, which links the hardware and controller functions to `ocp`.
 
 Note that the trace and the control system can be initialized with names. In this template, their are initialized with "App trace" and "App controller", respectively. 
 
 ## Running
 
-In this example, all the controller and hardware files are empty. However, it is already possible to interact with your control system.
+In this example, all the controller and hardware files are empty. However, it is already possible to interact with your control system with Python.
 
-Build the files and run the target (here, we're assuming you've opened this folder in Visual Studio Code - alternatively, you can just build with CMake if you don't want to use VS Code).  
-
-Then, run the Python script `python_ex_template.py` with a Python interpreter (we use IDLE for this).
+Build the files and run the target (manually or with Visual Studio Code).  Then, run the Python script `python_ex_template.py` with a Python interpreter (we use IDLE for this).
 
 Now, run `ocp.cs_get_number_controllers()` in the interpreter. The result should look like the following
 ```python

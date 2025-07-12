@@ -14,8 +14,8 @@ This example is structured in the following way:
 - `ocpConfig.h`: Defines the number of traces and control systems in the system.
 - `stypes.h`: Configuration file for the simulation, containing a description of the input and output signals.
 - `buck.py` and `python_ex_controller.py`: Python files for this example. `buck.py` has definitions that are specific to the controller, and `python_ex_controller.py` shows how to interact with the controller.
-- Folder `app`: contains the source files for the controller.
-- Folder `plecs`: contains the simulation of the converter.
+- `app` folder: contains the source files for the controller.
+- `plecs` folder: contains the simulation of the converter.
 
 The structure of the files in the `app` folder is discussed in the introductory example, and thus this won't be discussed here again.
 
@@ -85,13 +85,13 @@ The size of the trace, e.g. how many bytes it can store, can be set dynamically.
 
 In this case, the trace can store up to 10 MB of data. All signals in a single trace are stored simultaneously at an event defined by the user in the C code of the application. A common case is to set the trace so that it stores its signals every time the controller is executed. 
 
-The size of the trace can be dynamically set (up to its maximum size). For example, let's say we want to record the trace signals for 200 control events. Each trace is saved as a float in the controller's memory, which takes 4 bytes. Thus, if we have 4 signals and want to store 200 samples of each, we need to set the trace to have a size of `4*4*200`:
+The size of the trace can be dynamically set (up to its maximum size). For example, let's say we want to record the trace signals for 4000 control events. Each trace is saved as a float in the controller's memory, which takes 4 bytes. Thus, if we have 4 signals and want to store 4000 samples of each, we need to set the trace to have a size of `4*4*4000`:
 
 ```python
->>> ocp.trace_set_size(0, 4 * 4 * 200)
+>>> ocp.trace_set_size(0, 4 * 4 * 4000)
 (0,)
 >>> ocp.trace_get_size(0)
-(0, 3200)
+(0, 64000)
 ```
 
 ## Setting controller parameters
@@ -150,14 +150,7 @@ Now, we can set our controller. First, we obtain its gains, then we format these
 
 ## Running the controller
 
-Now that the controller is set, we can run a closed-loop simulation and retrieve data stored by the controller. To do so, we use PLECS to simulate the buck converter. To run the PLECS simulation, we first need to build another C program, which is responsible for interfacing the simulation and the controller. To do so, in the command prompt, navigate to the `plecs` folder and run make:
-
-```sh
-cd plecs
-make
-```
-
-Now, open the PLECS model and start the simulation. In `ocp`, the controller is initially disabled, and must be enabled. In the Python shell, run:
+Now that the controller is set, we can run a closed-loop simulation and retrieve data stored by the controller. To do so, we use PLECS to simulate the buck converter. Open the PLECS model in the `plecs` folder and start the simulation. In `ocp`, the controller is initially disabled, and must be enabled. In the Python shell, run:
 
 ```python
 >>> ocp.trace_reset(0); ocp.cs_enable(0)
@@ -176,7 +169,7 @@ Next, we can check the trace signals to see the data the controller recorded. We
 
 ```python
 >>> len(trace_data)
-3200
+64000
 ```
 
 Because we know that we have four float signals in the trace, we can convert this binary data to a numpy array. In `python_ex_controller.py`, we wrote a function to do exactly that. To convert the data, run: 
@@ -189,10 +182,10 @@ The second argument of this function is the number of signals in the trace, whic
 
 ```python
 >>> data.shape
-(200, 4)
+(4000, 4)
 ```
 
-This means each signal has 200 samples, and there are four signals, exactly as we've configured the trace previously. Now that we have the data, we can for example compare the reference signal and the output voltage as follows:
+This means each signal has 4000 samples, and there are four signals, exactly as we've configured the trace previously. Now that we have the data, we can for example compare the reference signal and the output voltage as follows:
 
 ```python
 >>> plt.plot(data[:, 1])
