@@ -21,7 +21,7 @@
 #include "rp/rp.h"
 
 #ifdef OCP_CONFIG_MASTER_CORE
-#include "ipcClient.h"
+#include "ipc/ipcClient.h"
 #endif
 //=============================================================================
 

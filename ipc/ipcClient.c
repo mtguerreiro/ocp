@@ -9,6 +9,8 @@
 //=============================================================================
 #include "ipcClient.h"
 
+/* For memcpy */
+#include "string.h"
 //=============================================================================
 
 //=============================================================================
@@ -148,30 +150,14 @@ int32_t ipcClientRequest(void *req, int32_t reqsize,
 //-----------------------------------------------------------------------------
 static int32_t ipcClientMemRead(void *src, void *dst, int32_t size){
 
-	size_t *s = (size_t *)src;
-	size_t *d = (size_t *)dst;
-
-	/* Size is rounded up instead of being truncated */
-	size = (size + sizeof(size_t) - 1) / sizeof(size_t);
-
-	while(size--){
-		*d++ = *s++;
-	}
+	memcpy(dst, src, size);
 
 	return 0;
 }
 //-----------------------------------------------------------------------------
 static int32_t ipcClientMemWrite(void *src, void *dst, int32_t size){
 
-	size_t *s = (size_t *)src;
-	size_t *d = (size_t *)dst;
-
-	/* Size is rounded up instead of being truncated */
-	size = (size + sizeof(size_t) - 1) / sizeof(size_t);
-
-	while(size--){
-		*d++ = *s++;
-	}
+	memcpy(dst, src, size);
 
 	return 0;
 }
