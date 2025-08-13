@@ -17,6 +17,7 @@
 #include "ocpOpil.h"
 
 #include "stddef.h"
+#include "string.h"
 
 #include "rp/rp.h"
 
@@ -851,7 +852,7 @@ static int32_t ocpIfMasterTraceRead(void *in, uint32_t insize,
 
 	uint32_t id;
 	size_t address;
-	uint32_t size;
+	int32_t size;
 	int32_t status;
 	int32_t nTracesSecondCore;
 
@@ -860,7 +861,7 @@ static int32_t ocpIfMasterTraceRead(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		status = ocpIfMasterTraceGetAddressSecondCore( id, (void *)(&address) );
 		if( status < 0 ) return status;
 
@@ -892,7 +893,7 @@ static int32_t ocpIfMasterTraceReset(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		status = ocpIfMasterTraceResetSecondCore(id);
 	}
 	else{
@@ -916,7 +917,7 @@ static int32_t ocpIfMasterTraceGetSize(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		size = ocpIfMasterTraceGetSizeSecondCore(id);
 	}
 	else{
@@ -945,7 +946,7 @@ static int32_t ocpIfMasterTraceSetSize(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		status = ocpIfMasterTraceSetSizeSecondCore(id, size);
 	}
 	else{
@@ -969,7 +970,7 @@ static int32_t ocpIfMasterTraceGetNumberSignals(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		nSignals = ocpIfMasterTraceGetNumberSignalsSecondCore(id);
 	}
 	else{
@@ -997,7 +998,7 @@ static int32_t ocpIfMasterTraceGetSignalsNames(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		size = ocpIfMasterTraceGetSignalsNamesSecondCore(id, o, maxoutsize);
 	}
 	else{
@@ -1061,7 +1062,7 @@ static int32_t ocpIfMasterTraceSetMode(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		status = ocpIfMasterTraceSetModeSecondCore(id, mode);
 	}
 	else{
@@ -1086,7 +1087,7 @@ static int32_t ocpIfMasterTraceGetMode(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 	    mode = ocpIfMasterTraceGetModeSecondCore(id);
 	}
 	else{
@@ -1115,7 +1116,7 @@ static int32_t ocpIfMasterTraceSetNumPreTrigSamples(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		status = ocpIfMasterTraceSetNumPreTrigSamplesSecondCore(id, num);
 	}
 	else{
@@ -1140,7 +1141,7 @@ static int32_t ocpIfMasterTraceGetNumPreTrigSamples(void *in, uint32_t insize,
     nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
     if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-    if( id < nTracesSecondCore ){
+    if( id < (uint32_t) nTracesSecondCore ){
         num = ocpIfMasterTraceGetNumPreTrigSamplesSecondCore(id);
     }
     else{
@@ -1169,7 +1170,7 @@ static int32_t ocpIfMasterTraceSetTrigSignal(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		status = ocpIfMasterTraceSetTrigSignalSecondCore(id, trace);
 	}
 	else{
@@ -1194,7 +1195,7 @@ static int32_t ocpIfMasterTraceGetTrigSignal(void *in, uint32_t insize,
     nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
     if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-    if( id < nTracesSecondCore ){
+    if( id < (uint32_t) nTracesSecondCore ){
         signal = ocpIfMasterTraceGetTrigSignalSecondCore(id);
     }
     else{
@@ -1223,7 +1224,7 @@ static int32_t ocpIfMasterTraceSetTrigLevel(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		status = ocpIfMasterTraceSetTrigLevelSecondCore(id, level);
 	}
 	else{
@@ -1249,7 +1250,7 @@ static int32_t ocpIfMasterTraceGetTrigLevel(void *in, uint32_t insize,
     nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
     if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-    if( id < nTracesSecondCore ){
+    if( id < (uint32_t) nTracesSecondCore ){
         status = ocpIfMasterTraceGetTrigLevelSecondCore(id, &level);
     }
     else{
@@ -1276,7 +1277,7 @@ static int32_t ocpIfMasterTraceGetTail(void *in, uint32_t insize,
 	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
 	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < nTracesSecondCore ){
+	if( id < (uint32_t) nTracesSecondCore ){
 		tail = ocpIfMasterTraceGetTailSecondCore(id);
 	}
 	else{
@@ -1303,7 +1304,7 @@ static int32_t ocpIfMasterTraceGetTrigState(void *in, uint32_t insize,
     nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
     if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-    if( id < nTracesSecondCore ){
+    if( id < (uint32_t) nTracesSecondCore ){
         state = ocpIfMasterTraceGetTrigStateSecondCore(id);
     }
     else{
@@ -1334,7 +1335,7 @@ static int32_t ocpIfMasterCSStatus(void *in, uint32_t insize,
 	nControllersSecondCore = ocpIfMasterCSGetNumberControllersSecondCore();
 	if( nControllersSecondCore < 0 ) return nControllersSecondCore;
 
-	if( id < nControllersSecondCore ) {
+	if( id < (uint32_t) nControllersSecondCore ) {
 		cmdStatus = ocpIfMasterCSStatusSecondCore(id, &status);
 	}
 	else{
@@ -1361,7 +1362,7 @@ static int32_t ocpIfMasterCSEnable(void *in, uint32_t insize,
 	nControllersSecondCore = ocpIfMasterCSGetNumberControllersSecondCore();
 	if( nControllersSecondCore < 0 ) return nControllersSecondCore;
 
-	if( id < nControllersSecondCore ) {
+	if( id < (uint32_t) nControllersSecondCore ) {
 		status = ocpIfMasterCSEnableSecondCore(id);
 	}
 	else{
@@ -1386,7 +1387,7 @@ static int32_t ocpIfMasterCSDisable(void *in, uint32_t insize,
 	nControllersSecondCore = ocpIfMasterCSGetNumberControllersSecondCore();
 	if( nControllersSecondCore < 0 ) return nControllersSecondCore;
 
-	if( id < nControllersSecondCore ) {
+	if( id < (uint32_t) nControllersSecondCore ) {
 		status = ocpIfMasterCSDisableSecondCore(id);
 	}
 	else{
@@ -1413,7 +1414,7 @@ static int32_t ocpIfMasterCSControllerIf(void *in, uint32_t insize,
 	nControllersSecondCore = ocpIfMasterCSGetNumberControllersSecondCore();
 	if( nControllersSecondCore < 0 ) return nControllersSecondCore;
 
-	if( id < nControllersSecondCore ) {
+	if( id < (uint32_t) nControllersSecondCore ) {
 		status = ocpIfMasterCSControllerInterfaceSecondCore(id, (void *)p, insize - 4, out, maxoutsize);
 	}
 	else{
@@ -1438,7 +1439,7 @@ static int32_t ocpIfMasterCSHardwareIf(void *in, uint32_t insize,
 	nControllersSecondCore = ocpIfMasterCSGetNumberControllersSecondCore();
 	if( nControllersSecondCore < 0 ) return nControllersSecondCore;
 
-	if( id < nControllersSecondCore ) {
+	if( id < (uint32_t) nControllersSecondCore ) {
 		status = ocpIfMasterCSHardwareInterfaceSecondCore(id, (void *)p, insize - 4, out, maxoutsize);
 	}
 	else{
@@ -1703,7 +1704,7 @@ static int32_t ocpIfMasterTraceSetTrigLevelSecondCore(uint32_t id, float level){
 
 	cmd[0] = OCP_IF_CMD_TRACE_SET_TRIG_LEVEL;
 	cmd[1] = id;
-	cmd[2] = *( (uint32_t *)&level );
+	memcpy( (void *)&cmd[2], (void *)&level,  sizeof(float) );
 
 	status = ipcClientRequest( (void *)&cmd, 12, 0, 0, OCP_IF_CONFIG_DUAL_CORE_COMM_TO );
 
