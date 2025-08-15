@@ -158,7 +158,7 @@ class TraceTemplate:
         
         fmt = '<' + 'f' * round(n / _TRACE_DATA_SIZE_BYTES)
 
-        data = np.array(struct.unpack(fmt, data_bin))
+        data = np.array(struct.unpack(fmt, data_bin), dtype=np.float32)
 
         data = data.reshape(round(n / n_signals / _TRACE_DATA_SIZE_BYTES), n_signals)
 
