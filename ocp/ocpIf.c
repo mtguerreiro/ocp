@@ -18,6 +18,7 @@
 
 #include "stddef.h"
 #include "string.h"
+#include "stdio.h"
 
 #include "rp/rp.h"
 
@@ -31,177 +32,120 @@
 //=============================================================================
 #ifndef OCP_CONFIG_MASTER_CORE
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceRead(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceRead(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceReset(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceReset(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetSize(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetSize(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetSize(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceSetSize(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetNumberSignals(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetNumberSignals(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetSignalsNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetSignalsNames(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetNumberTraces(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetNumberTraces(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTracesNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetTracesNames(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetAddress(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetAddress(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetMode(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceSetMode(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetMode(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetMode(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetNumPreTrigSamples(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceSetNumPreTrigSamples(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetNumPreTrigSamples(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetNumPreTrigSamples(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetTrigSignal(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceSetTrigSignal(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTrigSignal(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetTrigSignal(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetTrigLevel(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceSetTrigLevel(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTrigLevel(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetTrigLevel(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTail(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetTail(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTriggerState(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfTraceGetTriggerState(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSStatus(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfCSStatus(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSEnable(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfCSEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSDisable(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfCSDisable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSControllerIf(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfCSControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSHardwareIf(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfCSHardwareIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSGetNumberControllers(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfCSGetNumberControllers(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSGetControllersNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfCSGetControllersNames(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilUpdateMeasurements(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfOpilUpdateMeasurements(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilUpdateSimData(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfOpilUpdateSimData(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilRunControl(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfOpilRunControl(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilInitializeControl(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfOpilInitializeControl(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilGetControl(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfOpilGetControl(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilGetControllerData(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfOpilGetControllerData(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
 #else
-static int32_t ocpIfMasterTraceRead(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceRead(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceReset(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceReset(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetSize(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetSize(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetSize(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceSetSize(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetNumberSignals(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetNumberSignals(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetSignalsNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetSignalsNames(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetNumberTraces(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetNumberTraces(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetTracesNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetTracesNames(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetMode(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceSetMode(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetMode(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetMode(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetNumPreTrigSamples(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceSetNumPreTrigSamples(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetNumPreTrigSamples(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetNumPreTrigSamples(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetTrigSignal(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceSetTrigSignal(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetTrigSignal(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetTrigSignal(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetTrigLevel(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceSetTrigLevel(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetTrigLevel(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetTrigLevel(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetTail(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetTail(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetTrigState(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterTraceGetTrigState(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSStatus(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSStatus(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSEnable(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSEnable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSDisable(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSDisable(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSControllerIf(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSHardwareIf(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSHardwareIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSGetNumberControllers(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSGetNumberControllers(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSGetControllersNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSGetControllersNames(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceGetNumberTracesSecondCore(void);
 //-----------------------------------------------------------------------------
@@ -213,8 +157,7 @@ static int32_t ocpIfMasterTraceSetSizeSecondCore(uint32_t id, int32_t size);
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceGetNumberSignalsSecondCore(uint32_t id);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetSignalsNamesSecondCore(uint32_t id,
-		char *buffer, int32_t maxsize);
+static int32_t ocpIfMasterTraceGetSignalsNamesSecondCore(uint32_t id, char *buffer, int32_t maxsize);
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceGetTracesNamesSecondCore(char *buffer, int32_t maxsize);
 //-----------------------------------------------------------------------------
@@ -250,21 +193,19 @@ static int32_t ocpIfMasterCSDisableSecondCore(uint32_t id);
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterCSGetControllersNamesSecondCore(char *buffer, int32_t maxsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSControllerInterfaceSecondCore(uint32_t id,
-		void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSControllerInterfaceSecondCore(
+    uint32_t id, void *in, uint32_t insize, void **out, uint32_t maxoutsize
+);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterCSHardwareInterfaceSecondCore(uint32_t id,
-		void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfMasterCSHardwareInterfaceSecondCore(
+    uint32_t id, void *in, uint32_t insize, void **out, uint32_t maxoutsize
+);
 //-----------------------------------------------------------------------------
 #endif
 //-----------------------------------------------------------------------------
-static int32_t ocpIfPlatformID(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfPlatformID(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //-----------------------------------------------------------------------------
-static int32_t ocpIfPlatformIf(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize);
+static int32_t ocpIfPlatformIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize);
 //=============================================================================
 
 //=============================================================================
@@ -272,19 +213,16 @@ static int32_t ocpIfPlatformIf(void *in, uint32_t insize,
 //=============================================================================
 
 typedef struct{
-
-	rphandle_t handles[OCP_IF_CMD_END];
-	rpctx_t rp;
-
+    rphandle_t handles[OCP_IF_CMD_END];
+    rpctx_t rp;
 }ocpIfControl_t;
 
-#define OCP_IF_CONFIG_DUAL_CORE_COMM_TO		60000
+#define OCP_IF_CONFIG_DUAL_CORE_COMM_TO     60000
 //=============================================================================
 
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
-
 static ocpIfControl_t xcontrol;
 //=============================================================================
 
@@ -294,37 +232,37 @@ static ocpIfControl_t xcontrol;
 //-----------------------------------------------------------------------------
 int32_t ocpIfInitialize(void){
 
-	rpInitialize( &xcontrol.rp, OCP_IF_CMD_END, xcontrol.handles );
+    rpInitialize( &xcontrol.rp, OCP_IF_CMD_END, xcontrol.handles );
 
 #ifndef OCP_CONFIG_MASTER_CORE
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_READ, ocpIfTraceRead );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_RESET, ocpIfTraceReset );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_SIZE, ocpIfTraceGetSize );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_SIZE, ocpIfTraceSetSize );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_SIGNALS, ocpIfTraceGetNumberSignals );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_SIGNALS_NAMES, ocpIfTraceGetSignalsNames );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_TRACES, ocpIfTraceGetNumberTraces );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRACES_NAMES, ocpIfTraceGetTracesNames );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_ADDRESS, ocpIfTraceGetAddress );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_MODE, ocpIfTraceSetMode );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_MODE, ocpIfTraceGetMode );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES, ocpIfTraceSetNumPreTrigSamples );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUM_PRE_TRIG_SAMPLES, ocpIfTraceGetNumPreTrigSamples );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_SIGNAL, ocpIfTraceSetTrigSignal );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_SIGNAL, ocpIfTraceGetTrigSignal );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_LEVEL, ocpIfTraceSetTrigLevel );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_LEVEL, ocpIfTraceGetTrigLevel );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TAIL, ocpIfTraceGetTail );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_STATE, ocpIfTraceGetTriggerState );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_READ, ocpIfTraceRead );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_RESET, ocpIfTraceReset );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_SIZE, ocpIfTraceGetSize );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_SIZE, ocpIfTraceSetSize );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_SIGNALS, ocpIfTraceGetNumberSignals );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_SIGNALS_NAMES, ocpIfTraceGetSignalsNames );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_TRACES, ocpIfTraceGetNumberTraces );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRACES_NAMES, ocpIfTraceGetTracesNames );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_ADDRESS, ocpIfTraceGetAddress );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_MODE, ocpIfTraceSetMode );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_MODE, ocpIfTraceGetMode );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES, ocpIfTraceSetNumPreTrigSamples );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUM_PRE_TRIG_SAMPLES, ocpIfTraceGetNumPreTrigSamples );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_SIGNAL, ocpIfTraceSetTrigSignal );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_SIGNAL, ocpIfTraceGetTrigSignal );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_LEVEL, ocpIfTraceSetTrigLevel );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_LEVEL, ocpIfTraceGetTrigLevel );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TAIL, ocpIfTraceGetTail );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_STATE, ocpIfTraceGetTriggerState );
 
-	//rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_STATUS, ocpIfCSGetStatus );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_STATUS, ocpIfCSStatus );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_ENABLE, ocpIfCSEnable );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_DISABLE, ocpIfCSDisable );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_CONTROLLER_IF, ocpIfCSControllerIf );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_HARDWARE_IF, ocpIfCSHardwareIf );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_NUMBER_CONTROLLERS, ocpIfCSGetNumberControllers );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_CONTROLLERS_NAMES, ocpIfCSGetControllersNames );
+    //rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_STATUS, ocpIfCSGetStatus );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_STATUS, ocpIfCSStatus );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_ENABLE, ocpIfCSEnable );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_DISABLE, ocpIfCSDisable );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_CONTROLLER_IF, ocpIfCSControllerIf );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_HARDWARE_IF, ocpIfCSHardwareIf );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_NUMBER_CONTROLLERS, ocpIfCSGetNumberControllers );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_CONTROLLERS_NAMES, ocpIfCSGetControllersNames );
 
     rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_OPIL_UPDATE_MEASUREMENTS, ocpIfOpilUpdateMeasurements );
     rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_OPIL_UPDATE_SIM_DATA, ocpIfOpilUpdateSimData );
@@ -334,43 +272,43 @@ int32_t ocpIfInitialize(void){
     rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_OPIL_GET_CONTROLLER_DATA, ocpIfOpilGetControllerData );
 
 #else
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_READ, ocpIfMasterTraceRead );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_RESET, ocpIfMasterTraceReset );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_SIZE, ocpIfMasterTraceGetSize );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_SIZE, ocpIfMasterTraceSetSize );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_SIGNALS, ocpIfMasterTraceGetNumberSignals );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_SIGNALS_NAMES, ocpIfMasterTraceGetSignalsNames );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_TRACES, ocpIfMasterTraceGetNumberTraces );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRACES_NAMES, ocpIfMasterTraceGetTracesNames );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_MODE, ocpIfMasterTraceSetMode );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_MODE, ocpIfMasterTraceGetMode );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES, ocpIfMasterTraceSetNumPreTrigSamples );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_READ, ocpIfMasterTraceRead );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_RESET, ocpIfMasterTraceReset );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_SIZE, ocpIfMasterTraceGetSize );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_SIZE, ocpIfMasterTraceSetSize );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_SIGNALS, ocpIfMasterTraceGetNumberSignals );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_SIGNALS_NAMES, ocpIfMasterTraceGetSignalsNames );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUMBER_TRACES, ocpIfMasterTraceGetNumberTraces );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRACES_NAMES, ocpIfMasterTraceGetTracesNames );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_MODE, ocpIfMasterTraceSetMode );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_MODE, ocpIfMasterTraceGetMode );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES, ocpIfMasterTraceSetNumPreTrigSamples );
     rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_NUM_PRE_TRIG_SAMPLES, ocpIfMasterTraceGetNumPreTrigSamples );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_SIGNAL, ocpIfMasterTraceSetTrigSignal );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_SIGNAL, ocpIfMasterTraceSetTrigSignal );
     rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_SIGNAL, ocpIfMasterTraceGetTrigSignal );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_LEVEL, ocpIfMasterTraceSetTrigLevel );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_SET_TRIG_LEVEL, ocpIfMasterTraceSetTrigLevel );
     rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_LEVEL, ocpIfMasterTraceGetTrigLevel );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TAIL, ocpIfMasterTraceGetTail );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TAIL, ocpIfMasterTraceGetTail );
     rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_TRACE_GET_TRIG_STATE, ocpIfMasterTraceGetTrigState );
 
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_STATUS, ocpIfMasterCSStatus );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_ENABLE, ocpIfMasterCSEnable );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_DISABLE, ocpIfMasterCSDisable );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_CONTROLLER_IF, ocpIfMasterCSControllerIf );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_HARDWARE_IF, ocpIfMasterCSHardwareIf );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_NUMBER_CONTROLLERS, ocpIfMasterCSGetNumberControllers );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_CONTROLLERS_NAMES, ocpIfMasterCSGetControllersNames );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_STATUS, ocpIfMasterCSStatus );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_ENABLE, ocpIfMasterCSEnable );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_DISABLE, ocpIfMasterCSDisable );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_CONTROLLER_IF, ocpIfMasterCSControllerIf );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_HARDWARE_IF, ocpIfMasterCSHardwareIf );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_NUMBER_CONTROLLERS, ocpIfMasterCSGetNumberControllers );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_CS_GET_CONTROLLERS_NAMES, ocpIfMasterCSGetControllersNames );
 #endif
 
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_PLATFORM_ID, ocpIfPlatformID );
-	rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_PLATFORM_IF, ocpIfPlatformIf );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_PLATFORM_ID, ocpIfPlatformID );
+    rpRegisterHandle( &xcontrol.rp, OCP_IF_CMD_PLATFORM_IF, ocpIfPlatformIf );
 
-	return 0;
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t ocpIf(void *in, int32_t insize, void **out, int32_t maxoutsize){
 
-	return rpRequest( &xcontrol.rp, in, insize, out, maxoutsize);
+    return rpRequest( &xcontrol.rp, in, insize, out, maxoutsize);
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -381,318 +319,350 @@ int32_t ocpIf(void *in, int32_t insize, void **out, int32_t maxoutsize){
 //=============================================================================
 #ifndef OCP_CONFIG_MASTER_CORE
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceRead(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceRead(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	size_t address;
-	int32_t size;
-	int32_t status;
+    uint32_t id;
+    size_t address;
+    int32_t size;
+    int32_t status;
 
-	id = *( (uint32_t *)in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, insize );
 
-	status = ocpTraceGetAddress( id, (void *)(&address) );
-	if( status < 0 ) return status;
+    status = ocpTraceGetAddress( id, (void *)(&address) );
+    if( status < 0 ) return status;
 
-	size = ocpTraceGetSize( id );
-	if( size < 0 ) return size;
+    size = ocpTraceGetSize( id );
+    if( size < 0 ) return size;
 
-	*out = (void *)( address );
+    if( maxoutsize < sizeof(address) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    *out = (void *)( address );
 
-	return size;
+    return size;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceReset(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceReset(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t status;
+    (void)out;
+    (void)maxoutsize;
 
-	id = *( (uint32_t *)in );
+    uint32_t id;
+    int32_t status;
 
-	status = ocpTraceReset(id);
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, insize );
 
-	return status;
+    status = ocpTraceReset(id);
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetSize(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetSize(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t size;
-	uint32_t *o = (uint32_t *)*out;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    int32_t size;
 
-	id = *p++;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, insize );
 
-	size = ocpTraceGetSize(id);
-	if( size < 0 ) return size;
+    size = ocpTraceGetSize(id);
+    if( size < 0 ) return size;
 
-	*o = size;
+    if( maxoutsize < sizeof(size) )
+    memcpy( *out, (void *)&size, sizeof(size) );
 
-	return 4;
+    return sizeof(size);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetSize(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceSetSize(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	uint32_t size;
-	int32_t status;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    uint32_t size;
+    int32_t status;
+    char *p;
 
-	id = *p++;
-	size = *p;
+    if( insize < ( sizeof(id) + sizeof(size) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	status = ocpTraceSetSize(id, size);
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	return status;
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&size, (void *)p, sizeof(size) );
+
+    status = ocpTraceSetSize(id, size);
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetNumberSignals(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetNumberSignals(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t n;
+    uint32_t id;
+    int32_t n;
 
-	uint32_t *o = (uint32_t *)( *out );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, insize );
 
-	id = *( (uint32_t *)in );
+    n = ocpTraceGetNumberSignals(id);
+    if( n < 0 ) return n;
 
-	n = ocpTraceGetNumberSignals(id);
-	if( n < 0 ) return n;
+    if( maxoutsize < sizeof(n) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&n, sizeof(n) );
 
-	*o = n;
-
-	return 4;
+    return sizeof(n);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetSignalsNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetSignalsNames(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	uint32_t size;
+    uint32_t id;
+    uint32_t size;
 
-	char *o = (char *)( *out );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, insize );
 
-	id = *( (uint32_t *)in );
+    size = ocpTraceGetSignalsNames(id, (char *)( *out ), maxoutsize);
 
-	size = ocpTraceGetSignalsNames(id, o, maxoutsize);
-
-	return size;
+    return size;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetNumberTraces(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetNumberTraces(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	int32_t n;
+    (void)in;
+    (void)insize;
+    int32_t n;
 
-	uint32_t *o = (uint32_t *)( *out );
+    n = ocpTraceGetNumberTraces();
+    if( n < 0 ) return n;
 
-	n = ocpTraceGetNumberTraces();
-	if( n < 0 ) return n;
+    if( maxoutsize < sizeof(n) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&n, sizeof(n) );
 
-	*o = n;
-
-	return 4;
+    return sizeof(n);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTracesNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetTracesNames(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t size;
+    uint32_t size;
 
-	char *o = (char *)( *out );
+    size = ocpTraceGetTracesNames((char *)( *out ), maxoutsize);
 
-	size = ocpTraceGetTracesNames(o, maxoutsize);
-
-	return size;
+    return size;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetAddress(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetAddress(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	size_t address;
-	int32_t status;
+    uint32_t id;
+    size_t address;
+    int32_t status;
 
-	size_t *o = (size_t *)( *out );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, insize );
 
-	id = *( (uint32_t *)in );
+    status = ocpTraceGetAddress( id, (void *)(&address) );
+    if( status < 0 ) return status;
 
-	status = ocpTraceGetAddress( id, (void *)(&address) );
-	if( status < 0 ) return status;
+    if( maxoutsize < sizeof(address) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&address, sizeof(address) );
 
-	*o = address;
-
-	return sizeof(size_t);
+    return sizeof(size_t);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetMode(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceSetMode(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	uint32_t mode;
-	uint32_t *p;
-	int32_t status;
+    uint32_t id;
+    uint32_t mode;
+    char *p;
+    int32_t status;
 
-	p = (uint32_t *)in;
+    if( insize < ( sizeof(id) + sizeof(mode) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	id = *p++;
-	mode = *p++;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	status = ocpTraceSetMode(id, (ocpTraceMode_t)mode);
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&mode, p, sizeof(mode) );
 
-	return status;
+    status = ocpTraceSetMode(id, (ocpTraceMode_t)mode);
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetMode(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetMode(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	int32_t mode;
-	uint32_t *o = (uint32_t *)( *out );
+    uint32_t id;
+    int32_t mode;
 
-	uint32_t id;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	id = *((uint32_t *)in);
-	mode = ocpTraceGetMode(id);
+    mode = ocpTraceGetMode(id);
 
-	*o = mode;
+    if( maxoutsize < sizeof(mode) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&mode, sizeof(mode) );
 
-	return 4;
+    return sizeof(mode);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetNumPreTrigSamples(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceSetNumPreTrigSamples(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	uint32_t num;
-	int32_t status;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    uint32_t num;
+    int32_t status;
+    char *p;
 
-	id = *p++;
-	num = *p;
+    if( insize < ( sizeof(id) + sizeof(num) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	status = ocpTraceSetNumPreTrigSamples(id, num);
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	return status;
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&num, p, sizeof(num) );
+
+    status = ocpTraceSetNumPreTrigSamples(id, num);
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetNumPreTrigSamples(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetNumPreTrigSamples(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t *o = (uint32_t *)( *out );
-	int32_t nsamples;
-	uint32_t id;
+    int32_t nsamples;
+    uint32_t id;
 
-	id = *( (uint32_t *)in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	nsamples = ocpTraceGetNumPreTrigSamples(id);
+    nsamples = ocpTraceGetNumPreTrigSamples(id);
 
-	*o = nsamples;
-
-	return 4;
+    if( maxoutsize < sizeof(nsamples) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&nsamples, sizeof(nsamples) );
+    
+    return sizeof(nsamples);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetTrigSignal(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceSetTrigSignal(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	uint32_t signal;
-	int32_t status;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    uint32_t signal;
+    int32_t status;
+    char *p;
 
-	id = *p++;
-	signal = *p;
+    if( insize < ( sizeof(id) + sizeof(signal) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	status = ocpTraceSetTrigSignal(id, signal);
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	return status;
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&signal, p, sizeof(signal) );
+
+    status = ocpTraceSetTrigSignal(id, signal);
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTrigSignal(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetTrigSignal(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t *o = (uint32_t *)( *out );
-	uint32_t id;
-	uint32_t signal;
+    uint32_t id;
+    uint32_t signal;
 
-	id = *((uint32_t *)in);
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	signal = ocpTraceGetTrigSignal(id);
-	*o = signal;
+    signal = ocpTraceGetTrigSignal(id);
 
-	return 4;
+    if( maxoutsize < sizeof(signal) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&signal, sizeof(signal) );
+
+    return sizeof(signal) ;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceSetTrigLevel(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceSetTrigLevel(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	float level;
-	int32_t status;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    float level;
+    int32_t status;
+    char *p;
 
-	id = *p++;
-	level = *((float *)p);
+    if( insize < ( sizeof(id) + sizeof(level) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	status = ocpTraceSetTrigLevel(id, level);
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	return status;
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&level, p, sizeof(level) );
+
+    status = ocpTraceSetTrigLevel(id, level);
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTrigLevel(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetTrigLevel(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	int32_t status;
-	float *o = (float *)( *out );
-	uint32_t id;
-	float level;
+    int32_t status;
+    uint32_t id;
+    float level;
 
-	id = *((uint32_t *)in);
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	status = ocpTraceGetTrigLevel(id, &level);
-	if(status < 0 ) return status;
+    status = ocpTraceGetTrigLevel(id, &level);
+    if(status < 0 ) return status;
 
-	*o = level;
+    if( maxoutsize < sizeof(level) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&level, sizeof(level) );
 
-	return 4;
+    return sizeof(level);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTail(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetTail(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t tail;
-	uint32_t *o = (uint32_t *)*out;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    int32_t tail;
 
-	id = *p++;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	tail = ocpTraceGetTail(id);
-	if( tail < 0 ) return tail;
+    tail = ocpTraceGetTail(id);
+    if( tail < 0 ) return tail;
 
-	*o = tail;
+    if( maxoutsize < sizeof(tail) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&tail, sizeof(tail) );
 
-	return 4;
+    return sizeof(tail);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfTraceGetTriggerState(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfTraceGetTriggerState(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t state;
-	uint32_t *o = (uint32_t *)*out;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    int32_t state;
 
-	id = *p++;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	state = ocpTraceGetTriggerState(id);
-	if( state < 0 ) return state;
+    state = ocpTraceGetTriggerState(id);
+    if( state < 0 ) return state;
 
-	*o = state;
+    if( maxoutsize < sizeof(state) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&state, sizeof(state) );
 
-	return 4;
+    return sizeof(state);
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpIfCSStatus(void *in, uint32_t insize,

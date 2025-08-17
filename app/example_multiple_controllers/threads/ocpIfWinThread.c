@@ -67,7 +67,7 @@ void *ocpIfThread(void *ptr){
 
     /* Creates the server socket */
     if( (server_socket = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET ){
-        printf("%s: Error creating socket. Error Code : %d", __FUNCTION__, WSAGetLastError());
+        printf("%s: Error creating socket. Error Code : %d", __func__, WSAGetLastError());
         fflush( stdout );
         WSACleanup();
         return 0;
@@ -82,31 +82,31 @@ void *ocpIfThread(void *ptr){
     /* Binds the server socket to the address */
     status = bind( server_socket, (struct sockaddr *)&server_addr, sizeof(server_addr) );
     if( status < 0 ){
-        printf("%s: Error binding socket. bind returned: %d\n\r", __FUNCTION__, status);
+        printf("%s: Error binding socket. bind returned: %d\n\r", __func__, status);
         return 0;
     }
 
     /* Listens for incoming connections */
     status = listen(server_socket, OCP_IF_THREAD_BACKLOG); 
     if( status < 0 ){
-        printf("%s: Error listening for connections. listen returned: %d\n\r", __FUNCTION__, status);
+        printf("%s: Error listening for connections. listen returned: %d\n\r", __func__, status);
         close(server_socket);
         return 0;
     }
 
-    printf("%s: OCP interface ready and running.\n\r", __FUNCTION__);
+    printf("%s: OCP interface ready and running.\n\r", __func__);
 
     while(1){
         /* Waits for a connection */
         client_len = sizeof(client_addr);
         client_socket = accept( server_socket , (struct sockaddr *)&client_addr, &client_len );
         if( client_socket < 0 ) {
-            printf("%s: Error accepting connection. accept returned: %d\n\r", __FUNCTION__, client_socket);
+            printf("%s: Error accepting connection. accept returned: %d\n\r", __func__, client_socket);
             close(server_socket);
             return 0;
         }
 
-        printf("%s: Client connected from %s\n", __FUNCTION__, inet_ntoa(client_addr.sin_addr));
+        printf("%s: Client connected from %s\n", __func__, inet_ntoa(client_addr.sin_addr));
 
         pthread_create( &ocpIfThreadProcessHandle, NULL, ocpIfThreadProcess, (void *)&client_socket);
         pthread_join( ocpIfThreadProcessHandle, NULL);
@@ -148,14 +148,14 @@ void *ocpIfThreadProcess(void *param){
         while( nrx < 4 ){
           n = recv(sd, (void *)&recvbuf[nrx], 4 - nrx, 0);
           if( n <= 0 ){
-              printf("%s: error reading from socket %d, closing socket\r\n", __FUNCTION__, sd);
+              printf("%s: error reading from socket %d, closing socket\r\n", __func__, sd);
               fflush(stdout);
               break;
           }
           nrx += n;
         }
         if( nrx != 4 ){
-          printf("%s: error reading from socket %d, closing socket\r\n", __FUNCTION__, sd);
+          printf("%s: error reading from socket %d, closing socket\r\n", __func__, sd);
           fflush(stdout);
           break;
         }
@@ -166,14 +166,14 @@ void *ocpIfThreadProcess(void *param){
         while( nrx < size ){
           n = recv(sd, (void *)&recvbuf[nrx], size - nrx, 0);
           if( n <= 0 ){
-              printf("%s: error reading from socket %d, closing socket\r\n", __FUNCTION__, sd);
+              printf("%s: error reading from socket %d, closing socket\r\n", __func__, sd);
               fflush(stdout);
               break;
           }
           nrx += n;
         }
         if( nrx != size ){
-          printf("%s: error receiving all expected data from socket %d, closing socket\r\n", __FUNCTION__, sd);
+          printf("%s: error receiving all expected data from socket %d, closing socket\r\n", __func__, sd);
           fflush(stdout);
           break;
         }
@@ -192,7 +192,7 @@ void *ocpIfThreadProcess(void *param){
         //*( (int32_t *)recvbuf ) = ret;
         n = send(sd, (void *)&ret, 4, 0);
         if( n < 4 ){
-            printf("%s: error responding to client\'s request\r\n", __FUNCTION__);
+            printf("%s: error responding to client\'s request\r\n", __func__);
             fflush(stdout);
             break;
         }
@@ -201,7 +201,7 @@ void *ocpIfThreadProcess(void *param){
         if( ret > 0 ){
             n = send(sd, (void *)p, ret, 0);
             if( n < ret ){
-                printf("%s: error responding to client\'s request\r\n", __FUNCTION__);
+                printf("%s: error responding to client\'s request\r\n", __func__);
                 fflush(stdout);
             }
         }
@@ -211,7 +211,7 @@ void *ocpIfThreadProcess(void *param){
     /* Closes connection */
     status = shutdown(sd, 0);
     if( status < 0 ){
-        printf("%s: Shutdown failed. shutdown returned: %d\n", __FUNCTION__, status);
+        printf("%s: Shutdown failed. shutdown returned: %d\n", __func__, status);
     }
 
     close(sd);

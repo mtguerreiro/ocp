@@ -20,10 +20,13 @@ set(CMAKE_C_STANDARD_REQUIRED True)
 add_compile_options(
     -Wall
     -Wextra
-    -Wno-unused-parameter
+    -Wpedantic
+    -Wpointer-arith
+    -Wcast-align
+    -Wstrict-aliasing
+    #-Wno-unused-parameter
     -O2
 )
-
 add_subdirectory(${OCP_PATH} "${PROJECT_BINARY_DIR}/ocp")
 add_subdirectory(${OPIL_PATH} "${PROJECT_BINARY_DIR}/opil")
 

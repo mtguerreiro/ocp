@@ -40,7 +40,7 @@ typedef enum{
      *  - There is no specified format for the trace data. It is up to the user
      *    to decode these values.
      */
-	OCP_IF_CMD_TRACE_READ = 0,
+    OCP_IF_CMD_TRACE_READ = 0,
 
     /**
      * Command
@@ -51,7 +51,7 @@ typedef enum{
      * Response
      * No response
      */
-	OCP_IF_CMD_TRACE_RESET,
+    OCP_IF_CMD_TRACE_RESET,
 
     /**
      * Command
@@ -64,7 +64,7 @@ typedef enum{
      *  | TRACE SIZE (uint32) |
      *  -----------------------
      */
-	OCP_IF_CMD_TRACE_GET_SIZE,
+    OCP_IF_CMD_TRACE_GET_SIZE,
 
     /**
      * Command
@@ -81,7 +81,7 @@ typedef enum{
      * - This command will fail if the required size is larger than the
      *   maximum allowed size.
      */
-	OCP_IF_CMD_TRACE_SET_SIZE,
+    OCP_IF_CMD_TRACE_SET_SIZE,
 
     /**
      * Command
@@ -94,7 +94,7 @@ typedef enum{
      *  | # OF TRACED SIGNALS (uint32) |
      *  --------------------------------
      */
-	OCP_IF_CMD_TRACE_GET_NUMBER_SIGNALS,
+    OCP_IF_CMD_TRACE_GET_NUMBER_SIGNALS,
 
     /**
      * Command
@@ -110,7 +110,7 @@ typedef enum{
      * Notes
      * - Names are returned as strings, each terminated by '\0'.
      */
-	OCP_IF_CMD_TRACE_GET_SIGNALS_NAMES,
+    OCP_IF_CMD_TRACE_GET_SIGNALS_NAMES,
 
     /**
      * Command
@@ -126,7 +126,7 @@ typedef enum{
      * Notes
      * - Names are returned as strings, each terminated by '\0'.
      */
-	OCP_IF_CMD_TRACE_GET_NUMBER_TRACES,
+    OCP_IF_CMD_TRACE_GET_NUMBER_TRACES,
 
     /**
      * Command
@@ -142,7 +142,7 @@ typedef enum{
      * Notes
      * - Names are returned as strings, each terminated by '\0'.
      */
-	OCP_IF_CMD_TRACE_GET_TRACES_NAMES,
+    OCP_IF_CMD_TRACE_GET_TRACES_NAMES,
 
     /**
      * Command
@@ -155,142 +155,142 @@ typedef enum{
      *  | TRACE ADDRESS (uint32) |
      *  --------------------------
      */
-	OCP_IF_CMD_TRACE_GET_ADDRESS,
+    OCP_IF_CMD_TRACE_GET_ADDRESS,
 
-	/**
-	 * Command
-	 *  ----------------------------------------------------------
-	 *  | SET MODE (uint32) |  TRACE ID (uint32) | MODE (uint32) |
-	 *  ----------------------------------------------------------
-	 *
-	 * Response
-	 * No Response
-	 */
-	OCP_IF_CMD_TRACE_SET_MODE,
+    /**
+     * Command
+     *  ----------------------------------------------------------
+     *  | SET MODE (uint32) |  TRACE ID (uint32) | MODE (uint32) |
+     *  ----------------------------------------------------------
+     *
+     * Response
+     * No Response
+     */
+    OCP_IF_CMD_TRACE_SET_MODE,
 
-	/**
-	 * Command
-	 *  ------------------------------------------
-	 *  | GET MODE (uint32) |  TRACE ID (uint32) |
-	 *  ------------------------------------------
-	 *
-	 * Response
+    /**
+     * Command
+     *  ------------------------------------------
+     *  | GET MODE (uint32) |  TRACE ID (uint32) |
+     *  ------------------------------------------
+     *
+     * Response
      *  -----------------
      *  | MODE (uint32) |
      *  -----------------
-	 */
-	OCP_IF_CMD_TRACE_GET_MODE,
+     */
+    OCP_IF_CMD_TRACE_GET_MODE,
 
-	/**
-	 * Command
-	 *  ---------------------------------------------------------------------------------
-	 *  | SET NUM PRE TRIG SAMPLES (uint32) |  TRACE ID (uint32) | NUM SAMPLES (uint32) |
-	 *  ---------------------------------------------------------------------------------
-	 *
-	 * Response
-	 * No Response
-	 */
-	OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES,
+    /**
+     * Command
+     *  ---------------------------------------------------------------------------------
+     *  | SET NUM PRE TRIG SAMPLES (uint32) |  TRACE ID (uint32) | NUM SAMPLES (uint32) |
+     *  ---------------------------------------------------------------------------------
+     *
+     * Response
+     * No Response
+     */
+    OCP_IF_CMD_TRACE_SET_NUM_PRE_TRIG_SAMPLES,
 
-	/**
-	 * Command
-	 *  ----------------------------------------------------------
-	 *  | GET NUM PRE TRIG SAMPLES (uint32) |  TRACE ID (uint32) |
-	 *  ----------------------------------------------------------
-	 *
-	 * Response
+    /**
+     * Command
+     *  ----------------------------------------------------------
+     *  | GET NUM PRE TRIG SAMPLES (uint32) |  TRACE ID (uint32) |
+     *  ----------------------------------------------------------
+     *
+     * Response
      *  ------------------------
      *  | NUM SAMPLES (uint32) |
      *  ------------------------
-	 */
-	OCP_IF_CMD_TRACE_GET_NUM_PRE_TRIG_SAMPLES,
+     */
+    OCP_IF_CMD_TRACE_GET_NUM_PRE_TRIG_SAMPLES,
 
-	/**
-	 * Command
-	 *  -------------------------------------------------------------------
-	 *  | SET TRIG SIGNAL (uint32) |  TRACE ID (uint32) | SIGNAL (uint32) |
-	 *  -------------------------------------------------------------------
-	 *
-	 * Response
-	 * No Response
-	 */
-	OCP_IF_CMD_TRACE_SET_TRIG_SIGNAL,
+    /**
+     * Command
+     *  -------------------------------------------------------------------
+     *  | SET TRIG SIGNAL (uint32) |  TRACE ID (uint32) | SIGNAL (uint32) |
+     *  -------------------------------------------------------------------
+     *
+     * Response
+     * No Response
+     */
+    OCP_IF_CMD_TRACE_SET_TRIG_SIGNAL,
 
-	/**
-	 * Command
-	 *  -------------------------------------------------
-	 *  | GET TRIG SIGNAL (uint32) |  TRACE ID (uint32) |
-	 *  -------------------------------------------------
-	 *
-	 * Response
+    /**
+     * Command
+     *  -------------------------------------------------
+     *  | GET TRIG SIGNAL (uint32) |  TRACE ID (uint32) |
+     *  -------------------------------------------------
+     *
+     * Response
      *  --------------------
      *  | TRIGGER (uint32) |
      *  --------------------
-	 */
-	OCP_IF_CMD_TRACE_GET_TRIG_SIGNAL,
+     */
+    OCP_IF_CMD_TRACE_GET_TRIG_SIGNAL,
 
-	/**
-	 * Command
-	 *  ----------------------------------------------------------------
-	 *  | SET TRIG LEVEL (uint32) |  TRACE ID (uint32) | LEVEL (float) |
-	 *  ----------------------------------------------------------------
-	 *
-	 * Response
-	 * No Response
+    /**
+     * Command
+     *  ----------------------------------------------------------------
+     *  | SET TRIG LEVEL (uint32) |  TRACE ID (uint32) | LEVEL (float) |
+     *  ----------------------------------------------------------------
+     *
+     * Response
+     * No Response
      * 
      * Notes
      *  - The size of LEVEL is 4 bytes.
-	 */
-	OCP_IF_CMD_TRACE_SET_TRIG_LEVEL,
+    */
+    OCP_IF_CMD_TRACE_SET_TRIG_LEVEL,
 
-	/**
-	 * Command
-	 *  ----------------------------------------------------------------
-	 *  | SET TRIG LEVEL (uint32) |  TRACE ID (uint32) | LEVEL (float) |
-	 *  ----------------------------------------------------------------
-	 *
-	 * Response
+    /**
+     * Command
+     *  ----------------------------------------------------------------
+     *  | SET TRIG LEVEL (uint32) |  TRACE ID (uint32) | LEVEL (float) |
+     *  ----------------------------------------------------------------
+     *
+     * Response
      *  -----------------
      *  | LEVEL (float) |
      *  -----------------
      * 
      * Notes
      *  - The size of LEVEL is 4 bytes.
-	 */
-	OCP_IF_CMD_TRACE_GET_TRIG_LEVEL,
+     */
+    OCP_IF_CMD_TRACE_GET_TRIG_LEVEL,
 
-	/**
-	 * Command
-	 *  ------------------------------------------
-	 *  | GET TAIL (uint32) |  TRACE ID (uint32) |
-	 *  ------------------------------------------
-	 *
-	 * Response
+    /**
+     * Command
+     *  ------------------------------------------
+     *  | GET TAIL (uint32) |  TRACE ID (uint32) |
+     *  ------------------------------------------
+     *
+     * Response
      *  -----------------
      *  | TAIL (uint32) |
      *  -----------------
-	 * 
+     *
      * Notes
      *  - TAIL is the tail position of the circular buffer when the trace is
      *    in trigger mode.
-	 */
-	OCP_IF_CMD_TRACE_GET_TAIL,
+    */
+    OCP_IF_CMD_TRACE_GET_TAIL,
 
-	/**
-	 * Command
-	 *  ------------------------------------------------
-	 *  | GET TRIG STATE (uint32) |  TRACE ID (uint32) |
-	 *  ------------------------------------------------
-	 *
-	 * Response
+    /**
+     * Command
+     *  ------------------------------------------------
+     *  | GET TRIG STATE (uint32) |  TRACE ID (uint32) |
+     *  ------------------------------------------------
+     *
+     * Response
      *  -----------------
      *  | STATE (uint32) |
      *  -----------------
-	 * 
+     *
      * Notes
      *  - STATE is the state of the trigger when the trace is in trigger mode.
-	 */
-	OCP_IF_CMD_TRACE_GET_TRIG_STATE,
+    */
+    OCP_IF_CMD_TRACE_GET_TRIG_STATE,
 
     /**
      * Command
@@ -307,7 +307,7 @@ typedef enum{
      * - The meaning of the status is defined in the "ocpCSStatus_t"
      *   declaration in "ocpCS.h".
      */
-	OCP_IF_CMD_CS_STATUS,
+    OCP_IF_CMD_CS_STATUS,
 
     /**
      * Command
@@ -318,7 +318,7 @@ typedef enum{
      * Response
      * No response
      */
-	OCP_IF_CMD_CS_ENABLE,
+    OCP_IF_CMD_CS_ENABLE,
 
     /**
      * Command
@@ -329,7 +329,7 @@ typedef enum{
      * Response
      * No response
      */
-	OCP_IF_CMD_CS_DISABLE,
+    OCP_IF_CMD_CS_DISABLE,
 
     /**
      * Command
@@ -346,7 +346,7 @@ typedef enum{
      * - The contents of the response depends on the controller interface,
      *   and commands may or may not have responses.
      */
-	OCP_IF_CMD_CS_CONTROLLER_IF,
+    OCP_IF_CMD_CS_CONTROLLER_IF,
 
     /**
      * Command
@@ -363,7 +363,7 @@ typedef enum{
      * - The contents of the response depends on the hardware interface,
      *   and commands may or may not have responses.
      */
-	OCP_IF_CMD_CS_HARDWARE_IF,
+    OCP_IF_CMD_CS_HARDWARE_IF,
 
     /**
      * Command
@@ -377,7 +377,7 @@ typedef enum{
      *  ---------------------
      *
      */
-	OCP_IF_CMD_CS_GET_NUMBER_CONTROLLERS,
+    OCP_IF_CMD_CS_GET_NUMBER_CONTROLLERS,
 
     /**
      * Command
@@ -393,19 +393,21 @@ typedef enum{
      * Notes
      * - Names are returned as strings, each terminated by '\0'.
      */
-	OCP_IF_CMD_CS_GET_CONTROLLERS_NAMES,
+    OCP_IF_CMD_CS_GET_CONTROLLERS_NAMES,
 
-	OCP_IF_CMD_PLATFORM_ID,
-	OCP_IF_CMD_PLATFORM_IF,
-	OCP_IF_CMD_OPIL_UPDATE_MEASUREMENTS,
+    OCP_IF_CMD_PLATFORM_ID,
+    OCP_IF_CMD_PLATFORM_IF,
+    OCP_IF_CMD_OPIL_UPDATE_MEASUREMENTS,
     OCP_IF_CMD_OPIL_UPDATE_SIM_DATA,
     OCP_IF_CMD_OPIL_RUN_CONTROL,
     OCP_IF_CMD_OPIL_INITIALIZE_CONTROL,
     OCP_IF_CMD_OPIL_GET_CONTROL,
     OCP_IF_CMD_OPIL_GET_CONTROLLER_DATA,
-	OCP_IF_CMD_END
+    OCP_IF_CMD_END
 }ocpIfCommands_t;
 
+#define OCP_IF_ERR_INVALID_IN_SIZE     -1
+#define OCP_IF_ERR_INVALID_OUT_SIZE    -2
 //=============================================================================
 
 //=============================================================================

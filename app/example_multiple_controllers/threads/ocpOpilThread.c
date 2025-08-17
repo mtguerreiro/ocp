@@ -72,34 +72,34 @@ void *ocpOpilThread(void *ptr){
 
     /* Runs opil target */
 
-    printf("%s: OPiL target module running...\n", __FUNCTION__);
+    printf("%s: OPiL target module running...\n", __func__);
     fflush( stdout );
 
     while( 1 ){
 
-    printf("%s: Waiting for a connection...\n", __FUNCTION__);
+    printf("%s: Waiting for a connection...\n", __func__);
     fflush( stdout );
     conn = opiltargetConnectToHost(0);
 
     if( conn != 0 ){
-        printf("%s: Didn't receive a proper connection, trying it again...\n", __FUNCTION__);
+        printf("%s: Didn't receive a proper connection, trying it again...\n", __func__);
         fflush( stdout );
         continue;
     }
 
-    printf("%s: Connection received! Executing controller...\n", __FUNCTION__);
+    printf("%s: Connection received! Executing controller...\n", __func__);
     fflush( stdout );
 
     while( opiltargetExchangeDataHost() == 0 );
 
-    printf("%s: Connection terminated! Starting over\n", __FUNCTION__);
+    printf("%s: Connection terminated! Starting over\n", __func__);
     fflush( stdout );
 
     opiltargetDisconnectFromHost(0);
 
     }
 
-    printf("%s: \nClosing OPiL target module.\n", __FUNCTION__);
+    printf("%s: \nClosing OPiL target module.\n", __func__);
     fflush( stdout );
 
     return 0;
