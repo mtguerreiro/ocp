@@ -665,139 +665,147 @@ static int32_t ocpIfTraceGetTriggerState(
     return sizeof(state);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSStatus(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfCSStatus(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
+    uint32_t id;
 
-	int32_t status;
-	int32_t cmdStatus;
+    int32_t status;
+    int32_t cmdStatus;
 
-	int32_t *o = (int32_t *)( *out );
-	uint32_t *i = (uint32_t *)( in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	id = *i++;
+    cmdStatus = ocpCSStatus(id, &status);
 
-	cmdStatus = ocpCSStatus(id, &status);
+    if( cmdStatus < 0 ) return cmdStatus;
 
-	if( cmdStatus < 0 ) return cmdStatus;
+    if( maxoutsize < sizeof(status) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&status, sizeof(status) );
 
-	*o = status;
-
-	return 4;
+    return sizeof(status);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSEnable(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfCSEnable(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
+    (void)out;
+    (void)maxoutsize;
+    uint32_t id;
+    int32_t status;
 
-	int32_t status;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	id = *( (uint32_t *)in );
+    status = ocpCSEnable(id);
 
-	status = ocpCSEnable(id);
-
-	return status;
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSDisable(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfCSDisable(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
+    (void)out;
+    (void)maxoutsize;
+    uint32_t id;
+    int32_t status;
 
-	int32_t status;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	id = *( (uint32_t *)in );
+    status = ocpCSDisable(id);
 
-	status = ocpCSDisable(id);
-
-	return status;
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSControllerIf(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfCSControllerIf(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    char *p;
 
-	id = *p++;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	return ocpCSControllerInterface(id, (void *)p, insize - 4, out, maxoutsize);
+    p = (char *)in + sizeof(id);
+
+    return ocpCSControllerInterface(id, (void *)p, insize - sizeof(id), out, maxoutsize);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSHardwareIf(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfCSHardwareIf(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	uint32_t *p = (uint32_t *)in;
+    uint32_t id;
+    char *p;
 
-	id = *p++;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	return ocpCSHardwareInterface(id, (void *)p, insize - 4, out, maxoutsize);
+    p = (char *)in + sizeof(id);
+
+    return ocpCSHardwareInterface(id, (void *)p, insize - sizeof(id), out, maxoutsize);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSGetNumberControllers(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfCSGetNumberControllers(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	int32_t n;
+    int32_t n;
 
-	uint32_t *o = (uint32_t *)( *out );
+    n = ocpCSGetNumberControllers();
+    if( n < 0 ) return n;
 
-	n = ocpCSGetNumberControllers();
-	if( n < 0 ) return n;
+    if( maxoutsize < sizeof(n) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&n, sizeof(n) );
 
-	*o = n;
-
-	return 4;
+    return sizeof(n);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfCSGetControllersNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfCSGetControllersNames(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t size;
+    (void)in;
+    (void)insize;
+    int32_t size;
 
-	char *o = (char *)( *out );
+    size = ocpCSGetControllersNames((char *)(*out), maxoutsize);
 
-	size = ocpCSGetControllersNames(o, maxoutsize);
-
-	return size;
+    return size;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilUpdateMeasurements(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize){
+static int32_t ocpIfOpilUpdateMeasurements(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     ocpOpilUpdateMeas(in, insize);
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilUpdateSimData(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize){
+static int32_t ocpIfOpilUpdateSimData(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     ocpOpilUpdateSimData(in, insize);
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilRunControl(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize){
+static int32_t ocpIfOpilRunControl(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     ocpOpilRunControl();
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilInitializeControl(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize){
+static int32_t ocpIfOpilInitializeControl(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     ocpOpilInitControl();
 
     return 0;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilGetControl(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize){
+static int32_t ocpIfOpilGetControl(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     int32_t size;
 
@@ -806,8 +814,8 @@ static int32_t ocpIfOpilGetControl(void *in, uint32_t insize,
     return size;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfOpilGetControllerData(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize){
+static int32_t ocpIfOpilGetControllerData(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     int32_t size;
 
