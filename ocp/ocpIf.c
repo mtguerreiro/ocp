@@ -371,7 +371,7 @@ static int32_t ocpIfTraceGetSize(
     size = ocpTraceGetSize(id);
     if( size < 0 ) return size;
 
-    if( maxoutsize < sizeof(size) )
+    if( maxoutsize < sizeof(size) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
     memcpy( *out, (void *)&size, sizeof(size) );
 
     return sizeof(size);
@@ -825,296 +825,329 @@ static int32_t ocpIfOpilGetControllerData(
 }
 //-----------------------------------------------------------------------------
 #else
-static int32_t ocpIfMasterTraceRead(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceRead(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	size_t address;
-	int32_t size;
-	int32_t status;
-	int32_t nTracesSecondCore;
+    uint32_t id;
+    size_t address;
+    int32_t size;
+    int32_t status;
+    int32_t nTracesSecondCore;
 
-	id = *( (uint32_t *)in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		status = ocpIfMasterTraceGetAddressSecondCore( id, (void *)(&address) );
-		if( status < 0 ) return status;
+    if( id < (uint32_t) nTracesSecondCore ){
+        status = ocpIfMasterTraceGetAddressSecondCore( id, (void *)(&address) );
+        if( status < 0 ) return status;
 
-		size = ocpIfMasterTraceGetSizeSecondCore( id );
-		if( size < 0 ) return size;
-	}
-	else{
-		status = ocpTraceGetAddress( id, (void *)(&address) );
-		if( status < 0 ) return status;
+        size = ocpIfMasterTraceGetSizeSecondCore( id );
+        if( size < 0 ) return size;
+    }
+    else{
+        status = ocpTraceGetAddress( id, (void *)(&address) );
+        if( status < 0 ) return status;
 
-		size = ocpTraceGetSize( id );
-		if( size < 0 ) return size;
-	}
+        size = ocpTraceGetSize( id );
+        if( size < 0 ) return size;
+    }
 
-	*out = (void *)( address );
+    *out = (void *)( address );
 
-	return size;
+    return size;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceReset(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceReset(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t status;
-	int32_t nTracesSecondCore;
+    uint32_t id;
+    int32_t status;
+    int32_t nTracesSecondCore;
 
-	id = *( (uint32_t *)in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		status = ocpIfMasterTraceResetSecondCore(id);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		status = ocpTraceReset(id);
-	}
+    if( id < (uint32_t) nTracesSecondCore ){
+        status = ocpIfMasterTraceResetSecondCore(id);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        status = ocpTraceReset(id);
+    }
 
-	return status;
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetSize(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceGetSize(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t size;
-	int32_t *o = (int32_t *)*out;
-	int32_t nTracesSecondCore;
+    uint32_t id;
+    int32_t size;
+    int32_t *o = (int32_t *)*out;
+    int32_t nTracesSecondCore;
 
-	id = *( (uint32_t *)in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		size = ocpIfMasterTraceGetSizeSecondCore(id);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		size = ocpTraceGetSize(id);
-	}
+    if( id < (uint32_t) nTracesSecondCore ){
+        size = ocpIfMasterTraceGetSizeSecondCore(id);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        size = ocpTraceGetSize(id);
+    }
 
-	if( size < 0 ) return size;
-	*o = size;
+    if( size < 0 ) return size;
 
-	return 4;
+    if( maxoutsize < sizeof(size) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&size, sizeof(size) );
+
+    return sizeof(size);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetSize(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceSetSize(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t size;
-	int32_t status;
-	int32_t *p = (int32_t *)in;
-	int32_t nTracesSecondCore;
+    uint32_t id;
+    int32_t size;
+    int32_t status;
+    char *p;
+    int32_t nTracesSecondCore;
 
-	id = *p++;
-	size = *p;
+    if( insize < ( sizeof(id) + sizeof(size) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		status = ocpIfMasterTraceSetSizeSecondCore(id, size);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		status = ocpTraceSetSize(id, size);
-	}
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&size, (void *)p, sizeof(size) );
 
-	return status;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+
+    if( id < (uint32_t) nTracesSecondCore ){
+        status = ocpIfMasterTraceSetSizeSecondCore(id, size);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        status = ocpTraceSetSize(id, size);
+    }
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetNumberSignals(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceGetNumberSignals(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t nSignals;
-	int32_t *o = (int32_t *)*out;
-	int32_t nTracesSecondCore;
+    uint32_t id;
+    int32_t nSignals;
+    int32_t *o = (int32_t *)*out;
+    int32_t nTracesSecondCore;
 
-	id = *( (uint32_t *)in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		nSignals = ocpIfMasterTraceGetNumberSignalsSecondCore(id);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		nSignals = ocpTraceGetNumberSignals(id);
-	}
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( nSignals < 0 ) return nSignals;
-	*o = nSignals;
+    if( id < (uint32_t) nTracesSecondCore ){
+        nSignals = ocpIfMasterTraceGetNumberSignalsSecondCore(id);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        nSignals = ocpTraceGetNumberSignals(id);
+    }
 
-	return 4;
+    if( nSignals < 0 ) return nSignals;
+
+    if( maxoutsize < sizeof(nSignals) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&nSignals, sizeof(nSignals) );
+
+    return sizeof(nSignals);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetSignalsNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceGetSignalsNames(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t size;
-	int32_t nTracesSecondCore;
+    uint32_t id;
+    int32_t size;
+    int32_t nTracesSecondCore;
 
-	char *o = (char *)( *out );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	id = *( (uint32_t *)in );
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		size = ocpIfMasterTraceGetSignalsNamesSecondCore(id, o, maxoutsize);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		size = ocpTraceGetSignalsNames(id, o, maxoutsize);
-	}
+    if( id < (uint32_t) nTracesSecondCore ){
+        size = ocpIfMasterTraceGetSignalsNamesSecondCore(id, (char *)( *out ), maxoutsize);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        size = ocpTraceGetSignalsNames(id, (char *)( *out ), maxoutsize);
+    }
 
-	return size;
+    return size;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetNumberTraces(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceGetNumberTraces(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t *o = (uint32_t *)( *out );
+    (void)in;
+    (void)insize;
+    int32_t nTracesSecondCore;
+    int32_t nTracesThisCore;
+    int32_t nTraces;
 
-	int32_t nTracesSecondCore;
-	int32_t nTracesThisCore;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    nTracesThisCore = ocpTraceGetNumberTraces();
+    if( nTracesThisCore < 0 ) return nTracesSecondCore;
 
-	nTracesThisCore = ocpTraceGetNumberTraces();
-	if( nTracesThisCore < 0 ) return nTracesSecondCore;
+    nTraces = nTracesThisCore + nTracesSecondCore;
 
-	*o = nTracesThisCore + nTracesSecondCore;
+    if( maxoutsize < sizeof(nTraces) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&nTraces, sizeof(nTraces) );
 
-	return 4;
+    return sizeof(nTraces);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetTracesNames(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceGetTracesNames(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	int32_t sizeSecondCore;
-	int32_t sizeThisCore;
+    (void)in;
+    (void)insize;
+    int32_t sizeSecondCore;
+    int32_t sizeThisCore;
 
-	char *o = (char *)( *out );
+    char *o = (char *)( *out );
 
-	sizeSecondCore = ocpIfMasterTraceGetTracesNamesSecondCore(o, maxoutsize);
-	if( sizeSecondCore < 0 ) return sizeSecondCore;
+    sizeSecondCore = ocpIfMasterTraceGetTracesNamesSecondCore(o, maxoutsize);
+    if( sizeSecondCore < 0 ) return sizeSecondCore;
 
-	o = o + sizeSecondCore;
-	sizeThisCore = ocpTraceGetTracesNames(o, maxoutsize - sizeSecondCore);
-	if( sizeThisCore < 0 ) return sizeThisCore;
+    o = o + sizeSecondCore;
+    sizeThisCore = ocpTraceGetTracesNames(o, maxoutsize - sizeSecondCore);
+    if( sizeThisCore < 0 ) return sizeThisCore;
 
-	return sizeThisCore + sizeSecondCore;
+    return sizeThisCore + sizeSecondCore;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetMode(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceSetMode(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t status;
-	int32_t nTracesSecondCore;
-	uint32_t mode;
+    (void)out;
+    (void)maxoutsize;
+    uint32_t id;
+    int32_t status;
+    int32_t nTracesSecondCore;
+    uint32_t mode;
+    char *p;
 
-	uint32_t *p = (uint32_t *)in;
+    if( insize < ( sizeof(id) + sizeof(mode) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	id = *p++;
-	mode = *p;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&mode, (void *)p, sizeof(mode) );
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		status = ocpIfMasterTraceSetModeSecondCore(id, mode);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		status = ocpTraceSetMode(id, mode);
-	}
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	return status;
+    if( id < (uint32_t) nTracesSecondCore ){
+        status = ocpIfMasterTraceSetModeSecondCore(id, mode);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        status = ocpTraceSetMode(id, mode);
+    }
+
+    return status;
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetMode(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceGetMode(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    uint32_t *o = (uint32_t *)( *out );
+    uint32_t id;
+    int32_t nTracesSecondCore;
+    int32_t mode;
 
-	uint32_t id;
-	int32_t nTracesSecondCore;
-	int32_t mode;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	id = *( (uint32_t *)in );
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( id < (uint32_t) nTracesSecondCore ){
-	    mode = ocpIfMasterTraceGetModeSecondCore(id);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		mode = ocpTraceGetMode(id);
-	}
+    if( id < (uint32_t) nTracesSecondCore ){
+        mode = ocpIfMasterTraceGetModeSecondCore(id);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        mode = ocpTraceGetMode(id);
+    }
 
-    if( mode < 0 ) return mode;
-    *o = mode;
+    if( maxoutsize < sizeof(mode) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&mode, sizeof(mode) );
 
-	return 4;
+    return sizeof(mode);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetNumPreTrigSamples(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceSetNumPreTrigSamples(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t num;
-	int32_t status;
-	int32_t *p = (int32_t *)in;
-	int32_t nTracesSecondCore;
+    (void)out;
+    (void)maxoutsize;
+    uint32_t id;
+    int32_t num;
+    int32_t status;
+    char *p;
+    int32_t nTracesSecondCore;
 
-	id = *p++;
-	num = *p;
+    if( insize < ( sizeof(id) + sizeof(num) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		status = ocpIfMasterTraceSetNumPreTrigSamplesSecondCore(id, num);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		status = ocpTraceSetNumPreTrigSamples(id, num);
-	}
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&num, (void *)p, sizeof(num) );
 
-	return status;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+
+    if( id < (uint32_t) nTracesSecondCore ){
+        status = ocpIfMasterTraceSetNumPreTrigSamplesSecondCore(id, num);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        status = ocpTraceSetNumPreTrigSamples(id, num);
+    }
+
+    return status;
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceGetNumPreTrigSamples(void *in, uint32_t insize,
         void **out, uint32_t maxoutsize){
 
-    uint32_t *o = (uint32_t *)( *out );
     uint32_t id;
     int32_t num;
-    int32_t *p = (int32_t *)in;
     int32_t nTracesSecondCore;
 
-    id = *p++;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+
+    memcpy( (void *)&id, in, sizeof(id) );
 
     nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
     if( nTracesSecondCore < 0 ) return nTracesSecondCore;
@@ -1128,47 +1161,55 @@ static int32_t ocpIfMasterTraceGetNumPreTrigSamples(void *in, uint32_t insize,
     }
     if( num < 0 ) return num;
 
-    *o = num;
+    if( maxoutsize < sizeof(num) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&num, sizeof(num) );
 
-    return 4;
+    return sizeof(num);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetTrigSignal(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceSetTrigSignal(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t trace;
-	int32_t status;
-	int32_t *p = (int32_t *)in;
-	int32_t nTracesSecondCore;
+    (void)out;
+    (void)maxoutsize;
+    uint32_t id;
+    int32_t trace;
+    int32_t status;
+    char *p;
+    int32_t nTracesSecondCore;
 
-	id = *p++;
-	trace = *p;
+    if( insize < ( sizeof(id) + sizeof(trace) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		status = ocpIfMasterTraceSetTrigSignalSecondCore(id, trace);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		status = ocpTraceSetTrigSignal(id, trace);
-	}
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&trace, (void *)p, sizeof(trace) );
 
-	return status;
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+
+    if( id < (uint32_t) nTracesSecondCore ){
+        status = ocpIfMasterTraceSetTrigSignalSecondCore(id, trace);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        status = ocpTraceSetTrigSignal(id, trace);
+    }
+
+    return status;
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceGetTrigSignal(void *in, uint32_t insize,
         void **out, uint32_t maxoutsize){
 
-    uint32_t *o = (uint32_t *)( *out );
     uint32_t id;
     int32_t signal;
-    int32_t *p = (int32_t *)in;
     int32_t nTracesSecondCore;
 
-    id = *p++;
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+
+    memcpy( (void *)&id, in, sizeof(id) );
 
     nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
     if( nTracesSecondCore < 0 ) return nTracesSecondCore;
@@ -1182,48 +1223,56 @@ static int32_t ocpIfMasterTraceGetTrigSignal(void *in, uint32_t insize,
     }
     if( signal < 0 ) return signal;
 
-    *o = signal;
+    if( maxoutsize < sizeof(signal) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&signal, sizeof(signal) );
 
-    return 4;
+    return sizeof(signal);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceSetTrigLevel(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceSetTrigLevel(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	float level;
-	int32_t status;
-	int32_t *p = (int32_t *)in;
-	int32_t nTracesSecondCore;
-
-	id = *p++;
-	level = *((float *)p);
-
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
-
-	if( id < (uint32_t) nTracesSecondCore ){
-		status = ocpIfMasterTraceSetTrigLevelSecondCore(id, level);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		status = ocpTraceSetTrigLevel(id, level);
-	}
-
-	return status;
-}
-//-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetTrigLevel(void *in, uint32_t insize,
-        void **out, uint32_t maxoutsize){
-
-    float *o = (float *)( *out );
+    (void)out;
+    (void)maxoutsize;
     uint32_t id;
     float level;
     int32_t status;
-    int32_t *p = (int32_t *)in;
+    char *p;
     int32_t nTracesSecondCore;
 
-    id = *p++;
+    if( insize < ( sizeof(id) + sizeof(level) ) )
+        return OCP_IF_ERR_INVALID_IN_SIZE;
+
+    memcpy( (void *)&id, in, sizeof(id) );
+
+    p = (char *)in + sizeof(id);
+    memcpy( (void *)&level, (void *)p, sizeof(level) );
+
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+
+    if( id < (uint32_t) nTracesSecondCore ){
+        status = ocpIfMasterTraceSetTrigLevelSecondCore(id, level);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        status = ocpTraceSetTrigLevel(id, level);
+    }
+
+    return status;
+}
+//-----------------------------------------------------------------------------
+static int32_t ocpIfMasterTraceGetTrigLevel(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    uint32_t id;
+    float level;
+    int32_t status;
+    int32_t nTracesSecondCore;
+
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+
+    memcpy( (void *)&id, in, sizeof(id) );
 
     nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
     if( nTracesSecondCore < 0 ) return nTracesSecondCore;
@@ -1237,36 +1286,39 @@ static int32_t ocpIfMasterTraceGetTrigLevel(void *in, uint32_t insize,
     }
     if( status < 0 ) return status;
 
-    *o = level;
+    if( maxoutsize < sizeof(level) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&level, sizeof(level) );
 
-    return 4;
+    return sizeof(level);
 }
 //-----------------------------------------------------------------------------
-static int32_t ocpIfMasterTraceGetTail(void *in, uint32_t insize,
-		void **out, uint32_t maxoutsize){
+static int32_t ocpIfMasterTraceGetTail(
+    void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	uint32_t id;
-	int32_t tail;
-	int32_t *o = (int32_t *)*out;
-	int32_t nTracesSecondCore;
+    uint32_t id;
+    int32_t tail;
+    int32_t nTracesSecondCore;
 
-	id = *( (uint32_t *)in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
 
-	nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
-	if( nTracesSecondCore < 0 ) return nTracesSecondCore;
+    memcpy( (void *)&id, in, sizeof(id) );
 
-	if( id < (uint32_t) nTracesSecondCore ){
-		tail = ocpIfMasterTraceGetTailSecondCore(id);
-	}
-	else{
-		id = id - nTracesSecondCore;
-		tail = ocpTraceGetTail(id);
-	}
+    nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
+    if( nTracesSecondCore < 0 ) return nTracesSecondCore;
 
-	if( tail < 0 ) return tail;
-	*o = tail;
+    if( id < (uint32_t) nTracesSecondCore ){
+        tail = ocpIfMasterTraceGetTailSecondCore(id);
+    }
+    else{
+        id = id - nTracesSecondCore;
+        tail = ocpTraceGetTail(id);
+    }
+    if( tail < 0 ) return tail;
 
-	return 4;
+    if( maxoutsize < sizeof(tail) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&tail, sizeof(tail) );
+
+    return sizeof(tail);
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceGetTrigState(void *in, uint32_t insize,
@@ -1274,10 +1326,11 @@ static int32_t ocpIfMasterTraceGetTrigState(void *in, uint32_t insize,
 
     uint32_t id;
     int32_t state;
-    int32_t *o = (int32_t *)*out;
     int32_t nTracesSecondCore;
 
-    id = *( (uint32_t *)in );
+    if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
+
+    memcpy( (void *)&id, in, sizeof(id) );
 
     nTracesSecondCore = ocpIfMasterTraceGetNumberTracesSecondCore();
     if( nTracesSecondCore < 0 ) return nTracesSecondCore;
@@ -1291,9 +1344,11 @@ static int32_t ocpIfMasterTraceGetTrigState(void *in, uint32_t insize,
     }
 
     if( state < 0 ) return state;
-    *o = state;
 
-    return 4;
+    if( maxoutsize < sizeof(state) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
+    memcpy( *out, (void *)&state, sizeof(state) );
+
+    return sizeof(state);
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterCSStatus(void *in, uint32_t insize,

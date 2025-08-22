@@ -18,9 +18,9 @@
 //---------------------------------------------------------------------------
 void ctracememInitialize(ctracemem_t *trace, void *mem, int32_t size){
 
-    trace->start = mem;
-    trace->end = (void *)( (char *)mem + size );
-    trace->p = mem;
+    trace->start = (ctracemem_size_t *)mem;
+    trace->end = (ctracemem_size_t *)( (char *)mem + size );
+    trace->p = (ctracemem_size_t *)mem;
 
     trace->maxsize = size;
 }
