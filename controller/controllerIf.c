@@ -74,19 +74,22 @@ int32_t controllerIfRegister(controller_t *controller, uint32_t csid){
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSetReferences(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status = -1;
-    uint32_t *p = (uint32_t *)in;
-    uint32_t csid;
-
     (void)out;
     (void)maxoutsize;
+    int32_t status = -1;
+    char *p;
+    uint32_t csid;
 
-    csid = *p++;
+    if( insize < sizeof(csid) ) return -1;
+
+    memcpy( (void *)&csid, in, sizeof(csid) );
+
+    p = (char *)in + sizeof(csid);
 
     if( csid >= OCP_CS_END ) return -1;
 
     if( controllers[csid] != 0 )
-        status = controllerSetRef(controllers[csid], (void *)p, insize - 4);
+        status = controllerSetRef(controllers[csid], (void *)p, insize - sizeof(csid));
 
     return status;
 }
@@ -94,34 +97,38 @@ static int32_t controllerIfSetReferences(void *in, uint32_t insize, void **out, 
 static int32_t controllerIfGetReferences(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     int32_t status = -1;
-    uint32_t *p = (uint32_t *)in;
     uint32_t csid;
-    void *o = (void *)*out;
 
-    csid = *p++;
+    if( insize != sizeof(csid) ) return -1;
+
+    memcpy( (void *)&csid, in, sizeof(csid) );
 
     if( csid >= OCP_CS_END ) return -1;
 
     if( controllers[csid] != 0 )
-        status = controllerGetRef(controllers[csid], o, maxoutsize);
+        status = controllerGetRef(controllers[csid], *out, maxoutsize);
 
     return status;
 }
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSet(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status = -1;
-    uint32_t *p = (uint32_t *)in;
-    uint32_t csid;    
-    uint32_t ctl;
-
     (void)out;
     (void)maxoutsize;
+    int32_t status = -1;
+    char *p;
+    uint32_t csid;
+    uint32_t ctl;
 
-    csid = *p++;
-    ctl = *p++;
+    if( insize < (sizeof(csid) + sizeof(ctl)) ) return -1;
 
-   if( csid >= OCP_CS_END ) return -1;
+    memcpy( (void *)&csid, in, sizeof(csid) );
+
+    p = (char *)in + sizeof(csid);
+
+    memcpy( (void *)&ctl, (void *)p, sizeof(ctl) );
+
+    if( csid >= OCP_CS_END ) return -1;
 
     if( controllers[csid] != 0 )
         status = controllerSet(controllers[csid], ctl);
@@ -132,32 +139,43 @@ static int32_t controllerIfSet(void *in, uint32_t insize, void **out, uint32_t m
 static int32_t controllerIfGet(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     uint32_t ctl;
-    uint32_t *p = (uint32_t  *)*out;
-    uint32_t csid = *((uint32_t *)in);
+    uint32_t csid;
+
+    if( insize < sizeof(csid) ) return -1;
+
+    memcpy( (void *)&csid, in, sizeof(csid) );
 
     if( csid >= OCP_CS_END ) return -1;
 
     if( controllers[csid] == 0 ) return -1;
-    
+
     ctl = controllerGet(controllers[csid]);
 
-    *p = ctl;
+    if( maxoutsize < sizeof(ctl) ) return -1;
 
-    return 4;
+    memcpy( *out, (void *)&ctl, sizeof(ctl) );
+
+    return sizeof(ctl);
 }
 //-----------------------------------------------------------------------------
 static int32_t controllerIfReset(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    int32_t status = -1;
-    uint32_t *p = (uint32_t *)in;
-    uint32_t csid;    
-    uint32_t ctl;
-
     (void)out;
     (void)maxoutsize;
+    int32_t status = -1;
+    uint32_t csid;
+    uint32_t ctl;
+    char *p;
 
-    csid = *p++;
-    ctl = *p++;
+    if( insize < (sizeof(csid) + sizeof(ctl)) ) return -1;
+
+    memcpy( (void *)&csid, in, sizeof(csid) );
+
+    p = (char *)in + sizeof(csid);
+
+    memcpy( (void *)&ctl, (void *)p, sizeof(ctl) );
+
+    if( csid >= OCP_CS_END ) return -1;
 
     if( controllers[csid] != 0 )
         status = controllerReset(controllers[csid], ctl);
@@ -167,16 +185,30 @@ static int32_t controllerIfReset(void *in, uint32_t insize, void **out, uint32_t
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSetParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
     int32_t status = -1;
-    uint32_t *p = (uint32_t *)in;
+    char *p;
     uint32_t csid;    
     uint32_t ctl;
 
-    csid = *p++;
-    ctl = *p++;
+    if( insize < (sizeof(csid) + sizeof(ctl)) ) return -1;
+
+    memcpy( (void *)&csid, in, sizeof(csid) );
+
+    p = (char *)in + sizeof(csid);
+
+    memcpy( (void *)&ctl, (void *)p, sizeof(ctl) );
+
+    p += sizeof(ctl);
+
+    if( csid >= OCP_CS_END ) return -1;
 
     if( controllers[csid] != 0 )
-        status = controllerSetParams(controllers[csid], ctl, (void *)p, insize - 8);
+        status = controllerSetParams(
+            controllers[csid], ctl,
+            (void *)p, insize - ( sizeof(csid) + sizeof(ctl) )
+        );
 
     return status;
 }
@@ -184,12 +216,19 @@ static int32_t controllerIfSetParams(void *in, uint32_t insize, void **out, uint
 static int32_t controllerIfGetParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
     int32_t status = -1;
-    uint32_t *p = (uint32_t *)in;
-    uint32_t csid;    
+    char *p;
+    uint32_t csid;
     uint32_t ctl;
 
-    csid = *p++;
-    ctl = *p++;
+    if( insize < (sizeof(csid) + sizeof(ctl)) ) return -1;
+
+    memcpy( (void *)&csid, in, sizeof(csid) );
+
+    p = (char *)in + sizeof(csid);
+
+    memcpy( (void *)&ctl, (void *)p, sizeof(ctl) );
+
+    if( csid >= OCP_CS_END ) return -1;
 
     if( controllers[csid] != 0 )
         status = controllerGetParams(controllers[csid], ctl, *out, maxoutsize);

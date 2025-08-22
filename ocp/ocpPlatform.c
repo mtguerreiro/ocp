@@ -1,9 +1,3 @@
-/*
- * ocpPlatform.c
- *
- *  Created on: 4 de mar de 2023
- *      Author: marco
- */
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -26,22 +20,27 @@ static char xplatformID[] = "My platform";
 //---------------------------------------------------------------------------
 int32_t ocpPlatformID(char *buffer, uint32_t maxsize){
 
-	uint32_t k;
-	char *p;
+    uint32_t k;
+    char *p;
 
-	p = xplatformID;
-	k = 0;
-	while( (*p != 0) && (k < maxsize) ){
-		*buffer++ = *p++;
-		k++;
-	}
+    p = xplatformID;
+    k = 0;
+    while( (*p != 0) && (k < maxsize) ){
+        *buffer++ = *p++;
+        k++;
+    }
 
-	return k;
+    return k;
 }
 //---------------------------------------------------------------------------
 int32_t ocpPlatformIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-	return 0;
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+
+    return 0;
 }
 //---------------------------------------------------------------------------
 //===========================================================================

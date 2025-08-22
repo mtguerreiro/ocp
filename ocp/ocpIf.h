@@ -1,9 +1,3 @@
-/*
- * ocpIf.h
- *
- *  Created on: 17.02.2023
- *      Author: mguerreiro
- */
 
 #ifndef OCP_IF_H_
 #define OCP_IF_H_

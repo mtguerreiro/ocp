@@ -1,9 +1,3 @@
-/*
- * ocpIf.c
- *
- *  Created on: 18 de fev de 2023
- *      Author: marco
- */
 
 //=============================================================================
 /*-------------------------------- Includes ---------------------------------*/
@@ -347,7 +341,6 @@ static int32_t ocpIfTraceReset(
 
     (void)out;
     (void)maxoutsize;
-
     uint32_t id;
     int32_t status;
 
@@ -380,6 +373,8 @@ static int32_t ocpIfTraceGetSize(
 static int32_t ocpIfTraceSetSize(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
     uint32_t id;
     uint32_t size;
     int32_t status;
@@ -449,6 +444,8 @@ static int32_t ocpIfTraceGetNumberTraces(
 static int32_t ocpIfTraceGetTracesNames(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)in;
+    (void)insize;
     uint32_t size;
 
     size = ocpTraceGetTracesNames((char *)( *out ), maxoutsize);
@@ -478,6 +475,8 @@ static int32_t ocpIfTraceGetAddress(
 static int32_t ocpIfTraceSetMode(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
     uint32_t id;
     uint32_t mode;
     char *p;
@@ -516,6 +515,8 @@ static int32_t ocpIfTraceGetMode(
 static int32_t ocpIfTraceSetNumPreTrigSamples(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
     uint32_t id;
     uint32_t num;
     int32_t status;
@@ -554,6 +555,8 @@ static int32_t ocpIfTraceGetNumPreTrigSamples(
 static int32_t ocpIfTraceSetTrigSignal(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
     uint32_t id;
     uint32_t signal;
     int32_t status;
@@ -592,6 +595,8 @@ static int32_t ocpIfTraceGetTrigSignal(
 static int32_t ocpIfTraceSetTrigLevel(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
     uint32_t id;
     float level;
     int32_t status;
@@ -632,6 +637,8 @@ static int32_t ocpIfTraceGetTrigLevel(
 static int32_t ocpIfTraceGetTail(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)in;
+    (void)insize;
     uint32_t id;
     int32_t tail;
 
@@ -749,6 +756,8 @@ static int32_t ocpIfCSHardwareIf(
 static int32_t ocpIfCSGetNumberControllers(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)in;
+    (void)insize;
     int32_t n;
 
     n = ocpCSGetNumberControllers();
@@ -775,6 +784,9 @@ static int32_t ocpIfCSGetControllersNames(
 static int32_t ocpIfOpilUpdateMeasurements(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
+
     ocpOpilUpdateMeas(in, insize);
 
     return 0;
@@ -782,6 +794,9 @@ static int32_t ocpIfOpilUpdateMeasurements(
 //-----------------------------------------------------------------------------
 static int32_t ocpIfOpilUpdateSimData(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    (void)out;
+    (void)maxoutsize;
 
     ocpOpilUpdateSimData(in, insize);
 
@@ -791,6 +806,11 @@ static int32_t ocpIfOpilUpdateSimData(
 static int32_t ocpIfOpilRunControl(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+
     ocpOpilRunControl();
 
     return 0;
@@ -798,6 +818,11 @@ static int32_t ocpIfOpilRunControl(
 //-----------------------------------------------------------------------------
 static int32_t ocpIfOpilInitializeControl(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
 
     ocpOpilInitControl();
 
@@ -807,6 +832,9 @@ static int32_t ocpIfOpilInitializeControl(
 static int32_t ocpIfOpilGetControl(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)in;
+    (void)insize;
+    (void)maxoutsize;
     int32_t size;
 
     size = ocpOpilGetControl(out);
@@ -817,6 +845,9 @@ static int32_t ocpIfOpilGetControl(
 static int32_t ocpIfOpilGetControllerData(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)in;
+    (void)insize;
+    (void)maxoutsize;
     int32_t size;
 
     size = ocpOpilGetControllerData(out);
@@ -889,7 +920,6 @@ static int32_t ocpIfMasterTraceGetSize(
 
     uint32_t id;
     int32_t size;
-    int32_t *o = (int32_t *)*out;
     int32_t nTracesSecondCore;
 
     if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
@@ -950,7 +980,6 @@ static int32_t ocpIfMasterTraceGetNumberSignals(
 
     uint32_t id;
     int32_t nSignals;
-    int32_t *o = (int32_t *)*out;
     int32_t nTracesSecondCore;
 
     if( insize < sizeof(id) ) return OCP_IF_ERR_INVALID_IN_SIZE;
@@ -1935,7 +1964,6 @@ static int32_t ocpIfMasterCSControllerInterfaceSecondCore(
 
     uint32_t d;
     int32_t size;
-    uint32_t k;
     char buffer[insize + sizeof(d) + sizeof(id)];
 
     d = OCP_IF_CMD_CS_CONTROLLER_IF;
@@ -1959,7 +1987,6 @@ static int32_t ocpIfMasterCSHardwareInterfaceSecondCore(
 
     uint32_t d;
     int32_t size;
-    uint32_t k;
     char buffer[insize + sizeof(d) + sizeof(id)];
 
     d = OCP_IF_CMD_CS_HARDWARE_IF;
@@ -1983,6 +2010,8 @@ static int32_t ocpIfMasterCSHardwareInterfaceSecondCore(
 static int32_t ocpIfPlatformID(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)in;
+    (void)insize;
     uint32_t size;
 
     char *o = (char *)( *out );
