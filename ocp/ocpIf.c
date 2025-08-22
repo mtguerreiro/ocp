@@ -859,6 +859,7 @@ static int32_t ocpIfOpilGetControllerData(
 static int32_t ocpIfMasterTraceRead(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)maxoutsize;
     uint32_t id;
     size_t address;
     int32_t size;
@@ -894,6 +895,8 @@ static int32_t ocpIfMasterTraceRead(
 static int32_t ocpIfMasterTraceReset(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
     uint32_t id;
     int32_t status;
     int32_t nTracesSecondCore;
@@ -947,6 +950,8 @@ static int32_t ocpIfMasterTraceGetSize(
 static int32_t ocpIfMasterTraceSetSize(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)out;
+    (void)maxoutsize;
     uint32_t id;
     int32_t size;
     int32_t status;
@@ -1550,6 +1555,8 @@ static int32_t ocpIfMasterCSGetNumberControllers(
 static int32_t ocpIfMasterCSGetControllersNames(
     void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+    (void)in;
+    (void)insize;
     int32_t sizeSecondCore;
     int32_t sizeThisCore;
 
