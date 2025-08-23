@@ -12,8 +12,9 @@
 
 #include "app/app.h"
 
-#include "threads/ocpIfThread.h"
-#include "threads/ocpOpilThread.h"
+#include "demo_threads/ocpIfThread.h"
+#include "demo_threads/ocpOpilThread.h"
+#include "ocpConfig.h"
 //=============================================================================
 
 //=============================================================================

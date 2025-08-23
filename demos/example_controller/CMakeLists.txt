@@ -8,7 +8,8 @@ set(OPIL_PATH "../../../opil/")
 set(OPIL_TARGET_IP "127.0.0.1" CACHE STRING "IP of the OPiL target")
 set(OPIL_TARGET_PORT 8090 CACHE STRING "Port opened by the OPiL target")
 
-set(OCP_DEMO_THREADS ON)
+set(OCP_DEMO_THREADS_OCP  ON)
+set(OCP_DEMO_THREADS_OPIL ON)
 
 set(PLECS_BUILD_DIR "${CMAKE_SOURCE_DIR}/plecs/build/")
 add_custom_target(build_plecs ALL
@@ -20,12 +21,7 @@ add_custom_target(build_plecs ALL
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_STANDARD_REQUIRED True)
 
-add_compile_options(
-    -Wall
-    -Wextra
-    #-Wpedantic
-    -O2
-)
+add_compile_options( -Wall -Wextra -O2 )
 
 add_subdirectory(${OCP_PATH} "${PROJECT_BINARY_DIR}/ocp")
 add_subdirectory(${OPIL_PATH} "${PROJECT_BINARY_DIR}/opil")

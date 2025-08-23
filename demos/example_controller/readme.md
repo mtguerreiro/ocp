@@ -2,7 +2,7 @@
 
 This example shows how to use `ocp` for closed-loop control and data logging. To demonstrate closed-loop control, a buck converter is simulated with a software, which exchanges measurements and control signals with the controller. 
 
-In this example, we use Python to set the parameters of the controller (for example, gains and reference signal), to enable the controller, and retrieve logged data. The main goal of this example is to show some of the interesting possibilities when using Python to interact with the C controller. Refer to the `example_controllers` for an example handling multiple controllers under the same control system.
+In this example, we use Python to set the parameters of the controller (for example, gains and reference signal), to enable the controller, and retrieve logged data. The main goal of this example is to show some of the interesting possibilities when using Python to interact with the C controller. Refer to the `example_multiple_controllers` for an example handling multiple controllers under the same control system.
 
 Before going over this example, it is recommend to take a look at the introductory example (`example_intro`), since this example skips some of the initialization details. 
 
@@ -43,7 +43,7 @@ top_level_folder
 
 ## Starting the controller and interacting with it
 
-First, we can build and run the C program, which will initialize the controller and be ready to exchange data with the simulation. To do so, build and run this example with Visual Studio Code, or alternatively, build the program with CMake and run the executable.
+First, we can build and run the C program, which will initialize the controller and be ready to exchange data with the simulation. To do so, build and run this example (CMake or with Visual Studio Code).
 
 Once the program is running, we can use the Python interface to query the controller. Next, run the `python_ex_controller.py` from within a Python interpreter (we use IDLE for this), and now the controller should be accessible from the Python interpreter. For example, we can query the number and name of the controllers in the application:
 
@@ -96,28 +96,42 @@ The size of the trace can be dynamically set (up to its maximum size). For examp
 
 ## Setting controller parameters
 
-The Python interface allows setting parameters of the controller dynamically. Each controller has a "controller interface" function that can be used to exchange data with the controller. In this example, the implementation only sends data to the controller, but  `example_control_system` shows how to do both.
+The Python interface allows setting parameters of the controller dynamically. Each controller has a "controller interface" function that can be used to exchange data with the controller. In this example, the implementation only sends data to the controller, but  `example_multiple_controllers` shows how to send and receive data.
 
-If we check the `appControllerIf` function in the `app/appController.c` file, we'll see the following code:
+If we check the `app/appController.c`, we see two important definitions. At the top of the file, we see:
+```c
+typedef struct{
+    float ki;
+    float kv;
+    float k_ev;
+    float v_ref;
+}params_t;
+```
+and
+```c
+static params_t params = {
+    .ki = 0.0530530303030496f, .kv = -0.04430925432587546f, .k_ev = -98.62715371027674f,
+    .v_ref = 6.0f
+};
+```
 
+We use the `params_t` structure, and a `params` variable, to define the parameters of the controller we wish to change dynamically. Then, in the  `appControllerIf`, we'll see the following code:
 ```c
 int32_t appControllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
-    float *p = (float *)in;
+    (void)out;
+    (void)maxoutsize;
 
-    ki = *p++;
-    kv = *p++;
-    k_ev = *p++;
-
-    v_ref = *p++;
+    if( insize != sizeof(params_t) ) return -1;
+    memcpy( (void *)&params, in, sizeof(params_t) );
 
     return 0;
 }
 ```
 
-This function shows the parameters that can be set through the controller interface. Namely, it is possible to set the gains `ki`, `kv`, and `k_ev`, and the reference signal `v_ref`.  
+This functions takes the data in the `in` buffer and copies it to the `params` variable that was declared earlier. 
 
-In the Python side, there is a `ocp.cs_controller_if` function, which takes as argument a data packet to be delivered to the `appControllerIf` function in C. Because we know what the C function expects, we can build a data packet in Python so that we can set the parameters in the controller.
+In the Python side, there is an `ocp.cs_controller_if` function, which takes as argument a data packet to be delivered to the `appControllerIf` function in C. Because we know that the C function will copy the binary data to the `params` variable, we can build the data packet in Python so that we can set the parameters in the controller.
 
 In Python, we can create a function to assemble this data packet as follows (defined in the `buck.py` file):
 
@@ -192,3 +206,9 @@ This means each signal has 4000 samples, and there are four signals, exactly as 
 >>> plt.plot(data[:, 3])
 ```
 
+## Next
+Now that we have the flexibility of Python to design and parametrize the controller, testing the controller with different parameters is just a matter of creating additional Python code to loop through some parameters and configure the controller.
+
+Here, we are directly interacting with the `ocp` Python module, which offers the low level interface to the controller. Because of this, it is a bit awkward to set and read the trace, and set the parameters of the converter.
+
+However, it is possible to use the primitives of the `ocp` Python module to build a higher level module that is much easier to interact with. Moreover, it is also possible to design, set and run multiple controllers, so that they can be compared. This is expanded in the `example_multiple_controllers` example.

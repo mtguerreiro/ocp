@@ -71,3 +71,6 @@ Note that to query and set the size of the trace, we have to give the ID of the 
 
 Python communicates with the controller using TCP sockets. Thus, as far as Python is concerned, it has no idea whether the controller is actually a physical one, or is being emulated (as we're doing here). 
 
+## Next
+
+This example just shows some of the primitives of the `ocp` Python module, and explains the structure of the controller files. For a more concrete example with a closed-loop system, check the `example_controller`, which explains how to configure a controller and run it in a closed-loop system.

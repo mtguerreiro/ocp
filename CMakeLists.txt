@@ -51,7 +51,7 @@ target_include_directories(ocp
     ./
 )
 
-if(OCP_DEMO_THREADS)
+if(OCP_DEMO_THREADS_OCP OR OCP_DEMO_THREADS_OPIL)
     add_subdirectory(utils/demo_threads)
     target_include_directories(ocp
         PUBLIC
