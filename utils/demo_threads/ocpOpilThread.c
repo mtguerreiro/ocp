@@ -48,6 +48,7 @@ static uint8_t txbuf[256];
 //-----------------------------------------------------------------------------
 void *ocpOpilThread(void *ptr){
 
+    (void)ptr;
     int32_t conn;
 
     /* Initializes opil */
@@ -71,36 +72,26 @@ void *ocpOpilThread(void *ptr){
     opiltargetInitialize(&comm, &control);
 
     /* Runs opil target */
-
-    printf("%s: OPiL target module running...\n", __FUNCTION__);
-    fflush( stdout );
+    LogInfo( ("OPiL target module running") );
 
     while( 1 ){
+        LogInfo( ("Waiting for a connection") );
+        conn = opiltargetConnectToHost(0);
 
-    printf("%s: Waiting for a connection...\n", __FUNCTION__);
-    fflush( stdout );
-    conn = opiltargetConnectToHost(0);
+        if( conn != 0 ){
+            LogError( ("Error receiving a connection, trying it again") );
+            continue;
+        }
 
-    if( conn != 0 ){
-        printf("%s: Didn't receive a proper connection, trying it again...\n", __FUNCTION__);
-        fflush( stdout );
-        continue;
+        LogInfo( ("Connection received! Running controller...") );
+
+        while( opiltargetExchangeDataHost() == 0 );
+
+        LogInfo( ("Connection terminated. Starting over") );
+        opiltargetDisconnectFromHost(0);
     }
 
-    printf("%s: Connection received! Executing controller...\n", __FUNCTION__);
-    fflush( stdout );
-
-    while( opiltargetExchangeDataHost() == 0 );
-
-    printf("%s: Connection terminated! Starting over\n", __FUNCTION__);
-    fflush( stdout );
-
-    opiltargetDisconnectFromHost(0);
-
-    }
-
-    printf("%s: \nClosing OPiL target module.\n", __FUNCTION__);
-    fflush( stdout );
+    LogInfo( ("Closing OPiL target module") );
 
     return 0;
 }

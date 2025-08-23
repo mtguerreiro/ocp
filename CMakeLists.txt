@@ -44,11 +44,20 @@ target_sources(ocp
     PRIVATE
     utils/dfilt.c
 )
+
 target_include_directories(ocp
     PRIVATE
     ${PROJECT_SOURCE_DIR}/
     ./
 )
+
+if(OCP_DEMO_THREADS)
+    add_subdirectory(utils/demo_threads)
+    target_include_directories(ocp
+        PUBLIC
+        utils/
+    )
+endif()
 
 target_include_directories(ocp
     PUBLIC
