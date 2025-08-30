@@ -63,7 +63,7 @@ static params_t params = {
 //-----------------------------------------------------------------------------
 int32_t appControllerCascadedInit(void){
 
-    ocpTraceAddSignal(APP_CONFIG_OCP_TRACE_ID, (void *)&i_ref, "Reference current");
+    ocpTraceAddSignal(APP_CONFIG_OCP_TRACE_ID, (void *)&i_ref, "Current reference");
 
     return 0;
 }

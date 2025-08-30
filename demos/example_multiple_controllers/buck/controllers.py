@@ -118,7 +118,7 @@ class _SFB(pyocp.controller.ControllerTemplate):
         
         super().__init__(ctl_id, ctl_if)
         self.keys = (
-            'ki', 'k_ei', 'kv', 'dt'
+            'ki', 'kv', 'k_ev', 'dt'
         )
         self._model_params = _ModelParams
 

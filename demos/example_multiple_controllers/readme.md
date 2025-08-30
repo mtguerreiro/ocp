@@ -75,7 +75,6 @@ Last, we have an `iface.py` file, which is used to actually implement the interf
 # Running the example
 
 This example uses PLECS to simulate a converter, and uses `opil` (get it [here](https://gitlab.rhrk.uni-kl.de/lrs/opil)) to interface PLECS with the controller. It is assumed that you have the `ocp` and `opil` folders in the same location, like so:
-
 ```
 top_level_folder
 └───ocp
@@ -97,7 +96,6 @@ top_level_folder
 To run the controller, build and execute its C program, and then run the `python_ex_multiple_controllers.py` script from within a Python interpreter. 
 
 In this example, there are two controllers. We'll start by first configuring the cascaded controller. We do so by setting its gains, its parameters, and enabling it:
-
 ```python
 >>> buck_if.cascaded.set_gains(ts=1e-3, os=2)
 (0,)
@@ -115,7 +113,7 @@ Next, we set the reference for the output voltage:
 
 Before we enable the controller, we'll set the trace so that we can record the data from the controller:
 ```python
->>> buck_if.trace.set_size(4000)
+>>> buck_if.trace.set_size(2000)
 (0,)
 ```
 
@@ -146,13 +144,95 @@ Next, let's set the reference to zero (at this point, if the simulation has ende
 (0,)
 ```
 
-Then, enable the state feedback controller:
+Then, enable the state feedback controller, reset the trace and set the reference to 5 V again::
 ```python
 >>> buck_if.sfb.enable()
 (0,)
-```
-and reset the trace and set the reference to 5 V again:
-```python
->>> buck_if.sfb.enable()
+>>> buck_if.trace.reset();buck_if.set_ref(5)
+(0,)
 (0,)
 ```
+
+In the simulation, the output voltage should be back to 5 V again, but this time it was regulated by the state feedback controller.
+
+We can check the transient by fetching the data from the controller:
+```python
+>>> status, data2 = buck_if.trace.read()
+>>> plt.plot(data2[:, 1])
+```
+
+Technically, we can plot the two sets of data side by side for comparison:
+```python
+>>> plt.figure()
+>>> plt.plot(data[:, 1])
+>>> plt.plot(data2[:, 1])
+```
+
+However, the data is not aligned because the trace is reset at different time instants. Next, we'll see how to set the trace to its trigger mode, which will allow us to see compare the response of the controllers side by side.
+
+Another point to keep in mind is to be careful when switching between controllers at run time. Depending on the controller, it might be necessary to initialize its states, especially if it contains integrators. This is something that needs to be handled by the controller in the application and should be transparent to the Python interface. In this example we don't worry about this, but a real application would need more a more careful implementation.
+
+# Using the trace in trigger mode
+
+The trace has an option to set it to trigger mode. In this mode, the trace starts capturing data only after its trigger is set. 
+
+The trigger can be selected as any of the signals that the trace records. In this example, we can check the signals of the traces by running:
+```python
+>>> status, signals = buck_if.trace.get_signals()
+>>> signals
+[b'Inductor current', b'Output voltage', b'Duty-cycle', b'Current reference', b'Voltage reference']
+>>> signals[4]
+b'Voltage reference'
+```
+
+The trace is set to trigger mode by selecting the trigger signal, setting the level and the number of samples to be recorded pre-trigger, and setting its mode to `1`. For this example, we'll set the trigger to be the voltage reference, which is signal number `4` in the trace. The commands to set the trace are:
+```python
+>>> buck_if.trace.set_size(600)
+(0,)
+>>> buck_if.trace.set_trig_signal(4)
+(0,)
+>>> buck_if.trace.set_n_pre_trig_samples(100)
+(0,)
+>>> buck_if.trace.set_trig_level(7)
+(0,)
+>>> buck_if.trace.set_mode(1)
+(0,)
+>>> buck_if.trace.reset()
+(0,)
+```
+
+Now, change the reference to 8 V and retrieve the data from the controller:
+```python
+>>> buck_if.set_ref(8)
+(0,)
+>>> status, data_sfb = buck_if.trace.read()
+(0,)
+```
+
+At this point, we got the response of the state feedback controller. Now let's get the response of the cascaded controller. To do so, we'll set the reference to 5 V again, reset the trace, change the controller, and finally set the reference to 8 V again: 
+```python
+>>> buck_if.set_ref(5)
+(0,)
+>>> buck_if.trace.reset()
+(0,)
+>>> buck_if.cascaded.enable()
+(0,)
+>>> buck_if.set_ref(8)
+(0,)
+```
+
+Then, we can retrieve the data from the controller and plot the results side by side:
+```python
+>>> status, data_casc = buck_if.trace.read()
+(0,)
+>>> plt.figure()
+>>> plt.plot(data_casc[:, 1])
+>>> plt.plot(data_sfb[:, 1])
+```
+
+## Summary
+
+This example showed how to manage multiple controllers in a single control system with a tailored Python module. Adding new controllers is straightforward, and by using the trace in trigger mode, it is possible to easily compare the response of different controllers, or one controller for various sets of parameters.
+
+The `buck` Python module presented here can easily be expanded to include a test bench. The test bench can perform a sequence of steps, such as configuring the trace, setting the reference and the controllers, then changing the setpoint and fetching the data of the controller, effectively automating testing and data acquisition. It is also easy to create additional metadata that can go with the trace data, e.g. the controller being tested and its parameters.
+ 
