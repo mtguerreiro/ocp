@@ -22,23 +22,29 @@
 //-----------------------------------------------------------------------------
 int32_t appControllerSfbInit(void);
 //-----------------------------------------------------------------------------
-int32_t appControllerSfbRun(void *meas, int32_t nmeas,
+int32_t appControllerSfbRun(
+    void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
-    void *outputs, int32_t nmaxoutputs);
+    void *outputs, int32_t nmaxoutputs
+);
 //-----------------------------------------------------------------------------
-int32_t appControllerSfbSetParams(void *params, uint32_t size);
+int32_t appControllerSfbSetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
 int32_t appControllerSfbGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
 void appControllerSfbReset(void);
 //-----------------------------------------------------------------------------
-int32_t appControllerSfbFirstEntry(void *meas, int32_t nmeas,
+int32_t appControllerSfbFirstEntry(
+    void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
-    void *outputs, int32_t nmaxoutputs);
+    void *outputs, int32_t nmaxoutputs
+);
 //-----------------------------------------------------------------------------
-int32_t appControllerSfbLastExit(void *meas, int32_t nmeas,
+int32_t appControllerSfbLastExit(
+    void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
-    void *outputs, int32_t nmaxoutputs);
+    void *outputs, int32_t nmaxoutputs
+);
 //-----------------------------------------------------------------------------
 void appControlSfbGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------

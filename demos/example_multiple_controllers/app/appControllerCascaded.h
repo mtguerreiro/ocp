@@ -22,23 +22,29 @@
 //-----------------------------------------------------------------------------
 int32_t appControllerCascadedInit(void);
 //-----------------------------------------------------------------------------
-int32_t appControllerCascadedRun(void *meas, int32_t nmeas,
+int32_t appControllerCascadedRun(
+    void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
-    void *outputs, int32_t nmaxoutputs);
+    void *outputs, int32_t nmaxoutputs
+);
 //-----------------------------------------------------------------------------
-int32_t appControllerCascadedSetParams(void *params, uint32_t size);
+int32_t appControllerCascadedSetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
 int32_t appControllerCascadedGetParams(void *buffer, uint32_t size);
 //-----------------------------------------------------------------------------
 void appControllerCascadedReset(void);
 //-----------------------------------------------------------------------------
-int32_t appControllerCascadedFirstEntry(void *meas, int32_t nmeas,
+int32_t appControllerCascadedFirstEntry(
+    void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
-    void *outputs, int32_t nmaxoutputs);
+    void *outputs, int32_t nmaxoutputs
+);
 //-----------------------------------------------------------------------------
-int32_t appControllerCascadedLastExit(void *meas, int32_t nmeas,
+int32_t appControllerCascadedLastExit(
+    void *meas, int32_t nmeas,
     void *refs, int32_t nrefs,
-    void *outputs, int32_t nmaxoutputs);
+    void *outputs, int32_t nmaxoutputs
+);
 //-----------------------------------------------------------------------------
 void appControlCascadedGetCallbacks(void *callbacksBuffer);
 //-----------------------------------------------------------------------------

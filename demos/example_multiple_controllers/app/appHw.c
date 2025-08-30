@@ -17,15 +17,25 @@ int32_t appHwInit(void){
 //-----------------------------------------------------------------------------
 int32_t appHwGetMeasurements(void *inputs){
 
+    (void)inputs;
+
     return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t appHwUpdateControl(void *outputs, int32_t n){
 
+    (void)outputs;
+    (void)n;
+
     return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t appHwIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
+
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
 
     return 0;
 }

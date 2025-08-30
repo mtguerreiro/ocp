@@ -43,7 +43,7 @@ top_level_folder
 
 ## Starting the controller and interacting with it
 
-First, we can build and run the C program, which will initialize the controller and be ready to exchange data with the simulation. To do so, build and run this example (CMake or with Visual Studio Code).
+First, we can build and run the C program, which will initialize the controller and be ready to exchange data with the simulation. To do so, build and run this example (manually or with Visual Studio Code).
 
 Once the program is running, we can use the Python interface to query the controller. Next, run the `python_ex_controller.py` from within a Python interpreter (we use IDLE for this), and now the controller should be accessible from the Python interpreter. For example, we can query the number and name of the controllers in the application:
 

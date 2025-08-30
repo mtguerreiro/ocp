@@ -159,6 +159,8 @@ static int32_t appOpilInit(void){
 //-----------------------------------------------------------------------------
 void appAdcIrq(void *callbackRef){
 
+    (void)callbackRef;
+
     ocpCSRun(APP_CONFIG_OCP_CS_ID);
     ocpTraceSave(APP_CONFIG_OCP_TRACE_ID);
 }

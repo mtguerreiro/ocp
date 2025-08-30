@@ -1,22 +1,16 @@
 # Introduction
 
-This example shows how to use `ocp` to manage several controllers under the same control system. The example demonstrates how to implement e compare the performance of a cascaded and a state feedback controler for the buck converter.
+This example shows how to use `ocp` to manage several controllers under the same control system. The example demonstrates how to implement and compare the performance of a cascaded and a state feedback controler for the buck converter.
 
-In this example, we use Python to set the parameters of the controllers, to enable the controllers, and to switch between them.  The main goal of this example is to show some of the flexibility of combining Python and the controllers running C code. 
+In this example, we use Python to set the parameters of the controllers, to enable the controllers, and to switch between them.  The main goal of this example is to show some of the flexibility of using Python to manage and set the controllers. 
 
-In the previous example (`example_controller`), we implemented a state feedback controller, and configure its parameters through Python. Moreover, we were able to retrieve the trace data recorded by the controller and check the transient response of the output voltage. 
+In the previous example (`example_controller`), we implemented a state feedback controller, and configured its parameters through Python. Moreover, we were able to retrieve the trace data recorded by the controller and check the transient response of the output voltage. 
 
-However, as the last example shows, it is necessary to run execute many steps before we can get the system running, such as packing and unpacking binary data, figuring out the size of the trace in bytes, etc. Here, we show how to build a Python module tailored for an application such that we don't have to deal with the low-level `ocp` functions. Furthermore, we also provide a structure to handle multiple controllers in the application.
+In the last example, it was necessary to run many steps before we could get the system up and running, such as packing and unpacking binary data, figuring out the size of the trace in bytes, etc. Here, we show how to build a Python module tailored for an application such that we don't have to deal with the low-level `ocp` functions. Furthermore, we also provide a structure to handle multiple controllers in the application.
 
 Before going over this example, it is recommend to have a look at the single controller example (`example_controller`). 
 
-
 # File structure
-
-
-
-When there are multiple controllers, the number of files can start increasi
-Now that there are multiple controllers, the number of files 
 
 This example is structured in the following way:
 
@@ -43,6 +37,7 @@ typedef enum{
 Each controller in the application needs to follow a template that is compatible with the `controller` library. For this example, two controllers are implemented:
 - `appControllerSfb.c`
 - `appControllerCascaded.c`
+
 In the initialization of `appController.c`, these controllers are included in a callback table that is passed to the `controller` library:
 ```c
     controllerGetCbs_t ctlGetCbs[APP_CONTROLLER_END] = {0};
@@ -71,7 +66,7 @@ Note that we create an object for each controller, and we give their correspondi
 
 The definition of the controllers come next. We'll just focus on the `_Cascaded` class for the cascaded controller. In the initialization of the class, it is important to provide the parameters of the controller in a `keys` tuple. They have to be in the same order as they are expected to be received by the controller. Then, the `_decode` and `_encode` methods will take care of packing and unpacking the data in binary format. As in the `example_controller` example, we define a `set_gains` method that takes the desired controller response as parameters, gets the gains and sends it to the controllers. Note that for this, a `set_params` method is used, which is defined in the `pyocp.controller.ControllerTemplate` class. The method takes a dictionary as argument, and packs the data in binary format and sends it to the controller. 
 
-One thing to note is that the C controller always receives all parameters simultaneously. This means that, if the controller has 10 parameters but we only need to change 1, we have to write all 10 parameters together. This is embedded in the `set_params` method of the `pyocp.controller.ControllerTemplate` class. This method will first read and decode the data in the controller, update the fields with the new values passed to it as a dictionary, and then send all parameters to the controller again. In the template, it is assumed that all data in the controller is in floating point. If not the case, we can just overwrite the `set_params` method with a custom implementation.
+One thing to note is that the C controller always receives all parameters simultaneously. This means that, if the controller has 10 parameters but we only need to change 1, we have to write all 10 parameters together. This is embedded in the `set_params` method of the `pyocp.controller.ControllerTemplate` class. This method will first read and decode the data in the controller in a dictionary, update the new values, and then send all the parameters to teh controller again. In the template, it is assumed that all data in the controller is in floating point. If not the case, we can just overwrite the `set_params` method with a custom implementation.
 
 Next, we have a look at the `trace.py` file. In this file, a class `Trace` is defined which uses the `pyocp.trace.TraceTemplate` class as template. Most of the trace functionalities are similar. The implementation assumes only floating point signals in the trace, and takes care of decoding the trace data and setting the appropriate size according to the number of samples we would like to record.
 
@@ -99,6 +94,65 @@ top_level_folder
         ....
 ```
 
-## Starting the controller and interacting with it
+To run the controller, build and execute its C program, and then run the `python_ex_multiple_controllers.py` script from within a Python interpreter. 
 
+In this example, there are two controllers. We'll start by first configuring the cascaded controller. We do so by setting its gains, its parameters, and enabling it:
 
+```python
+>>> buck_if.cascaded.set_gains(ts=1e-3, os=2)
+(0,)
+>>> buck_if.cascaded.set_params({'i_max':4, 'i_min':-4})
+(0,)
+>>> buck_if.cascaded.enable()
+(0,)
+```
+
+Next, we set the reference for the output voltage:
+```python
+>>> buck_if.set_ref(5)
+(0,)
+```
+
+Before we enable the controller, we'll set the trace so that we can record the data from the controller:
+```python
+>>> buck_if.trace.set_size(4000)
+(0,)
+```
+
+In constrast with the previous example (`example_controller`), here we don't use the low-level `ocp` functions, but rather higher level functions built in the `buck` module, which make interacting with the controller much easier.
+
+Now, run the PLECS model in the `plecs` folder, and run the following to reset the trace and enable the controller:
+```python
+>>> buck_if.trace.reset(); buck_if.enable()
+(0,)
+(0,)
+```
+
+In the PLECS scope you should see the output voltage regulated at 5 V. We can retrieve and plot the data from the controller as follows:
+```python
+>>> status, data = buck_if.trace.read()
+>>> plt.plot(data[:, 1])
+```
+
+Since we have two controllers, we can switch between them. To do so, we first configure the other controller, i.e. the state feedback controller:
+```python
+>>> buck_if.sfb.set_gains(ts=1e-3, os=2)
+(0,)
+```
+
+Next, let's set the reference to zero (at this point, if the simulation has ended, just start it again):
+```python
+>>> buck_if.set_ref(0)
+(0,)
+```
+
+Then, enable the state feedback controller:
+```python
+>>> buck_if.sfb.enable()
+(0,)
+```
+and reset the trace and set the reference to 5 V again:
+```python
+>>> buck_if.sfb.enable()
+(0,)
+```

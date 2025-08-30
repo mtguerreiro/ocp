@@ -12,6 +12,7 @@ class _ModelParams:
     R : float = 10
     L : float = 47e-6
     Co : float = 220e-6
+    dt : float = 1/100e3
 
 
 class Reference(pyocp.controller.ReferenceTemplate):
@@ -53,7 +54,7 @@ class _Cascaded(pyocp.controller.ControllerTemplate):
 
         self.keys = (
             'ki', 'k_ei', 'kv', 'k_ev',
-            'i_max', 'i_min'
+            'i_max', 'i_min', 'dt'
         )
         self._model_params = _ModelParams
 
@@ -91,7 +92,8 @@ class _Cascaded(pyocp.controller.ControllerTemplate):
         V_in = self._model_params.V_in
         R = self._model_params.R
         L = self._model_params.L
-        CO = self._model_params.Co
+        Co = self._model_params.Co
+        dt = self._model_params.dt
         
         ts_v = ts
         os_v = os
@@ -104,11 +106,10 @@ class _Cascaded(pyocp.controller.ControllerTemplate):
         k_ei = (L / V_in) * ( - wn_i**2 )
 
         zeta_v, wn_v = _zeta_wn(ts_v, os_v)
-        kv = ( CO ) * ( 2 * zeta_v * wn_v - 1 / R / CO )
-        k_ev = ( CO ) * ( - wn_v**2 )
+        kv = ( Co ) * ( 2 * zeta_v * wn_v - 1 / R / Co )
+        k_ev = ( Co ) * ( - wn_v**2 )
 
-        return {'ki': ki, 'k_ei': k_ei, 'kv': kv, 'k_ev':k_ev}
-
+        return {'ki': ki, 'k_ei': k_ei, 'kv': kv, 'k_ev':k_ev, 'dt':dt}
 
 
 class _SFB(pyocp.controller.ControllerTemplate):
@@ -117,7 +118,7 @@ class _SFB(pyocp.controller.ControllerTemplate):
         
         super().__init__(ctl_id, ctl_if)
         self.keys = (
-            'ki', 'k_ei', 'kv'
+            'ki', 'k_ei', 'kv', 'dt'
         )
         self._model_params = _ModelParams
 
@@ -156,6 +157,7 @@ class _SFB(pyocp.controller.ControllerTemplate):
         R = self._model_params.R
         L = self._model_params.L
         Co = self._model_params.Co
+        dt = self._model_params.dt
         
         A = np.array([
             [0,         -1 / L],
@@ -191,7 +193,7 @@ class _SFB(pyocp.controller.ControllerTemplate):
         kv = K[1]
         k_ev = K[2]
         
-        return {'ki':ki, 'kv':kv, 'k_ev':k_ev}
+        return {'ki':ki, 'kv':kv, 'k_ev':k_ev, 'dt':dt}
 
 
 def _dict_encode(keys, params):

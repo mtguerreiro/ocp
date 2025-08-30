@@ -29,14 +29,14 @@ static stypesControllerData_t xtControllerData;
 //-----------------------------------------------------------------------------
 int32_t appOpilUpdateMeasurements(void *meas, int32_t size){
 
-	uint8_t *src, *dst;
+    uint8_t *src, *dst;
 
-	dst = (uint8_t *)( &xtMeasurements );
-	src = (uint8_t *)( meas );
+    dst = (uint8_t *)( &xtMeasurements );
+    src = (uint8_t *)( meas );
 
-	while(size--) *dst++ = *src++;
+    while(size--) *dst++ = *src++;
 
-	return 0;
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t appOpilGetMeasurements(void *meas){
@@ -56,14 +56,14 @@ int32_t appOpilGetMeasurements(void *meas){
 //-----------------------------------------------------------------------------
 int32_t appOpilUpdateSimData(void *simData, int32_t size){
 
-	uint8_t *src, *dst;
+    uint8_t *src, *dst;
 
-	dst = (uint8_t *)( &xtSimData );
-	src = (uint8_t *)( simData );
+    dst = (uint8_t *)( &xtSimData );
+    src = (uint8_t *)( simData );
 
-	while(size--) *dst++ = *src++;
+    while(size--) *dst++ = *src++;
 
-	return 0;
+    return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t appOpilGetSimData(void **simData, int32_t size){
