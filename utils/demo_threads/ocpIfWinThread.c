@@ -17,7 +17,7 @@
 
 /* Open controller project */
 #include "ocp/ocpIf.h"
-
+#include "ocpConfig.h"
 //============================================================================
 
 
@@ -98,8 +98,8 @@ void *ocpIfThread(void *ptr){
         /* Waits for a connection */
         client_len = sizeof(client_addr);
         client_socket = accept( server_socket , (struct sockaddr *)&client_addr, &client_len );
-        if( client_socket < 0 ) {
-            LogError( ("Socket accept failed with error code %d", client_socket) );
+        if( client_socket == INVALID_SOCKET  ) {
+            LogError( ("Socket accept failed with error code %d", WSAGetLastError()) );
             close(server_socket);
             return 0;
         }
