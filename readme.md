@@ -12,7 +12,7 @@ The framework is organized around three main ideas:
 
 ## Getting started
 
-The easiest way to get started is to have a look at the examples provided in the `demo` folder:
+The easiest way to get started is to have a look at the examples provided in the `demos` folder:
 
 - Introductory example (`example_intro`): shows the structure of a minimal application with `ocp`, how to initialize traces and controllers, and how to interact with them from Python.
 
