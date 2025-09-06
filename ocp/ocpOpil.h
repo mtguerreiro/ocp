@@ -1,9 +1,3 @@
-/*
- * ocpOpil.h
- *
- *  Created on: 11.09.2023
- *      Author: LRS
- */
 
 #ifndef OCP_OPIL_H_
 #define OCP_OPIL_H_

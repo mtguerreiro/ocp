@@ -1,9 +1,3 @@
-/*
- * ocpTrace.h
- *
- *  Created on: 17.02.2023
- *      Author: mguerreiro
- */
 
 #ifndef OCP_TRACE_H_
 #define OCP_TRACE_H_
