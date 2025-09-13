@@ -1,0 +1,3 @@
+[submodule "clogging"]
+	path = clogging
+	url = git@github.com:mtguerreiro/clogging.git
