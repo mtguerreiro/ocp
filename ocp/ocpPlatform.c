@@ -4,6 +4,7 @@
 //=============================================================================
 #include "ocpPlatform.h"
 
+#include "string.h"
 //=============================================================================
 
 //===========================================================================
@@ -18,17 +19,11 @@ static char xplatformID[] = OCP_PLATFORM_ID;
 //---------------------------------------------------------------------------
 int32_t ocpPlatformID(char *buffer, uint32_t maxsize){
 
-    uint32_t k;
-    char *p;
+    if( maxsize < sizeof(xplatformID) ) return -1;
 
-    p = xplatformID;
-    k = 0;
-    while( (*p != 0) && (k < maxsize) ){
-        *buffer++ = *p++;
-        k++;
-    }
+    memcpy(buffer, xplatformID, sizeof(xplatformID));
 
-    return k;
+    return sizeof(xplatformID);
 }
 //---------------------------------------------------------------------------
 int32_t ocpPlatformIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize){

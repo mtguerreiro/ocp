@@ -166,7 +166,6 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
         break;
 
         case WAIT_FOR_RESET:
-            return;
             break;
     }
 }

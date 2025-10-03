@@ -4,6 +4,7 @@
 //=============================================================================
 #include "controller.h"
 
+#include "string.h"
 //=============================================================================
 
 //=============================================================================
@@ -73,30 +74,19 @@ int32_t controllerRun(controller_t *controller,
 //-----------------------------------------------------------------------------
 int32_t controllerSetRef(controller_t *controller, void *ref, uint32_t size){
 
-    uint32_t k;
-    uint8_t *src = (uint8_t *)ref;
-    uint8_t *dst = (uint8_t *)controller->refs.buffer;
-
     if( size != controller->refs.size ) return CONTROLLER_ERR_INVALID_REF_SIZE;
 
-    for(k = 0; k < size; k++){
-        *dst++ = *src++;
-    }
+    memcpy((void *)controller->refs.buffer, ref, controller->refs.size);
+
 
     return 0;
 }
 //-----------------------------------------------------------------------------
 int32_t controllerGetRef(controller_t *controller, void *buffer, uint32_t size){
 
-    uint32_t k;
-    uint8_t *src = (uint8_t *)controller->refs.buffer;
-    uint8_t *dst = (uint8_t *)buffer;
-
     if( size < controller->refs.size ) return CONTROLLER_ERR_INVALID_REF_BUF_SIZE;
 
-    for(k = 0; k < controller->refs.size; k++){
-        *dst++ = *src++;
-    }
+    memcpy(buffer, (void *)controller->refs.buffer, controller->refs.size);
 
     return controller->refs.size;
 }

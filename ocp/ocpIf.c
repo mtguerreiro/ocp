@@ -218,6 +218,16 @@ typedef struct{
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
 static ocpIfControl_t xcontrol;
+
+#ifdef OCP_CONFIG_MASTER_CORE
+
+#ifndef OCP_CONFIG_IPC_BUFFER_SIZE
+#define OCP_CONFIG_IPC_BUFFER_SIZE          256
+#endif
+
+static char ipcBuffer[OCP_CONFIG_IPC_BUFFER_SIZE];
+
+#endif
 //=============================================================================
 
 //=============================================================================
@@ -1105,7 +1115,7 @@ static int32_t ocpIfMasterTraceSetMode(
     }
     else{
         id = id - nTracesSecondCore;
-        status = ocpTraceSetMode(id, mode);
+        status = ocpTraceSetMode(id, (ocpTraceMode_t)mode);
     }
 
     return status;
@@ -1971,17 +1981,16 @@ static int32_t ocpIfMasterCSControllerInterfaceSecondCore(
 
     uint32_t d;
     int32_t size;
-    char buffer[insize + sizeof(d) + sizeof(id)];
 
     d = OCP_IF_CMD_CS_CONTROLLER_IF;
-    memcpy( (void *)buffer, (void *)&d, sizeof(d) );
+    memcpy( (void *)ipcBuffer, (void *)&d, sizeof(d) );
 
-    memcpy( (void *)&buffer[sizeof(d)], (void *)&id, sizeof(id) );
+    memcpy( (void *)&ipcBuffer[sizeof(d)], (void *)&id, sizeof(id) );
 
-    memcpy( (void *) &buffer[ sizeof(d) + sizeof(id) ], in, insize );
+    memcpy( (void *) &ipcBuffer[ sizeof(d) + sizeof(id) ], in, insize );
 
     size = ipcClientRequest(
-        (void *)buffer, insize + sizeof(d) + sizeof(id),
+        (void *)ipcBuffer, insize + sizeof(d) + sizeof(id),
         out, maxoutsize,
         OCP_IF_CONFIG_DUAL_CORE_COMM_TO
     );
@@ -1994,17 +2003,16 @@ static int32_t ocpIfMasterCSHardwareInterfaceSecondCore(
 
     uint32_t d;
     int32_t size;
-    char buffer[insize + sizeof(d) + sizeof(id)];
 
     d = OCP_IF_CMD_CS_HARDWARE_IF;
-    memcpy( (void *)buffer, (void *)&d, sizeof(d) );
+    memcpy( (void *)ipcBuffer, (void *)&d, sizeof(d) );
 
-    memcpy( (void *)&buffer[sizeof(d)], (void *)&id, sizeof(id) );
+    memcpy( (void *)&ipcBuffer[sizeof(d)], (void *)&id, sizeof(id) );
 
-    memcpy( (void *) &buffer[ sizeof(d) + sizeof(id) ], in, insize );
+    memcpy( (void *) &ipcBuffer[ sizeof(d) + sizeof(id) ], in, insize );
 
     size = ipcClientRequest(
-        (void *)buffer, insize + sizeof(d) + sizeof(id),
+        (void *)ipcBuffer, insize + sizeof(d) + sizeof(id),
         out, maxoutsize,
         OCP_IF_CONFIG_DUAL_CORE_COMM_TO
     );
