@@ -8,15 +8,14 @@ import pyocp
 import struct
 import numpy as np
 
-_TRACE_MODE_MANUAL  = 0
-_TRACE_MODE_TRIGGER = 1
-
-_TRACE_DATA_SIZE_BYTES = 4
-
 class TraceTemplate:
     """
     """
     def __init__(self, tr_id, ocp_if):
+
+        self._TRACE_MODE_MANUAL  = 0
+        self._TRACE_MODE_TRIGGER = 1
+        self._TRACE_DATA_SIZE_BYTES = 4
 
         self._tr_id = tr_id
         self._ocp_if = ocp_if
@@ -32,7 +31,7 @@ class TraceTemplate:
         if status < 0:
             return (-1, status)
 
-        if mode == _TRACE_MODE_TRIGGER:
+        if mode == self._TRACE_MODE_TRIGGER:
             status, data_bin = self._reorder_data(data_bin)
             if status < 0:
                 return (-1, status)
@@ -75,7 +74,7 @@ class TraceTemplate:
         if status < 0:
             return (-1, status)
 
-        size = tr_size / n_signals / _TRACE_DATA_SIZE_BYTES
+        size = tr_size / n_signals
 
         return (0, size)
         
@@ -86,7 +85,7 @@ class TraceTemplate:
         if status < 0:
             return (-1, status)
 
-        tr_size = size * n_signals * _TRACE_DATA_SIZE_BYTES
+        tr_size = size * n_signals
 
         return self._ocp_if.trace_set_size(self._tr_id, tr_size)
 
@@ -142,7 +141,7 @@ class TraceTemplate:
         if status < 0:
             return (-1, status)
 
-        data_size = _TRACE_DATA_SIZE_BYTES
+        data_size = self._TRACE_DATA_SIZE_BYTES
         data_ro = data[data_size*tail:] + data[:data_size*tail]
 
         return (0, data_ro)
@@ -155,11 +154,12 @@ class TraceTemplate:
             return (-1, status)
 
         n = len(data_bin)
+        print(n)
         
-        fmt = '<' + 'f' * round(n / _TRACE_DATA_SIZE_BYTES)
+        fmt = '<' + 'f' * round(n / self._TRACE_DATA_SIZE_BYTES)
 
         data = np.array(struct.unpack(fmt, data_bin), dtype=np.float32)
 
-        data = data.reshape(round(n / n_signals / _TRACE_DATA_SIZE_BYTES), n_signals)
+        data = data.reshape(round(n / n_signals / self._TRACE_DATA_SIZE_BYTES), n_signals)
 
         return (status, data)

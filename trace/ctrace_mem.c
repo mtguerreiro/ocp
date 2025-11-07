@@ -19,7 +19,7 @@
 void ctracememInitialize(ctracemem_t *trace, void *mem, int32_t size){
 
     trace->start = (ctracemem_size_t *)mem;
-    trace->end = (ctracemem_size_t *)( (char *)mem + size );
+    trace->end = trace->start + size;
     trace->p = (ctracemem_size_t *)mem;
 
     trace->maxsize = size;
@@ -36,7 +36,7 @@ int32_t ctracememGetSize(ctracemem_t *trace){
 
     int32_t size;
 
-    size = (trace->end - trace->start) * sizeof(ctracemem_size_t);
+    size = trace->end - trace->start;
 
     return size;
 }
@@ -44,8 +44,6 @@ int32_t ctracememGetSize(ctracemem_t *trace){
 int32_t ctracememSetSize(ctracemem_t *trace, int32_t size){
 
     if( size > trace->maxsize ) return -1;
-
-    size = size / sizeof(ctracemem_size_t);
 
     trace->end = trace->start + size;
     trace->p = trace->start;
@@ -61,8 +59,6 @@ void ctracememReset(ctracemem_t *trace){
 void ctracememSave(ctracemem_t *trace, void **src, uint32_t size){
 
     ctracemem_size_t **s = (ctracemem_size_t **)src;
-
-    size = size / sizeof(ctracemem_size_t);
 
     if( (trace->p + size) > trace->end ) return;
 
@@ -121,7 +117,6 @@ void ctracememTrigModeSave(ctracemem_t *trace, void **src, uint32_t size){
 
     ctracemem_size_t **s = (ctracemem_size_t **)src;
 
-    size = size / sizeof(ctracemem_size_t);
     uint32_t sampleCounter = size;
 
     switch( trace->trigModeParams.fsmState ) {

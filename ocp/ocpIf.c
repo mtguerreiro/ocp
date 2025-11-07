@@ -343,7 +343,7 @@ static int32_t ocpIfTraceRead(
     if( maxoutsize < sizeof(address) ) return OCP_IF_ERR_INVALID_OUT_SIZE;
     *out = (void *)( address );
 
-    return size;
+    return size * sizeof(ctracemem_size_t);
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpIfTraceReset(
@@ -899,7 +899,7 @@ static int32_t ocpIfMasterTraceRead(
 
     *out = (void *)( address );
 
-    return size;
+    return size * sizeof(ctracemem_size_t);
 }
 //-----------------------------------------------------------------------------
 static int32_t ocpIfMasterTraceReset(
