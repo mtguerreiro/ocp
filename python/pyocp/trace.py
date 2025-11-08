@@ -154,7 +154,6 @@ class TraceTemplate:
             return (-1, status)
 
         n = len(data_bin)
-        print(n)
         
         fmt = '<' + 'f' * round(n / self._TRACE_DATA_SIZE_BYTES)
 

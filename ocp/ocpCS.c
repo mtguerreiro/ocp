@@ -39,7 +39,7 @@ int32_t ocpCSInitialize(uint32_t id, ocpCSConfig_t *config, char *name){
     controlsysInitialize( &xcscontrol.cs[id], config );
 
     tplim = xcscontrol.names + OCP_CS_END * OCP_CS_CONFIG_CS_NAME_MAX_LEN;
-    while( *name && (xcscontrol.np < tplim) ) *xcscontrol.np++ = *name++;
+    while( *name && (xcscontrol.np < (tplim - 1U)) ) *xcscontrol.np++ = *name++;
     *xcscontrol.np++ = 0;
 
     return 0;
