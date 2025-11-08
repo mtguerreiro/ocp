@@ -80,18 +80,18 @@ The size of the trace, e.g. how many bytes it can store, can be set dynamically.
 
 ```python
 >>> ocp.trace_get_size(0)
-(0, 10485760)
+(0, 25600)
 ```
 
-In this case, the trace can store up to 10 MB of data. All signals in a single trace are stored simultaneously at an event defined by the user in the C code of the application. A common case is to set the trace so that it stores its signals every time the controller is executed. 
+In this case, the trace can store up to 25600 samples. In the trace, each signal is stored as a float, which means that the size of the trace in bytes is about 100 kB . All signals in a single trace are stored simultaneously at an event defined by the user in the C code of the application. A common case is to set the trace so that it stores its signals every time the controller is executed. 
 
-The size of the trace can be dynamically set (up to its maximum size). For example, let's say we want to record the trace signals for 4000 control events. Each trace is saved as a float in the controller's memory, which takes 4 bytes. Thus, if we have 4 signals and want to store 4000 samples of each, we need to set the trace to have a size of `4*4*4000`:
+The size of the trace can be dynamically set (up to its maximum size). For example, let's say we want to record the trace signals for 4000 control events. If we have 4 signals and want to store 4000 samples of each, we need to set the trace to have a size of `4*4000`:
 
 ```python
->>> ocp.trace_set_size(0, 4 * 4 * 4000)
+>>> ocp.trace_set_size(0, 4 * 4000)
 (0,)
 >>> ocp.trace_get_size(0)
-(0, 64000)
+(0, 16000)
 ```
 
 ## Setting controller parameters
@@ -179,14 +179,15 @@ Next, we can check the trace signals to see the data the controller recorded. We
 >>> status, trace_data = ocp.trace_read(0)
 ```
 
-`ocp.trace_read` returns the data stored in the controller's memory in binary format. If you check, `trace_data` has the size that we had previously set:
+`ocp.trace_read` returns the data stored in the controller's memory in binary format. If you check, `trace_data` has four times the size that we had previously set:
 
 ```python
 >>> len(trace_data)
 64000
 ```
 
-Because we know that we have four float signals in the trace, we can convert this binary data to a numpy array. In `python_ex_controller.py`, we wrote a function to do exactly that. To convert the data, run: 
+This is because we set the size of the trace to be 16000 floats, and each float is four bytes.
+With this information, we can convert this binary data to a numpy array. In `python_ex_controller.py`, we wrote a function to do exactly that. To convert the data, run: 
 
 ```python
 >>> data = trace_data_to_np_array(trace_data, 4)

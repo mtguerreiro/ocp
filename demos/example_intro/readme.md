@@ -30,7 +30,7 @@ One way to organize your application is to create four source files: `main.c`, `
 
 Having a look at the `appInit` function in the `app.c` file, the traces are initialized first. This is important because the hardware and the controller might add signals to the traces, so it is important that they are already initialized. After initializing the trace, the hardware and the controller are initialized. Last, `ocp`'s control system is initialized, which links the hardware and controller functions to `ocp`.
 
-Note that the trace and the control system can be initialized with names. In this template, their are initialized with "App trace" and "App controller", respectively. 
+Note that the trace and the control system can be initialized with names. In this template, they are initialized with "App trace" and "App controller", respectively. 
 
 ## Running
 
@@ -60,11 +60,11 @@ We can also interact with the trace. For example, we can query the name of the t
 We can also get and set the size of the trace:
 ```python
 >>> ocp.trace_get_size(0)
-(0, 104857600)
->>> ocp.trace_set_size(0, 1024)
+(0, 25600)
+>>> ocp.trace_set_size(0, 100)
 (0,) 
 >>> ocp.trace_get_size(0)
-(0, 1024)
+(0, 100)
 ```
 
 Note that to query and set the size of the trace, we have to give the ID of the trace that we want to query. This ID must match the one used to initialize the trace, as we did in `app.c`.

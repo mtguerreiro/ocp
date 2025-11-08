@@ -20,7 +20,10 @@ typedef struct ctraceConfig_t{
 	uint32_t size;
 
 	void **data;
+	uint32_t dataSize;
+
 	char *names;
+	uint32_t namesBufferSize;
 }ctraceConfig_t;
 
 /* Save Mode enum */
@@ -34,8 +37,10 @@ typedef struct ctrace_t{
 
 	uint32_t n;
 	void **data;
+	uint32_t dataSize;
 	char *names;
 	char *np;
+	char *ne;
 	ctraceMode_t traceMode;
 	ctracemem_t mem;
 }ctrace_t;

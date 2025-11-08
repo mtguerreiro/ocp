@@ -39,8 +39,10 @@ void appAdcIrq(void *callbackRef);
 //=============================================================================
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
-#define APP_OCP_CONFIG_TRACE_0_NAME_LEN         800
-#define APP_OCP_CONFIG_TRACE_0_MAX_SIGNALS      20
+#define APP_OCP_CONFIG_TRACE_0_SIZE_ELEMENTS    (25 * 1024)
+
+#define APP_OCP_CONFIG_TRACE_0_NAME_LEN         64
+#define APP_OCP_CONFIG_TRACE_0_MAX_SIGNALS      10
 
 #define APP_OCP_CONFIG_INPUT_BUF_SIZE           50
 #define APP_OCP_CONFIG_OUTPUT_BUF_SIZE          20
@@ -51,7 +53,7 @@ void appAdcIrq(void *callbackRef);
 //=============================================================================
 static char trace0Names[APP_OCP_CONFIG_TRACE_0_NAME_LEN];
 static size_t trace0Data[APP_OCP_CONFIG_TRACE_0_MAX_SIGNALS];
-static uint8_t traceBuffer[APP_CONFIG_OCP_TRACE_0_SIZE_BYTES];
+static float traceBuffer[APP_OCP_CONFIG_TRACE_0_SIZE_ELEMENTS];
 
 static float bInputs[APP_OCP_CONFIG_INPUT_BUF_SIZE];
 static float bOutputs[APP_OCP_CONFIG_OUTPUT_BUF_SIZE];
@@ -85,9 +87,11 @@ static int32_t appOcpTracesInit(void){
     ocpTraceConfig_t config;
 
     config.mem = (void *)traceBuffer;
-    config.size = APP_CONFIG_OCP_TRACE_0_SIZE_BYTES;
+    config.size = APP_OCP_CONFIG_TRACE_0_SIZE_ELEMENTS;
     config.data = (void **)trace0Data;
+    config.dataSize = APP_OCP_CONFIG_TRACE_0_MAX_SIGNALS;
     config.names = trace0Names;
+    config.namesBufferSize = sizeof(trace0Names);
 
     ocpTraceInitialize(APP_CONFIG_OCP_TRACE_ID, &config, "App trace");
 

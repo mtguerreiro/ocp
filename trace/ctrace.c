@@ -11,7 +11,6 @@
 
 /*
  * TODOs
- *  - limit signal name
  *  - thread-safe?
  */
 //===========================================================================
@@ -25,22 +24,22 @@ void ctraceInitialize(ctrace_t *trace, ctraceConfig_t *config){
 	ctracememInitialize( &trace->mem, config->mem, config->size );
 
 	trace->data = config->data;
+	trace->dataSize = config->dataSize;
 	trace->names = config->names;
 	trace->np = config->names;
+	trace->ne = trace->np + config->namesBufferSize;
 
 	trace->n = 0;
 }
 //---------------------------------------------------------------------------
 void ctraceAddSignal(ctrace_t *trace, void *src, char *name){
 
-	uint32_t n;
+	if( trace->n >= trace->dataSize ) return;
 
-	n = trace->n;
+	trace->data[ trace->n ] = src;
 
-	trace->data[n] = src;
-
-	while( *name ) *(trace->np++) = *name++;
-	*(trace->np++) = 0;
+	while( *name && (trace->np < (trace->ne - 1U)) ) *(trace->np++) = *name++;
+	if( trace->np < trace->ne ) *(trace->np++) = 0;
 
 	trace->n++;
 }

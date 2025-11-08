@@ -1,9 +1,3 @@
-/*
- * ctrace_mem.h
- *
- *  Created on: 21 de ago de 2022
- *      Author: marco
- */
 
 #ifndef CTRACE_MEM_H_
 #define CTRACE_MEM_H_
@@ -58,7 +52,8 @@ typedef struct ctracemem_t{
  *
  * @param trace Pointer to trace memory region.
  * @param mem Address which the trace pointer is assigned to, defines start of trace memory region.
- * @param size Total size of memory reserved for the traces.
+ * @param size Total size of memory reserved for the traces, in number of elements.
+ *             One element has the size of `ctracemem_size_t`.
  */
 void ctracememInitialize(ctracemem_t *trace, void *mem, int32_t size);
 //---------------------------------------------------------------------------
@@ -71,22 +66,20 @@ void ctracememInitialize(ctracemem_t *trace, void *mem, int32_t size);
 void ctracememAddress(ctracemem_t *trace, void *address);
 //---------------------------------------------------------------------------
 /**
- * @brief Gets the total number of bytes configured for all traces.
- *
- * This is defined by the amount of samples that are stored.
+ * @brief Gets the current set size of elements for the traces.
  *
  * @param trace Pointer to trace memory region.
- * @return total number of bytes configured for all traces.
+ * @return total number of elements set for the traces.
  */
 int32_t ctracememGetSize(ctracemem_t *trace);
 //---------------------------------------------------------------------------
 /**
- * @brief Sets total size of all traces.
+ * @brief Sets total size of the traces.
  *
  * This defines the amount of samples that are stored.
  *
  * @param trace Pointer to trace memory region.
- * @param size Total size of all traces, determined by the product of the amount of traces and the amount of samples to be stored.
+ * @param size total number of elements to store.
  * @return -1 if size parameter exceeds the maximum trace size, 0 otherwise.
  */
 int32_t ctracememSetSize(ctracemem_t *trace, int32_t size);

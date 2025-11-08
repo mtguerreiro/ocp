@@ -44,7 +44,7 @@ int32_t ocpTraceInitialize(uint32_t id, ocpTraceConfig_t *config, char *name){
 	ctraceInitialize( &xifcontrol.traces[id] , config );
 
 	tplim = xifcontrol.names + OCP_TRACE_END * OCP_TRACE_CONFIG_TRACE_NAME_MAX_LEN;
-	while( *name && (xifcontrol.np < tplim) ) *xifcontrol.np++ = *name++;
+	while( *name && (xifcontrol.np < (tplim - 1U)) ) *xifcontrol.np++ = *name++;
 	*xifcontrol.np++ = 0;
 
 	return 0;
