@@ -101,6 +101,8 @@ int32_t ipcServerRequest(void){
 	ret = ipcServerMemRead((void *)( ipcServerCtl.serverAdd ), (void *)( &reqsize ), 4);
 	if( ret != 0 ) return IPC_SERVER_ERR_MEM_WRITE;
 
+	if( reqsize > ipcServerCtl.serverSize ) return IPC_SERVER_ERR_CL_REQ_SIZE;
+
 	respsize = ipcServerCtl.reqHandle((void *)( ipcServerCtl.serverAdd + 4 ), reqsize,
 			(void **)( &resp ), ipcServerCtl.clientSize);
 
@@ -109,6 +111,7 @@ int32_t ipcServerRequest(void){
 
 	if( respsize > 0 ){
 		if( ((uint32_t)( resp )) != (ipcServerCtl.clientAdd + 4) ){
+			if( respsize > ipcServerCtl.clientSize ) return IPC_SERVER_ERR_SV_RESP_SIZE;
 			ret = ipcServerMemWrite( resp, (void *)(ipcServerCtl.clientAdd + 4), respsize);
 			if( ret != 0 ) return IPC_SERVER_ERR_MEM_WRITE;
 		}

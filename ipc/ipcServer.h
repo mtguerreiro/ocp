@@ -122,6 +122,8 @@ typedef int32_t (*ipcServerRequestHandle)(void *req, int32_t reqsize, void **res
 #define IPC_SERVER_ERR_MEM_READ			-2  /*!< Failed to read from memory */
 #define IPC_SERVER_ERR_IRQ_SEND			-3	/*!< Failed to generate interrupt */
 #define IPC_SERVER_ERR_IRQ_RECEIVE		-4	/*!< Failed to receive interrupt */
+#define IPC_SERVER_ERR_CL_RESP_SIZE		-5	/*!< Server's response exceeds client's buffer size */
+#define IPC_SERVER_ERR_CL_REQ_SIZE		-6	/*!< Client's request exceeds server's buffer size */
 //=============================================================================
 
 //=============================================================================
