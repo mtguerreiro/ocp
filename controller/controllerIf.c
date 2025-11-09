@@ -20,7 +20,9 @@
 //=============================================================================
 /*--------------------------------- Globals ---------------------------------*/
 //=============================================================================
+#if OCP_CS_CONFIG_ENABLE != 0
 static controller_t *controllers[OCP_CS_END] = {0};
+#endif
 static rpctx_t rp;
 static rphandle_t handles[CONTROLLER_IF_END];
 //=============================================================================
@@ -61,11 +63,17 @@ int32_t controllerIf(void *in, uint32_t insize, void **out, uint32_t maxoutsize)
 //-----------------------------------------------------------------------------
 int32_t controllerIfRegister(controller_t *controller, uint32_t csid){
 
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)controller;
+    (void)csid;
+    return -1;
+#else
     if( csid >= OCP_CS_END ) return -1;
 
     controllers[csid] = controller;
 
     return 0;
+#endif
 }
 //-----------------------------------------------------------------------------
 //=============================================================================
@@ -76,6 +84,13 @@ int32_t controllerIfRegister(controller_t *controller, uint32_t csid){
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSetReferences(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+    return -1;
+#else
     (void)out;
     (void)maxoutsize;
     int32_t status = -1;
@@ -94,10 +109,18 @@ static int32_t controllerIfSetReferences(void *in, uint32_t insize, void **out, 
         status = controllerSetRef(controllers[csid], (void *)p, insize - sizeof(csid));
 
     return status;
+#endif
 }
 //-----------------------------------------------------------------------------
 static int32_t controllerIfGetReferences(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+    return -1;
+#else
     int32_t status = -1;
     uint32_t csid;
 
@@ -111,10 +134,18 @@ static int32_t controllerIfGetReferences(void *in, uint32_t insize, void **out, 
         status = controllerGetRef(controllers[csid], *out, maxoutsize);
 
     return status;
+#endif
 }
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSet(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+    return -1;
+#else
     (void)out;
     (void)maxoutsize;
     int32_t status = -1;
@@ -136,10 +167,18 @@ static int32_t controllerIfSet(void *in, uint32_t insize, void **out, uint32_t m
         status = controllerSet(controllers[csid], ctl);
 
     return status;
+#endif
 }
 //-----------------------------------------------------------------------------
 static int32_t controllerIfGet(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+    return -1;
+#else
     uint32_t ctl;
     uint32_t csid;
 
@@ -158,10 +197,18 @@ static int32_t controllerIfGet(void *in, uint32_t insize, void **out, uint32_t m
     memcpy( *out, (void *)&ctl, sizeof(ctl) );
 
     return sizeof(ctl);
+#endif
 }
 //-----------------------------------------------------------------------------
 static int32_t controllerIfReset(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+    return -1;
+#else
     (void)out;
     (void)maxoutsize;
     int32_t status = -1;
@@ -183,10 +230,18 @@ static int32_t controllerIfReset(void *in, uint32_t insize, void **out, uint32_t
         status = controllerReset(controllers[csid], ctl);
 
     return status;
+#endif
 }
 //-----------------------------------------------------------------------------
 static int32_t controllerIfSetParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+    return -1;
+#else
     (void)out;
     (void)maxoutsize;
     int32_t status = -1;
@@ -213,10 +268,18 @@ static int32_t controllerIfSetParams(void *in, uint32_t insize, void **out, uint
         );
 
     return status;
+#endif
 }
 //-----------------------------------------------------------------------------
 static int32_t controllerIfGetParams(void *in, uint32_t insize, void **out, uint32_t maxoutsize){
 
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)in;
+    (void)insize;
+    (void)out;
+    (void)maxoutsize;
+    return -1;
+#else
     int32_t status = -1;
     char *p;
     uint32_t csid;
@@ -236,6 +299,7 @@ static int32_t controllerIfGetParams(void *in, uint32_t insize, void **out, uint
         status = controllerGetParams(controllers[csid], ctl, *out, maxoutsize);
 
     return status;
+#endif
 }
 //-----------------------------------------------------------------------------
 //=============================================================================

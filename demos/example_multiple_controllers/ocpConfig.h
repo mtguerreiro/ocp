@@ -21,7 +21,8 @@
 //=============================================================================
 /*------------------------------- Definitions -------------------------------*/
 //=============================================================================
-/* Trace configurations */
+/* Trace settings */
+#define OCP_TRACE_CONFIG_ENABLE                 1
 #define OCP_TRACE_CONFIG_TRACE_NAME_MAX_LEN     20
 
 typedef enum{
@@ -29,7 +30,8 @@ typedef enum{
     OCP_TRACE_END
 }ocpTraceIDs_t;
 
-/* Controller configurations */
+/* Controller settings */
+#define OCP_CS_CONFIG_ENABLE                    1
 #define OCP_CS_CONFIG_CS_NAME_MAX_LEN           20
 
 typedef enum{

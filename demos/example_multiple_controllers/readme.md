@@ -224,7 +224,6 @@ At this point, we got the response of the state feedback controller. Now let's g
 Then, we can retrieve the data from the controller and plot the results side by side:
 ```python
 >>> status, data_casc = buck_if.trace.read()
-(0,)
 >>> plt.figure()
 >>> plt.plot(data_casc[:, 1])
 >>> plt.plot(data_sfb[:, 1])

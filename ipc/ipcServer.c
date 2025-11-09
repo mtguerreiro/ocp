@@ -111,7 +111,7 @@ int32_t ipcServerRequest(void){
 
 	if( respsize > 0 ){
 		if( ((uint32_t)( resp )) != (ipcServerCtl.clientAdd + 4) ){
-			if( respsize > ipcServerCtl.clientSize ) return IPC_SERVER_ERR_SV_RESP_SIZE;
+			if( respsize > ipcServerCtl.clientSize ) return IPC_SERVER_ERR_CL_RESP_SIZE;
 			ret = ipcServerMemWrite( resp, (void *)(ipcServerCtl.clientAdd + 4), respsize);
 			if( ret != 0 ) return IPC_SERVER_ERR_MEM_WRITE;
 		}
