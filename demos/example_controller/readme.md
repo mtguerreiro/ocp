@@ -80,7 +80,7 @@ The size of the trace, e.g. how many bytes it can store, can be set dynamically.
 
 ```python
 >>> ocp.trace_get_size(0)
-(0, 25600)
+(0, 32000)
 ```
 
 In this case, the trace can store up to 25600 samples. In the trace, each signal is stored as a float, which means that the size of the trace in bytes is about 100 kB . All signals in a single trace are stored simultaneously at an event defined by the user in the C code of the application. A common case is to set the trace so that it stores its signals every time the controller is executed. 

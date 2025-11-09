@@ -37,13 +37,13 @@ static int32_t appOcpControlSystemInit(void);
 #define APP_OCP_CS_ID                           OCP_CS_1
 #define APP_OCP_TRACE_ID                        OCP_TRACE_1
 
-#define APP_OCP_CONFIG_TRACE_0_SIZE_ELEMENTS    (25 * 1024)
+#define APP_OCP_CONFIG_TRACE_0_SIZE_ELEMENTS    (32 * 1000)
 
 #define APP_OCP_CONFIG_TRACE_0_NAME_LEN         64
 #define APP_OCP_CONFIG_TRACE_0_MAX_SIGNALS      20
 
-#define APP_OCP_CONFIG_INPUT_BUF_SIZE           50
-#define APP_OCP_CONFIG_OUTPUT_BUF_SIZE          20
+#define APP_OCP_CONFIG_INPUT_BUF_SIZE           16
+#define APP_OCP_CONFIG_OUTPUT_BUF_SIZE          8
 
 //=============================================================================
 

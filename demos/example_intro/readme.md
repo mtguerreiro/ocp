@@ -60,7 +60,7 @@ We can also interact with the trace. For example, we can query the name of the t
 We can also get and set the size of the trace:
 ```python
 >>> ocp.trace_get_size(0)
-(0, 25600)
+(0, 32000)
 >>> ocp.trace_set_size(0, 100)
 (0,) 
 >>> ocp.trace_get_size(0)
