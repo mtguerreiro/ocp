@@ -23,6 +23,7 @@ void controlsysInitialize(controlsys_t *sys, controlsysConfig_t *config){
 	sys->fapplyOutputs = config->fapplyOutputs;
 
 	sys->frun = config->frun;
+    sys->frun2 = config->frun2;
 
 	sys->fonEntry = config->fonEntry;
 	sys->fonExit = config->fonExit;
@@ -87,6 +88,18 @@ int32_t controlsysRun(controlsys_t *sys){
     if( sys->fonExit ) sys->fonExit();
 
 	return sys->status;
+}
+//-----------------------------------------------------------------------------
+void controlsysRun2(controlsys_t *sys){
+
+    int32_t ninputs = -1;
+    int32_t noutputs = -1;
+    int32_t status;
+
+    ninputs = sys->fgetInputs( sys->binputs );
+    if( ninputs < 0 ) return;
+
+    sys->frun2( sys->binputs, ninputs );
 }
 //-----------------------------------------------------------------------------
 int32_t controlsysEnable(controlsys_t *sys){

@@ -24,6 +24,7 @@ typedef void (*controllerGetCbs_t)(void *callbacksBuffer);
 
 typedef int32_t (*controllerInit_t)(void);
 typedef int32_t (*controllerRun_t)(void *meas, int32_t nmeas, void *refs, int32_t nrefs, void *outputs, int32_t nmaxoutputs);
+typedef void (*controllerRun2_t)(void *meas, int32_t nmeas, void *refs, int32_t nrefs);
 typedef int32_t (*controllerSetParams_t)(void *params, uint32_t size);
 typedef int32_t (*controllerGetParams_t)(void *buffer, uint32_t size);
 typedef void (*controllerReset_t)(void);
@@ -33,11 +34,13 @@ typedef int32_t (*controllerLastExit_t)(void *meas, int32_t nmeas, void *refs, i
 typedef struct {
     controllerInit_t init;
     controllerRun_t run;
+    controllerRun2_t run2;
     controllerSetParams_t setParams;
     controllerGetParams_t getParams;
     controllerReset_t reset;
     controllerFirstEntry_t firstEntry;
     controllerLastExit_t lastExit;
+    void (*triggerRun2)(void);
 }controllerCallbacks_t;
 
 typedef struct{
@@ -80,6 +83,8 @@ void controllerInit(controller_t *controller, controllerConfig_t *config);
 int32_t controllerRun(controller_t *controller,
     void *meas, int32_t nmeas, 
     void *outputs, int32_t nmaxoutputs);
+//-----------------------------------------------------------------------------
+void controllerRun2(controller_t *controller, void *meas, int32_t nmeas);
 //-----------------------------------------------------------------------------
 int32_t controllerSetRef(controller_t *controller, void *ref, uint32_t size);
 //-----------------------------------------------------------------------------

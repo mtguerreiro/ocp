@@ -107,6 +107,8 @@ int32_t ocpCSHardwareInterface(uint32_t id,
  */
 int32_t ocpCSRun(uint32_t id);
 //-----------------------------------------------------------------------------
+void ocpCSRun2(uint32_t id);
+//-----------------------------------------------------------------------------
 /**
  * @brief Enables the control system.
  * 

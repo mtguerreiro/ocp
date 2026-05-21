@@ -161,6 +161,8 @@ typedef int32_t(*controlsysGetInputs_t)(void *inputs);
  */
 typedef int32_t(*controlsysRun_t)(void *inputs, int32_t ninputs, void *outputs, int32_t nmaxoutputs);
 
+typedef void(*controlsysRun2_t)(void *inputs, int32_t ninputs);
+
 /**
  * @brief Apply inputs.
  *
@@ -290,6 +292,7 @@ typedef struct {
     controlsysApplyOutputs_t fapplyOutputs;
 
     controlsysRun_t frun;
+    controlsysRun2_t frun2;
 
     controlsysHardwareInterface_t fhwInterface;
     controlsysHardwareStatus_t fhwStatus;
@@ -381,6 +384,8 @@ int32_t controlsysHardwareInterface(controlsys_t *sys,
  * @return Run status.
  */
 int32_t controlsysRun(controlsys_t *sys);
+//-----------------------------------------------------------------------------
+void controlsysRun2(controlsys_t *sys);
 //-----------------------------------------------------------------------------
 /**
  * @brief Enables the control system.

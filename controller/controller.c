@@ -29,6 +29,11 @@ void controllerInit(controller_t *controller, controllerConfig_t *config){
     controller->cbs = config->cbsBuffer;
     controller->nControllers = config->nControllers;
 
+    /* Initializes callback buffer */
+    for(k = 0; k < config->nControllers; k++){
+        memset( &controller->cbs[k], 0, sizeof(controllerCallbacks_t) );
+    }
+
     /* 
      * Initializing active as nControllers ensures controllerRun does not run
      * until a valid controller is set. 
@@ -70,6 +75,17 @@ int32_t controllerRun(controller_t *controller,
     );
 
     return status;
+}
+//-----------------------------------------------------------------------------
+void controllerRun2(controller_t *controller, void *meas, int32_t nmeas){
+
+    int32_t status;
+    uint32_t active = controller->active;
+    uint32_t previous = controller->previous;
+
+    if( controller->cbs[active].run2 == 0 ) return;
+
+    controller->cbs[active].run2(meas, nmeas, controller->refs.buffer, controller->refs.size);
 }
 //-----------------------------------------------------------------------------
 int32_t controllerSetRef(controller_t *controller, void *ref, uint32_t size){

@@ -106,6 +106,17 @@ int32_t ocpCSRun(uint32_t id){
 #endif
 }
 //-----------------------------------------------------------------------------
+void ocpCSRun2(uint32_t id){
+
+#if OCP_CS_CONFIG_ENABLE == 0
+    (void)id;
+#else
+    if( id >= OCP_CS_END ) return;
+
+    controlsysRun2( &xcscontrol.cs[id] );
+#endif
+}
+//-----------------------------------------------------------------------------
 int32_t ocpCSEnable(uint32_t id){
 
 #if OCP_CS_CONFIG_ENABLE == 0
