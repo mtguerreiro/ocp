@@ -79,9 +79,7 @@ int32_t controllerRun(controller_t *controller,
 //-----------------------------------------------------------------------------
 void controllerRun2(controller_t *controller, void *meas, int32_t nmeas){
 
-    int32_t status;
     uint32_t active = controller->active;
-    uint32_t previous = controller->previous;
 
     if( controller->cbs[active].run2 == 0 ) return;
 

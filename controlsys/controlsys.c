@@ -93,8 +93,6 @@ int32_t controlsysRun(controlsys_t *sys){
 void controlsysRun2(controlsys_t *sys){
 
     int32_t ninputs = -1;
-    int32_t noutputs = -1;
-    int32_t status;
 
     ninputs = sys->fgetInputs( sys->binputs );
     if( ninputs < 0 ) return;
