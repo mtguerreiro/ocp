@@ -61,6 +61,13 @@ void *ocpIfThread(void *ptr){
         return 0;
     }
 
+    int reuse = 1;
+    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)) < 0)
+        LogError(("setsockopt(SO_REUSEADDR) failed"));
+
+    if (setsockopt(server_socket, SOL_SOCKET, SO_REUSEPORT, (const char*)&reuse, sizeof(reuse)) < 0)
+        LogError(("setsockopt(SO_REUSEPORT) failed"));
+
     /* Sets up the server address structure */
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
